@@ -1,14 +1,9 @@
 const testConfig = require("firebase-functions-test")();
 const { helloWorld } = require("../../index");
 
-
-
 testConfig.mockConfig({
   test: {
-    key: "IndexTest",
-  },
-  projconfig: {
-    projectid: "projectId",
+    key: "value",
   },
 });
 
