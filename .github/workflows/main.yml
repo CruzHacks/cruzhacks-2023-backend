@@ -78,6 +78,6 @@ jobs:
       - name: Auto Deploy functions
         run: |
             cd functions
-            yarn deploy:dev --token $token
+            yarn deploy:prod --token $token
         env: 
           token: ${{ secrets.FIREBASE_TOKEN }}
