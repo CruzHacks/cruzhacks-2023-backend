@@ -6,12 +6,10 @@
     "serve": "firebase emulators:start",
     "shell": "firebase functions:shell",
     "start": "yarn run shell",
-    "deploy": "firebase deploy --only functions",
+    "deploy": "firebase deploy --only functions:helloWorld",
     "logs": "firebase functions:log",
     "test": "jest --watchAll",
-    "test:ci": "jest --ci --color --runInBand --silent",
-    "deploy:dev": "firebase deploy -P default --only functions",
-    "deploy:prod": "firebase deploy -P production --only functions"
+    "test:ci": "jest --ci --color --runInBand --silent"
   },
   "engines": {
     "node": "14"
