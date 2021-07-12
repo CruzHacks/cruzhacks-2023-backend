@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const { addDocument } = require("../../Utils/database");
+const { addDocument } = require("../../utils/database");
 
 app.get("/", async (req, res) => {
   try {
