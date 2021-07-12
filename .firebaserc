@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "cruzhacks-4a899"
+    "production": "cruzhacks-4a899",
+    "default": "cruzhacks-2022-development"
   }
 }

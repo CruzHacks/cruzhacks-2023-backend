@@ -3,10 +3,9 @@ module.exports = {
     ecmaVersion: 2017,
   },
   plugins: ["promise", "prettier", "jest"],
-  extends: ["eslint:recommended", "plugin:prettier/recommended", "plugin:jest/recommended"],
+  extends: ["eslint:recommended", "plugin:prettier/recommended"],
   rules: {
     "prettier/prettier": "error",
-
     "no-unused-vars": [
       "error",
       {
@@ -39,10 +38,6 @@ module.exports = {
 
     // Prefer using arrow functions for callbacks
     "prefer-arrow-callback": 1,
-
-    // Return inside each then() to create readable and reusable Promise chains.
-    // Forces developers to return console logs and http calls in promises.
-    "promise/always-return": 2,
 
     //Enforces the use of catch() on un-returned promises
     "promise/catch-or-return": 2,
