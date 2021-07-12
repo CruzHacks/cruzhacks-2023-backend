@@ -1,6 +1,6 @@
 const testConfig = require("firebase-functions-test")();
 const supertest = require("supertest");
-const { addDocument, queryDocument } = require("../../Utils/database");
+const { addDocument, queryDocument } = require("../../utils/database");
 const { app } = require("../../controllers/expressExample/index");
 
 testConfig.mockConfig({
