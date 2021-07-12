@@ -9,7 +9,7 @@ testConfig.mockConfig({
   },
 });
 
-jest.mock("../../Utils/database");
+jest.mock("../../utils/database");
 
 describe("Supertest", () => {
   it("Should Return 200", (done) => {
