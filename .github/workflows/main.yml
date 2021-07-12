@@ -39,9 +39,9 @@ jobs:
         run: |
             cd functions
             yarn test:ci
-  auto-deploy-to-prod:
+  auto-deploy-to-test:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/production'
+    if: github.ref == 'refs/heads/development'
     needs: [tests, lint]
     steps:
       - uses: actions/checkout@v2
