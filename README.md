@@ -6,7 +6,7 @@ This repository contains all the endpoints used to support CruzHacks 2022. Devel
 =======
 
 1. Clone this repository 
-2. Set githooks with `git config --​global core.hooksPath ./.githooks`
+2. Set githooks with `git config core.hooksPath ./.githooks`
 3. Navigate to the `/functions` of the repository and run `yarn` which will install all the dependencies
 4. Running `yarn serve` will begin the firebase emulators
 

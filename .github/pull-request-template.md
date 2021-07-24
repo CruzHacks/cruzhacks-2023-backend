@@ -1,6 +1,6 @@
 Problem
 =======
-What problem or issue does this pull request solve [Jira](https://cruzhacks-2022.atlassian.net/jira/core/projects/C2D/board)
+What problem or issue does this pull request solve [Jira](https://cruzhacks-dev.atlassian.net/jira/software/c/projects/C2D/issues/
 
 
 
@@ -19,7 +19,6 @@ Change Summary:
 Dev-Ops
 =======
 If you added an ENV variable, please check off that you've updated the following  
-- [ ] Key & Sample value to `sample.runtimeconfig.json` 
 - [ ] GCP Secret Manager (Both development and production)
 
 Images/Important Notes (optional):
