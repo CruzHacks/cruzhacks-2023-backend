@@ -1,9 +1,11 @@
 const express = require("express");
-const app = express();
-const { addDocument } = require("../../utils/database");
 const cors = require("cors");
+const { addDocument } = require("../../utils/database");
 const { jwtCheck } = require("../../utils/middleware");
 const { corsConfig } = require("../../utils/config");
+
+const app = express();
+app.disable("x-powered-by");
 
 const corsOptions = {
   origin: corsConfig,
