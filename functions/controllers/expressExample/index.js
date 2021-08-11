@@ -1,11 +1,13 @@
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
 const { addDocument } = require("../../utils/database");
 const { jwtCheck } = require("../../utils/middleware");
 const { corsConfig } = require("../../utils/config");
 
 const app = express();
 app.disable("x-powered-by");
+app.use(helmet());
 
 const corsOptions = {
   origin: corsConfig,
