@@ -8,6 +8,10 @@ testConfig.mockConfig({
   document: {
     key: "value",
   },
+  auth: {
+    cors: "site",
+    issuer: "n/a",
+  },
 });
 
 jest.mock("../../../utils/database");
