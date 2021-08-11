@@ -3,10 +3,10 @@ const app = express();
 const { addDocument } = require("../../utils/database");
 const cors = require("cors");
 const { jwtCheck } = require("../../utils/middleware");
-const { auth0Config } = require("../../utils/config");
+const { corsConfig } = require("../../utils/config");
 
 const corsOptions = {
-  origin: auth0Config.cors,
+  origin: corsConfig,
   optionsSuccessStatus: 200,
 };
 
