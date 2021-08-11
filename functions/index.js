@@ -9,10 +9,12 @@ app.use(auth(config));
 app.get("/", checkAuthenticated);
 
 app.get("/private", requiresAuth(), (req, res) => {
+  // route that should require Auth
   res.send("Hello private");
 });
 
 app.get("/public", (req, res) => {
+  // route that shouldn't require Auth
   res.send("Hello public");
 });
 
