@@ -8,7 +8,7 @@ const { addDocument } = require("../../utils/database");
 const { jwtCheck } = require("../../utils/middleware");
 const { corsConfig } = require("../../utils/config");
 
-const API_TOKENS = functions.config().tokens
+const API_TOKENS = functions.config().tokens;
 
 const app = express();
 app.disable("x-powered-by");
@@ -54,8 +54,8 @@ app.post("/resend", jwtCheck, async (req, res) => {
 
   // make API call then response
   axios(options)
-    .then((axios_res) => {
-      res.status(201).json(axios_res.data);
+    .then((_axios_res) => {
+      res.status(201).send("Verification Email Sent");
     })
     .catch((axios_err) => {
       res.status(500).json(axios_err);
