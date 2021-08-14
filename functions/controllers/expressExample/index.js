@@ -54,7 +54,7 @@ app.post("/resend", jwtCheck, async (req, res) => {
 
   // make API call then response
   axios(options)
-    .then((_axios_res) => {
+    .then(() => {
       res.status(201).send("Verification Email Sent");
     })
     .catch((axios_err) => {
