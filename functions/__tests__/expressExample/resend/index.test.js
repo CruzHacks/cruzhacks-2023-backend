@@ -23,7 +23,7 @@ describe("Supertest", () => {
   });
   it("Should Return 201", async (done) => {
     jwtCheck.mockImplementation((req, res, next) => next());
-    await supertest(app)
+    supertest(app)
       .post("/resend")
       .expect(201)
       .then((res) => {
