@@ -33,7 +33,7 @@ app.get("/", async (req, res) => {
 
 app.get("/resend", jwtCheck, async (req, res) => {
   try {
-    res.status(201).send({ message: "Hello?" });
+    res.json(req.user.sub);
   } catch (error) {
     res.status(500).send({ code: 500, message: "Bad/No key" });
   }
@@ -42,24 +42,23 @@ app.get("/resend", jwtCheck, async (req, res) => {
 app.post("/resend", jwtCheck, async (req, res) => {
   // this endpoint takes in a user_id then converts
   // it into an API call
-  const options = {
-    // options for the API call
-    method: "POST",
-    url: "https://cruzhacks.us.auth0.com/api/v2/jobs/verification-email",
-    headers: { authorization: "Bearer " + API_TOKENS.email },
-    data: {
-      user_id: req.body.user_id,
-    },
-  };
+  try {
+    const options = {
+      // options for the API call
+      method: "POST",
+      url: "https://cruzhacks.us.auth0.com/api/v2/jobs/verification-email",
+      headers: { authorization: "Bearer " + API_TOKENS.email },
+      data: {
+        user_id: (req.user && req.user.id) ? req.user.sub : "",
+      },
+    };
 
-  // make API call then response
-  axios(options)
-    .then(() => {
-      res.status(201).send("Verification Email Sent");
-    })
-    .catch((axios_err) => {
-      res.status(500).json(axios_err);
-    });
+    // make API call then response
+    axios(options)
+    res.status(201).send("Verification Email Sent");
+  } catch(_) {
+    res.status(500).json("Not Abler to send verification email");
+  }
 });
 
 module.exports = { app };
