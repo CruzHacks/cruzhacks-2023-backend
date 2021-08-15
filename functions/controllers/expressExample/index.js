@@ -49,14 +49,14 @@ app.post("/resend", jwtCheck, async (req, res) => {
       url: "https://cruzhacks.us.auth0.com/api/v2/jobs/verification-email",
       headers: { authorization: "Bearer " + API_TOKENS.email },
       data: {
-        user_id: (req.user && req.user.id) ? req.user.sub : "",
+        user_id: req.user && req.user.id ? req.user.sub : "",
       },
     };
 
     // make API call then response
-    axios(options)
+    axios(options);
     res.status(201).send("Verification Email Sent");
-  } catch(_) {
+  } catch (_err) {
     res.status(500).json("Not Abler to send verification email");
   }
 });

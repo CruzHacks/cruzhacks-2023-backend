@@ -11,11 +11,8 @@ testConfig.mockConfig({
     issuer: "issuer",
     jwk_uri: "some uri",
   },
-    email: "sometoken"
-  }
-);
-
-
+  email: "sometoken",
+});
 
 jest.mock("../../../utils/middleware");
 jest.mock("axios", () => jest.fn(() => Promise.resolve("Data sent")));
@@ -24,18 +21,10 @@ describe("Supertest", () => {
   afterEach(() => {
     jwtCheck.mockClear();
   });
-  
   it("Should Return 201", async (done) => {
     jwtCheck.mockImplementation((req, res, next) => next());
     await supertest(app)
       .post("/resend")
-      .set(
-        {
-          user : {
-            sub: "some suer id"
-          }
-        }
-      )
       .expect(201)
       .then((res) => {
         expect(axios).toHaveBeenCalled();
