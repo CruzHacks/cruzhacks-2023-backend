@@ -34,17 +34,20 @@ app.post("/resend", jwtCheck, async (req, res) => {
   try {
     const checkIfVerifiedOptions = {
       // options for the API call
+      // to see if email is already verified
       method: "GET",
       url: api_url + "users/" + req.user.sub,
       headers: { authorization: "Bearer " + api_token },
     };
 
-    const checkIfVerified = await axios(checkIfVerifiedOptions);
+    const checkIfVerified = await axios(checkIfVerifiedOptions); // send request
+
     if (checkIfVerified.data.email_verified) {
       throw "Email Already Verified";
     }
     const sendVerificationEmail = {
       // options for the API call
+      // to make call to auth0 server
       method: "POST",
       url: api_url + "jobs/verification-email",
       headers: { authorization: "Bearer " + api_token },
