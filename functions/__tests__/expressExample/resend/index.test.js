@@ -26,7 +26,7 @@ describe("Supertest", () => {
     axios.mockClear();
   });
 
-  it("Unverified User Should Get Authentication Email", async (done) => {
+  it("Should Send an Unverified User an Authentication Email", async (done) => {
     jwtCheck.mockImplementation((req, res, next) => {
       req.user = { sub: "test user" };
       next();
@@ -42,7 +42,7 @@ describe("Supertest", () => {
     done();
   });
 
-  it("User Already Verified So Request Should Reject", async (done) => {
+  it("Should Reject and Return 406 Because the User is Already Verified", async (done) => {
     jwtCheck.mockImplementation((req, res, next) => {
       req.user = { sub: "test user" };
       next();
@@ -56,7 +56,7 @@ describe("Supertest", () => {
     done();
   });
 
-  it("Verification Email Should Be Sent But Axios Had a Problem", async (done) => {
+  it("Should Return an Unknown Error and Return 500", async (done) => {
     jwtCheck.mockImplementation((req, res, next) => {
       req.user = { sub: "test user" };
       next();
