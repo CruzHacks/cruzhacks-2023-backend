@@ -2,13 +2,10 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const axios = require("axios");
-const functions = require("firebase-functions");
 
 const { addDocument } = require("../../utils/database");
 const { jwtCheck } = require("../../utils/middleware");
-const { corsConfig } = require("../../utils/config");
-
-const API_TOKENS = functions.config().tokens;
+const { corsConfig, api_token, api_url } = require("../../utils/config");
 
 const app = express();
 app.disable("x-powered-by");
@@ -31,34 +28,44 @@ app.get("/", async (req, res) => {
   }
 });
 
-app.get("/resend", jwtCheck, async (req, res) => {
-  try {
-    res.json(req.user.sub);
-  } catch (error) {
-    res.status(500).send({ code: 500, message: "Bad/No key" });
-  }
-});
-
 app.post("/resend", jwtCheck, async (req, res) => {
   // this endpoint takes in a user_id then converts
   // it into an API call
   try {
-    const options = {
+    const checkIfVerifiedOptions = {
+      // options for the API call
+      method: "GET",
+      url: api_url + "users/" + req.user.sub,
+      headers: { authorization: "Bearer " + api_token },
+    };
+
+    const checkIfVerified = await axios(checkIfVerifiedOptions);
+    if (checkIfVerified.data.email_verified) {
+      throw "Email Already Verified";
+    }
+    const sendVerificationEmail = {
       // options for the API call
       method: "POST",
-      url: "https://cruzhacks.us.auth0.com/api/v2/jobs/verification-email",
-      headers: { authorization: "Bearer " + API_TOKENS.email },
+      url: api_url + "jobs/verification-email",
+      headers: { authorization: "Bearer " + api_token },
       data: {
-        user_id: req.user && req.user.id ? req.user.sub : "",
+        user_id: req.user && req.user.sub ? req.user.sub : "",
       },
     };
 
     // make API call then response
-    res.status(201);
-    await axios(options);
-    res.send("Verification Email Sent");
-  } catch (_err) {
-    res.status(500).json("Not Abler to send verification email");
+    const verificationEmailRes = await axios(sendVerificationEmail);
+    if (verificationEmailRes.status === 201) {
+      res.status(201).send({ code: 201, message: "Verification Email Sent" });
+    } else {
+      throw "Could not Send";
+    }
+  } catch (err) {
+    if (err === "Email Already Verified") {
+      res.status(406).send({ code: 406, message: "Email Already Verified" });
+    } else {
+      res.status(500).send({ code: 500, message: "Unable to Send Verification Email" });
+    }
   }
 });
 
