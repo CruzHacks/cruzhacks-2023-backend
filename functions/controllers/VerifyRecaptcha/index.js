@@ -1,4 +1,3 @@
-const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const { base_google_endpoint, secretKey } = require("../../utils/config");
