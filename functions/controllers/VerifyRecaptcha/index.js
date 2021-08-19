@@ -15,12 +15,9 @@ verifyRecaptcha.use(express.json());
 
 verifyRecaptcha.post("/submit", async (req, res) => {
   // Logic to process case of no g-recaptcha-response
-  functions.logger.log(req.body);
-  if (Object.keys(req.body).includes("captcha")) {
-    if (req.body.captcha === undefined || req.body.captcha === "" || req.body.captcha === null) {
-      return res.status(401).send({ error: true, status: 401, message: "Please select captcha" });
-    }
-    const formBody = `secret=${secretKey}&response=${req.body.captcha}&remoteip=${req.socket.remoteAddress}`;
+  if (Object.keys(req.headers).includes("token")) {
+    const token = req.headers.token;
+    const formBody = `secret=${secretKey}&response=${token}&remoteip=${req.socket.remoteAddress}`;
 
     await fetch(base_google_endpoint, {
       method: "post",
@@ -31,7 +28,6 @@ verifyRecaptcha.post("/submit", async (req, res) => {
     })
       .then((response) => response.json())
       .then((g_response) => {
-        functions.logger.log("response data", g_response);
         if (Object.keys(g_response).includes("success")) {
           // make sure we have valid response object
           if (g_response.success) {
