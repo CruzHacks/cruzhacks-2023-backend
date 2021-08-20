@@ -5,9 +5,9 @@ jest.mock("isomorphic-fetch");
 const fetch = require("isomorphic-fetch");
 
 testConfig.mockConfig({
-  verifyRecaptcha: {
+  verify_recaptcha: {
     base_google_endpoint: "site",
-    secretKey: "token",
+    secret_key: "token",
   },
 });
 

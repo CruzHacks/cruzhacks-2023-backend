@@ -18,7 +18,7 @@ verifyRecaptcha.post("/submit", async (req, res) => {
     const token = req.headers.token;
     const formBody = `secret=${secretKey}&response=${token}&remoteip=${req.socket.remoteAddress}`;
 
-    await fetch(base_google_endpoint, {
+    return fetch(base_google_endpoint, {
       method: "post",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -50,6 +50,7 @@ verifyRecaptcha.post("/submit", async (req, res) => {
             }
           }
         }
+        return res.status(500).send({ error: true, status: 500, message: "Internal service error" });
       })
       .catch((error) => res.status(500).send({ error: true, status: 500, message: error.message }));
   } else {
