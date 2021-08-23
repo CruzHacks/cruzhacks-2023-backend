@@ -5,12 +5,19 @@ const axios = require("axios");
 
 const { addDocument } = require("../../utils/database");
 const { jwtCheck } = require("../../utils/middleware");
-const { corsConfig, api_token, api_url } = require("../../utils/config");
+const { corsConfig, issuer } = require("../../utils/config");
+const { db } = require("../../utils/admin");
 
 const app = express();
 app.disable("x-powered-by");
 app.use(helmet());
 app.use(express.json());
+
+let api_collection = db.collection("tokencol"); // Waiting for Rahul to finish his sprint
+let api_doc = api_collection.doc("token");
+let api_token = api_doc.token;
+
+const api_url = issuer + "api/v2/";
 
 const corsOptions = {
   origin: corsConfig,
