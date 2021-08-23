@@ -19,11 +19,10 @@ const getM2MToken = (context) => {
       client_id: client_id,
       client_secret: client_secret,
       audience: `${issuer}api/v2/`,
-      //   audience: "https://cruzhacks.us.auth0.com/api/v2/",
       grant_type: "client_credentials",
     }),
   };
-  fetch("https://cruzhacks.us.auth0.com/oauth/token", options)
+  fetch(`${issuer}oauth/token`, options)
     .then((res) => {
       res.json().then((data) => {
         writeToken(data.access_token);
