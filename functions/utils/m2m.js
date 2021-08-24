@@ -1,6 +1,7 @@
 const fetch = require("node-fetch");
-const { issuer, client_id, client_secret } = require("../../utils/config");
+const functions = require("firebase-functions");
 
+const { issuer, client_id, client_secret } = require("./config");
 const getM2MToken = () => {
   options = {
     method: "POST",
@@ -16,13 +17,15 @@ const getM2MToken = () => {
   };
   return fetch(`${issuer}oauth/token`, options)
     .then((res) => {
-      res.json();
+      //console.log(res)
+      return res.json();
     })
     .then((data) => {
+      //console.log(data)
       return data.access_token;
     })
     .catch((err) => {
-      console.log(err);
+      functions.logger.log(`Error: ${err}`);
       return "";
     });
 };
