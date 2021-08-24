@@ -23,7 +23,7 @@ const getM2MToken = () => {
     })
     .catch((err) => {
       console.log(err);
-      return false;
+      return "";
     });
 };
 
