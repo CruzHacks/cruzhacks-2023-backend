@@ -15,7 +15,6 @@ const getM2MToken = () => {
       grant_type: "client_credentials",
     }),
   };
-  console.log(options);
   return fetch(`${issuer}oauth/token`, options)
     .then((res) => {
       //console.log(res)
