@@ -16,9 +16,10 @@ const getM2MToken = () => {
   };
   return fetch(`${issuer}oauth/token`, options)
     .then((res) => {
-      res.json().then((data) => {
-        return data.access_token;
-      });
+      res.json();
+    })
+    .then((data) => {
+      return data.access_token;
     })
     .catch((err) => {
       console.log(err);
