@@ -2,7 +2,7 @@
   "name": "cruzhacks-2022-backend",
   "description": "Firebase functions for CruzHacks 2022 main site",
   "scripts": {
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings=0",
     "serve": "firebase emulators:start",
     "shell": "firebase functions:shell",
     "start": "yarn run shell",
