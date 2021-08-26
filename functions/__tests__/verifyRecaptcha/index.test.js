@@ -3,6 +3,7 @@ const supertest = require("supertest");
 const { verifyRecaptcha } = require("../../controllers/VerifyRecaptcha/index");
 jest.mock("isomorphic-fetch");
 const fetch = require("isomorphic-fetch");
+const { validKey } = require("../../utils/middleware");
 
 testConfig.mockConfig({
   verify_recaptcha: {
@@ -10,8 +11,10 @@ testConfig.mockConfig({
     secret_key: "token",
   },
 });
+jest.mock("../../utils/middleware");
 
 describe("POST /submit", () => {
+  validKey.mockImplementation((req, res, next) => next());
   describe("Given no captcha token", () => {
     it("should respond with a 401 status code", async () => {
       const response = await supertest(verifyRecaptcha).post("/submit").send({});
