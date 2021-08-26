@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const { base_google_endpoint, secretKey } = require("../../utils/config");
 const { corsConfig } = require("../../utils/config");
+const { validKey } = require("../../utils/middleware");
 const fetch = require("isomorphic-fetch");
 
 const verifyRecaptcha = express();
@@ -12,7 +13,7 @@ const corsOptions = {
 verifyRecaptcha.use(cors(corsOptions));
 verifyRecaptcha.use(express.json());
 
-verifyRecaptcha.post("/submit", async (req, res) => {
+verifyRecaptcha.post("/submit", validKey, async (req, res) => {
   // Logic to process case of no g-recaptcha-response
   if (Object.keys(req.headers).includes("token")) {
     const token = req.headers.token;
