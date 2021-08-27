@@ -9,9 +9,9 @@ const queryDocument = (collection, id) => {
 };
 
 const deleteDocument = (collection, id) => {
-  const snapshot = queryDocument(collection, id);
-  if (snapshot.exists) {
-    snapshot.delete();
+  const doc = queryDocument(collection, id);
+  if (doc.exists) {
+    doc.delete();
     return true;
   }
   return false;
