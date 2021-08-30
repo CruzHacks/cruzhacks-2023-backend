@@ -6,8 +6,8 @@
     "serve": "firebase emulators:start",
     "shell": "firebase functions:shell",
     "start": "yarn run shell",
-    "deploy:dev": "firebase deploy --only functions:helloWorld -P default",
-    "deploy:prod": "firebase deploy --only functions:helloWorld -P production",
+    "deploy:dev": "firebase deploy --only functions:auth functions:verifyRecaptcha -P default",
+    "deploy:prod": "firebase deploy --only functions:auth functions:verifyRecaptcha -P production",
     "logs": "firebase functions:log",
     "test": "jest --watchAll",
     "test:ci": "jest --ci --color --runInBand --silent"
