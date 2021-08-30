@@ -7,8 +7,8 @@ const fetch = require("isomorphic-fetch");
 
 const verifyRecaptcha = express();
 
-app.disable("x-powered-by");
-app.use(helmet());
+verifyRecaptcha.disable("x-powered-by");
+verifyRecaptcha.use(helmet());
 
 const corsOptions = {
   origin: corsConfig,
