@@ -6,6 +6,10 @@ const { validKey } = require("../../utils/middleware");
 const fetch = require("isomorphic-fetch");
 
 const verifyRecaptcha = express();
+
+app.disable("x-powered-by");
+app.use(helmet());
+
 const corsOptions = {
   origin: corsConfig,
   optionsSuccessStatus: 200,
