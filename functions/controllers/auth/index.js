@@ -3,7 +3,6 @@ const cors = require("cors");
 const helmet = require("helmet");
 const axios = require("axios");
 
-const { addDocument } = require("../../utils/database");
 const { jwtCheck } = require("../../utils/middleware");
 const { corsConfig, issuer } = require("../../utils/config");
 const { getM2MToken } = require("../../utils/m2m");
@@ -21,15 +20,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
-app.get("/", async (req, res) => {
-  try {
-    addDocument("users", { test: "functions" });
-    res.status(201).send({ code: 201, message: "Added data from db example" });
-  } catch (error) {
-    res.status(500).send({ code: 500, message: "Unable to retrieve user from database" });
-  }
-});
 
 app.post("/resend", jwtCheck, async (req, res) => {
   // this endpoint takes in a user_id then converts
