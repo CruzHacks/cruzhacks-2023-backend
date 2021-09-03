@@ -8,13 +8,4 @@ const queryDocument = (collection, id) => {
   return db.collection(collection).doc(id).get();
 };
 
-const deleteDocument = (collection, id) => {
-  const doc = queryDocument(collection, id);
-  if (doc.exists) {
-    doc.delete();
-    return true;
-  }
-  return false;
-};
-
-module.exports = { addDocument, queryDocument, deleteDocument };
+module.exports = { addDocument, queryDocument };
