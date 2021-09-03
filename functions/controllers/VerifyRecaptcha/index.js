@@ -1,11 +1,16 @@
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
 const { base_google_endpoint, secretKey } = require("../../utils/config");
 const { corsConfig } = require("../../utils/config");
 const { validKey } = require("../../utils/middleware");
 const fetch = require("isomorphic-fetch");
 
 const verifyRecaptcha = express();
+
+verifyRecaptcha.disable("x-powered-by");
+verifyRecaptcha.use(helmet());
+
 const corsOptions = {
   origin: corsConfig,
   optionsSuccessStatus: 200,

@@ -1,7 +1,7 @@
 const testConfig = require("firebase-functions-test")();
 const request = require("supertest");
 const axios = require("axios");
-const { app } = require("../../../controllers/expressExample/index");
+const { app } = require("../../../controllers/auth/index");
 const { jwtCheck } = require("../../../utils/middleware");
 
 testConfig.mockConfig({
