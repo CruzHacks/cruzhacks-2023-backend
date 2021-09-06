@@ -1,7 +1,7 @@
 const { db } = require("./admin");
 
-const addDocument = (collection, document) => {
-  db.collection(collection).add(document);
+const addDocument = (collection, id, document) => {
+  return db.collection(collection).doc(id).set(document);
 };
 
 const queryDocument = (collection, id) => {
