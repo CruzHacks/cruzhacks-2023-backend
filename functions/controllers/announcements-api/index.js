@@ -18,12 +18,11 @@ announcements.use(helmet());
 announcements.use(cors(corsOptions));
 announcements.use(express.json());
 
-// announcements.post('/')
 
 // Read all
 announcements.get("/", async (req, res) => {
   // orderBy() should default to ascending, double check
-  const snapshot = await db.collection("an  nouncements").orderBy("timeStamp").get();
+  const snapshot = await db.collection("announcements").orderBy("timeStamp").get();
   if (snapshot.empty) {
     return res.status(200).send(JSON.stringify([]));
   }
