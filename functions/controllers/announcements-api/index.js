@@ -20,7 +20,6 @@ announcements.use(express.json());
 
 // Read all
 announcements.get("/", async (req, res) => {
-  // orderBy() should default to ascending, double check
   const snapshot = queryCollectionSorted("announcements", "timeStamp");
   const documents = [];
   snapshot.forEach((doc) => {

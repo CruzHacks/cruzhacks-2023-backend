@@ -17,7 +17,7 @@ const queryCollection = (collection) => {
 };
 
 const queryCollectionSorted = (collection, opt) => {
-  // returns sorted in descending order
+  // returns sorted in ascending order
   // opt must be a string and it must be a doc field
   return db.collection(collection).orderBy(opt).get();
 };
