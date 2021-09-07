@@ -21,7 +21,7 @@ describe("test announcement endpoints", () => {
     });
   });
   describe("DELETE: delete announcement by id", () => {
-    deleteDocument.mockReturnValue(() => Promise.resolve({}));
+    deleteDocument.mockImplementation(() => Promise.resolve({}));
     it("Should respond with proper response codes and data", async () => {
       const response = await supertest(announcements).delete("/:id");
 
