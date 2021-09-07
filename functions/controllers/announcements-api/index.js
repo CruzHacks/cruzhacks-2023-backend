@@ -35,8 +35,7 @@ announcements.get("/", async (req, res) => {
   return res.status(200).send(JSON.stringify(documents));
 });
 
-// Delete
-announcements.delete("/:id", hasPermission("Organizer"), async (req, res) => {
+announcements.delete("/:id", hasPermission("delete:announcements"), async (req, res) => {
   const docRef = db.collection("announcements").document(req.params.id);
   await docRef
     .get()
@@ -55,9 +54,10 @@ announcements.delete("/:id", hasPermission("Organizer"), async (req, res) => {
 });
 
 // Create
-announcements.post("/", hasPermission("Organizer"), (req, res) => {
+announcements.post("/", hasPermission("delete:announcements"), async (req, res) => {
   const { title, message, timeStamp } = req.body;
   const data = { title, message, timeStamp };
+  // remember that we need to validate our data
   addDocument("announcements", title, data)
     .then((doc) => {
       return res.status(200).send({ error: false, status: 200, message: "Item successfully added.", data: doc });
