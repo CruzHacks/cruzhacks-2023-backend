@@ -57,7 +57,7 @@ announcements.delete("/:id", hasPermission("delete:announcements"), async (req, 
 announcements.post("/", hasPermission("delete:announcements"), async (req, res) => {
   const { title, message, timeStamp } = req.body;
   const data = { title, message, timeStamp };
-  // remember that we need to validate our data
+  // ***remember that we need to validate our data
   addDocument("announcements", title, data)
     .then((doc) => {
       return res.status(200).send({ error: false, status: 200, message: "Item successfully added.", data: doc });
