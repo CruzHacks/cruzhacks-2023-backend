@@ -28,7 +28,12 @@ announcements.get("/", async (req, res) => {
     const data = doc.data();
     documents.push({ id, ...data });
   });
-    return res.status(200).send({ error: false, status: 200, message: "Request success, announcements retrieved", announcements: JSON.stringify(documents) });
+  return res.status(200).send({
+    error: false,
+    status: 200,
+    message: "Request success, announcements retrieved",
+    announcements: JSON.stringify(documents),
+  });
 });
 
 announcements.delete("/:id", hasPermission("delete:announcements"), async (req, res) => {
@@ -52,6 +57,10 @@ announcements.delete("/:id", hasPermission("delete:announcements"), async (req, 
 // Create
 announcements.post("/", hasPermission("update:announcements"), async (req, res) => {
   const { title, message, timeStamp } = req.body;
+  // check if title matches regex  /^[a-zA-Z0-9 ]
+  if (!/^[a-zA-Z0-9 ]+$/.test(title) || !/^[a-zA-Z0-9 ]+$/.test(message) || !timeStamp) {
+    return res.status(400).send({ error: true, status: 500, message: "Invalid data provided." });
+  }
   const data = { title, message, timeStamp };
   // ***remember that we need to validate our data
   addDocument("announcements", data)
