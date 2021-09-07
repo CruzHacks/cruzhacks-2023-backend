@@ -36,21 +36,21 @@ announcements.get("/", async (req, res) => {
 });
 
 announcements.delete("/:id", hasPermission("delete:announcements"), async (req, res) => {
-  const docRef = db.collection("announcements").document(req.params.id);
-  await docRef
-    .get()
-    .then((doc) => {
-      if (doc.exists) {
-        doc.delete();
-        return res.status(200).send({ error: false, status: 200, message: "Item successfully removed." });
-      }
-      return res.status(400).send({
+  const toDelete = await deleteDocument("announcements", req.params.id);
+  toDelete
+    .then(() => res.status(200).send({
+      error: false,
+      status: 200,
+      message: "Announcement successfully removed!",
+    }))
+    .catch(error => {
+      functions.logger.log(error);
+      return res.status(500).send({
         error: true,
-        status: 400,
-        message: "The item requested for removal does not exist, please verify the query id.",
+        status: 500,
+        message: "Error occurred upon attempting to remove requested resource ...",
       });
-    })
-    .catch((err) => res.status(500).send({ error: true, status: 500, message: err.message }));
+    });
 });
 
 // Create

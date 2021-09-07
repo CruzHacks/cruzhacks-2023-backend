@@ -1,39 +1,30 @@
 const testConfig = require("firebase-functions-test")();
 const supertest = require("supertest");
-const { hasPermission } = require("../../utils/middleware");
 const { announcements } = require("../../controllers/announcements-api/index");
+const { hasPermission } = require("../../utils/middleware");
 const { addDocument, queryCollectionSorted, deleteDocument } = require("../../utils/database");
-
-testConfig.mockConfig({
-  auth: {
-    cors: "site",
-    audience: "audience",
-    issuer: "issuer",
-    jwk_uri: "some uri",
-  },
-});
 
 jest.mock("../../utils/database");
 jest.mock("../../utils/middleware");
 
-describe("tests announcements", () => {
-  hasPermission.mockImplementation((req, res, next) => next());
+describe("test announcement endpoints", () => {
+  hasPermission.mockImplementation((permission) => (req, res, next) => next());
 
-  describe("POST /announcements", () => {
-
-  });
-  describe("GET /announcements", () => {
-    queryCollectionSorted.mockImplementation((collection, opts) => {
-      return Promise.resolve([]);
-    })
-    it("Should respond with status code 200, and proper response data", async () => {
+  describe("GET: gets all announcements", () => {
+    queryCollectionSorted.mockImplementation(() => []);
+    it("Should respond with proper response codes and data", async () =>{
       const response = await supertest(announcements).get("/");
-      expect(queryCollectionSorted).toHaveBeenCalled(1);
+      expect(queryCollectionSorted).toHaveBeenCalledTimes(1);
       expect(response.statusCode).toBe(200);
+      expect(response.body.message).toBe("Request success, announcements retrieved");
+      expect(response.body.announcements).toBe("[]");
     });
-    
   });
-  describe("DELETE /announcements", () => {
-    
+  describe("DELETE: delete announcement by id", () => {
+    deleteDocument.mockReturnValue(() => Promise.resolve({}));
+    it("Should respond with proper response codes and data", async () => {
+      const response = await supertest(announcements).delete("/:id");
+
+    });
   });
 });
