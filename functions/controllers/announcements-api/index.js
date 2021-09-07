@@ -20,7 +20,7 @@ announcements.use(express.json());
 
 // Read all
 announcements.get("/", async (req, res) => {
-  const snapshot = queryCollectionSorted("announcements", "timeStamp");
+  const snapshot = await queryCollectionSorted("announcements", "timeStamp");
   const documents = [];
   snapshot.forEach((doc) => {
     const id = doc.id;
