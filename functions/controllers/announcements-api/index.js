@@ -5,7 +5,7 @@ const express = require("express");
 const cors = require("cors");
 const { corsConfig } = require("../../utils/config");
 const { hasPermission } = require("../../utils/middleware");
-const { addDocument, queryDocument } = require("../../utils/database");
+const { addDocument, queryCollectionSorted, deleteDocument } = require("../../utils/database");
 
 const announcements = express();
 const corsOptions = {
@@ -18,21 +18,17 @@ announcements.use(helmet());
 announcements.use(cors(corsOptions));
 announcements.use(express.json());
 
-
 // Read all
 announcements.get("/", async (req, res) => {
   // orderBy() should default to ascending, double check
-  const snapshot = await db.collection("announcements").orderBy("timeStamp").get();
-  if (snapshot.empty) {
-    return res.status(200).send(JSON.stringify([]));
-  }
+  const snapshot = queryCollectionSorted("announcements", "timeStamp");
   const documents = [];
   snapshot.forEach((doc) => {
     const id = doc.id;
     const data = doc.data();
     documents.push({ id, ...data });
   });
-  return res.status(200).send(JSON.stringify(documents));
+    return res.status(200).send({ error: false, status: 200, message: "Request success, announcements retrieved", announcements: JSON.stringify(documents) });
 });
 
 announcements.delete("/:id", hasPermission("delete:announcements"), async (req, res) => {
@@ -54,13 +50,13 @@ announcements.delete("/:id", hasPermission("delete:announcements"), async (req, 
 });
 
 // Create
-announcements.post("/", hasPermission("delete:announcements"), async (req, res) => {
+announcements.post("/", hasPermission("update:announcements"), async (req, res) => {
   const { title, message, timeStamp } = req.body;
   const data = { title, message, timeStamp };
   // ***remember that we need to validate our data
-  addDocument("announcements", title, data)
+  addDocument("announcements", data)
     .then((doc) => {
-      return res.status(200).send({ error: false, status: 200, message: "Item successfully added.", data: doc });
+      return res.status(201).send({ error: false, status: 201, message: "Item successfully added.", data: doc });
     })
     .catch((err) => res.status(500).send({ error: true, status: 500, message: err.message }));
 });
