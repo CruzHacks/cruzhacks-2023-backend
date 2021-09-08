@@ -35,7 +35,7 @@ announcements.get("/", async (req, res) => {
   });
 });
 
-announcements.delete("/:id", hasPermission("delete:announcements"), async (req, res) => {
+announcements.delete("/:id", () => hasPermission("delete:announcements"), async (req, res) => {
   const toDelete = await deleteDocument("announcements", req.params.id);
   toDelete
     .then(() => res.status(200).send({
@@ -54,7 +54,7 @@ announcements.delete("/:id", hasPermission("delete:announcements"), async (req, 
 });
 
 // Create
-announcements.post("/", hasPermission("update:announcements"), async (req, res) => {
+announcements.post("/", () => hasPermission("update:announcements"), async (req, res) => {
   const { title, message, timeStamp } = req.body;
   // check if title matches regex  /^[a-zA-Z0-9 ]
   if (!/^[a-zA-Z0-9 ]+$/.test(title) || !/^[a-zA-Z0-9 ]+$/.test(message) || !timeStamp) {
