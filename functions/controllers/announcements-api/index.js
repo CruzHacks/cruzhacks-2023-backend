@@ -4,7 +4,7 @@ const helmet = require("helmet");
 const express = require("express");
 const cors = require("cors");
 const { corsConfig } = require("../../utils/config");
-const { hasPermission } = require("../../utils/middleware");
+const { hasDeleteAnnouncement, hasUpdateAnnouncement } = require("../../utils/middleware");
 const { addDocument, queryCollectionSorted, deleteDocument } = require("../../utils/database");
 
 const announcements = express();
@@ -35,9 +35,8 @@ announcements.get("/", async (req, res) => {
   });
 });
 
-announcements.delete("/:id", hasPermission("delete:announcements"), async (req, res) => {
-  const toDelete = await deleteDocument("announcements", req.params.id);
-  toDelete
+announcements.delete("/:id", hasDeleteAnnouncement, async (req, res) => {
+  deleteDocument("announcements", req.params.id)
     .then(() => res.status(200).send({
       error: false,
       status: 200,
@@ -54,7 +53,7 @@ announcements.delete("/:id", hasPermission("delete:announcements"), async (req, 
 });
 
 // Create
-announcements.post("/", hasPermission("update:announcements"), async (req, res) => {
+announcements.post("/", hasUpdateAnnouncement, async (req, res) => {
   const { title, message, timeStamp } = req.body;
   // check if title matches regex  /^[a-zA-Z0-9 ]
   if (!/^[a-zA-Z0-9 ]+$/.test(title) || !/^[a-zA-Z0-9 ]+$/.test(message) || !timeStamp) {
