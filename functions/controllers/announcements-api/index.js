@@ -53,7 +53,7 @@ announcements.delete("/:id", hasDeleteAnnouncement, async (req, res) => {
 });
 
 // Create
-announcements.post("/", hasUpdateAnnouncement, async (req, res) => {
+announcements.post("/", () => hasPermission("update:announcements"), async (req, res) => {
   const { title, message, timeStamp } = req.body;
   // check if title matches regex  /^[a-zA-Z0-9 ]
   if (!/^[a-zA-Z0-9 ]+$/.test(title) || !/^[a-zA-Z0-9 ]+$/.test(message) || !timeStamp) {
