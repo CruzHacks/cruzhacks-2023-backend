@@ -35,14 +35,14 @@ const validateResume = (files) => {
     const resume = files.file;
     fileTypes = ["application/pdf", "application/docx"];
     if (resume) {
-        if (!fileTypes.includes(resume.type)) {
-            errors.push("Document Type is not valid")
-        }
-        if (resume.size > maxSize) {
-            errors.push("Document is greater than 1mb")
-        }
-        // TODO:
-        // Validate file name for correct extension
+      if (!fileTypes.includes(resume.type)) {
+        errors.push("Document Type is not valid");
+      }
+      if (resume.size > maxSize) {
+        errors.push("Document is greater than 1mb");
+      }
+      // TODO:
+      // Validate file name for correct extension
     }
   }
   return errors;
