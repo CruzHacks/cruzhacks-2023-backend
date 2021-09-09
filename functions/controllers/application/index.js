@@ -68,10 +68,11 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
         let uploadErr = "";
         // Upload Resume Here
         if (files && files.file) {
+          // TODO: Update Resume File Name
           uploadFile(storage, "resume", "resume.pdf", files.file)
             .then((filedata) => {
               // Checks if upload URL exists
-              if (filedata && filedata && filedata[filedata.length - 1] && filedata[filedata.length - 1]["mediaLink"]) {
+              if (filedata && (filedata.length > 0) && filedata[filedata.length - 1] && filedata[filedata.length - 1]["mediaLink"]) {
                 // TODO: Set Document
               } else {
                 uploadErr = "An error has Occurred";
