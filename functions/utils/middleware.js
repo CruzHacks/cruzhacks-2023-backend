@@ -45,4 +45,6 @@ const hasPermission = (permission) => {
   };
 };
 
-module.exports = { jwtCheck, validKey, hasPermission };
+const hasUpdateApp = hasPermission("update:app");
+
+module.exports = { jwtCheck, validKey, hasPermission, hasUpdateApp };
