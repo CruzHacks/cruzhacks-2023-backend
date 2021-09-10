@@ -8,4 +8,8 @@ const queryDocument = (collection, id) => {
   return db.collection(collection).doc(id).get();
 };
 
-module.exports = { addDocument, queryDocument };
+const setDocument = (collection, id, document) => {
+  return db.collection(collection).doc(id).set(document);
+};
+
+module.exports = { addDocument, queryDocument, setDocument };
