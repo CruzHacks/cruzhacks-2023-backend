@@ -1,4 +1,3 @@
-/* eslint-disable consistent-return */
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -9,7 +8,7 @@ const { storage } = require("../../utils/admin");
 const { jwtCheck, hasUpdateApp } = require("../../utils/middleware");
 const { corsConfig, issuer } = require("../../utils/config");
 const { getM2MToken } = require("../../utils/m2m");
-const { createAppObject, validateAppData, validateResume } = require("../../utils/application");
+const { createAppObject, validateAppData, validateResume, isValidFileData } = require("../../utils/application");
 const { uploadFile } = require("../../utils/storage");
 
 const application = express();
@@ -29,10 +28,10 @@ application.use(cors(corsOptions));
 application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
   try {
     const form = new formidable.IncomingForm();
-    await form.parse(req, async (err, fields, files) => {
+    return await form.parse(req, async (err, fields, files) => {
       if (err) {
-        // Log Errors
-        throw "Error Parsing Form";
+        // TODO: Log Errors
+        return res.status(500).send({ code: 400, message: "Server Error" });
       }
       try {
         // TODO: Update createAppObject and validateAppObject functions
@@ -41,13 +40,13 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
 
         if (isValidData.length > 0) {
           // TODO: Log Errors
-          throw "Form Validation Failed";
+          return res.status(400).send({ code: 400, message: "Form Validation Failed", errors: isValidData });
         }
 
         const isValidResume = validateResume(files);
         if (isValidResume.length > 0) {
           // TODO: Log Errors
-          throw "Resume Validation Failed";
+          return res.status(400).send({ code: 400, message: "Resume Validation Failed", errors: isValidResume });
         }
 
         const token = await getM2MToken();
@@ -59,53 +58,48 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
 
         const userInfo = await axios(userInfoOptions);
         if (!userInfo.data.email_verified) {
-          throw "Email Not Verified";
+          // TODO: Log unverified email
+          return res.status(403).send({ code: 403, message: "Unauthorized User" });
         }
         if (userInfo.data.email !== appData.email) {
-          throw "Auth0 Id email mistmatch";
+          // TODO: Log expected email and actual email
+          return res.status(400).send({ code: 400, message: "Auth0Id discrepancy with Email" });
         }
 
-        let uploadErr = "";
         // Upload Resume Here
         if (files && files.file) {
           // TODO: Update Resume File Name
-          uploadFile(storage, "resume", "resume.pdf", files.file)
-            .then((filedata) => {
-              // Checks if upload URL exists
-              if (
-                filedata &&
-                filedata.length > 0 &&
-                filedata[filedata.length - 1] &&
-                filedata[filedata.length - 1]["mediaLink"]
-              ) {
-                // TODO: Set Document
-              } else {
-                uploadErr = "An error has Occurred";
-              }
-            })
-            .catch((error) => {
-              uploadErr = error;
-            });
+          return (
+            uploadFile(storage, "resume", "resume.pdf", files.file)
+              .then((filedata) => {
+                // Checks if upload URL exists
+                if (isValidFileData(filedata)) {
+                  // TODO: Set Document
+                  // return setDocument.then( ())
+                } else {
+                  return res.status(400).send({ code: 400, message: "An Error Occurred Uploading Your Resume" });
+                }
+                return res.status(201).send({ code: 201, message: "Successfully Updated Application" });
+              })
+              // eslint-disable-next-line no-unused-vars
+              .catch((error) => {
+                // Log Errors
+
+                return res.status(400).send({ code: 500, message: "Server Error" });
+              })
+          );
         } else {
           // TODO: Set Document
         }
-        if (uploadErr) {
-          throw uploadErr;
-        }
         return res.status(201).send({ code: 201, message: "Successfully Updated Application" });
-      } catch (err) {
+      } catch (error) {
         // Log Errors
-        if (err === "Email Not Verified") {
-          return res.status(403).send({ code: 403, message: "Unauthorized User" });
-        } else if (err === "Auth0 Id email mistmatch") {
-          return res.status(404).send({ code: 400, message: "Auth0Id discrepancy with Email" });
-        } else {
-          return res.status(500).send({ code: 500, message: err });
-        }
+        return res.status(500).send({ code: 500, message: "Server Error" });
       }
     });
   } catch (error) {
-    return res.status(500).send({ code: 500, message: error });
+    // Log Errors
+    return res.status(500).send({ code: 500, message: "Server Error" });
   }
 });
 

@@ -48,4 +48,8 @@ const validateResume = (files) => {
   return errors;
 };
 
-module.exports = { createAppObject, validateAppData, validateResume };
+const isValidFileData = (filedata) => {
+  return filedata && filedata.length > 0 && filedata[filedata.length - 1] && filedata[filedata.length - 1]["mediaLink"];
+};
+
+module.exports = { createAppObject, validateAppData, validateResume, isValidFileData };
