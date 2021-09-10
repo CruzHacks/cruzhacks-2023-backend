@@ -33,16 +33,25 @@ const validateResume = (files) => {
   if (files && files.file) {
     const maxSize = 1000000;
     const resume = files.file;
-    fileTypes = ["application/pdf", "application/docx"];
+    //console.log(resume)
+    const fileExtensions = {
+      pdf: "application/pdf",
+      docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      doc: "application/msword",
+    };
+
     if (resume) {
-      if (!fileTypes.includes(resume.type)) {
-        errors.push("Document Type is not valid");
+      const filename = resume.name;
+      const extension = filename.split(".").pop();
+      if (!fileExtensions[extension]) {
+        errors.push("Not a Valid File extension");
+      }
+      if (fileExtensions[extension] && fileExtensions[extension] !== resume.type) {
+        errors.push("File Extension and Type does not match");
       }
       if (resume.size > maxSize) {
         errors.push("Document is greater than 1mb");
       }
-      // TODO:
-      // Validate file name for correct extension
     }
   }
   return errors;
@@ -52,4 +61,9 @@ const isValidFileData = (filedata) => {
   return filedata && filedata.length > 0 && filedata[filedata.length - 1] && filedata[filedata.length - 1]["mediaLink"];
 };
 
-module.exports = { createAppObject, validateAppData, validateResume, isValidFileData };
+const getNewFileName = (data, filename) => {
+  const extension = filename.split(".").pop();
+  return "example" + "." + extension;
+};
+
+module.exports = { createAppObject, validateAppData, validateResume, isValidFileData, getNewFileName };

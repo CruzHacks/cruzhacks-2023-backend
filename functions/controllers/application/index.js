@@ -28,9 +28,9 @@ const corsOptions = {
 application.use(cors(corsOptions));
 
 /* TODO: 
-  Update createAppObject and validateAppObject
-  Update document id posted
-  Update uploaded resume file name
+  Update createAppObject and validateAppObject with schema
+  Update document id posted (if necessary)
+  Update getNewFileName to get unique filenames
   Unit Test Functions
 */
 application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
@@ -38,25 +38,23 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
     const form = new formidable.IncomingForm();
     return await form.parse(req, async (err, fields, files) => {
       if (err) {
-        // TODO: Log Errors
-        return res.status(500).send({ code: 400, message: "Server Error" });
+        functions.logger.log("Form Error: " + err);
+        return res.status(500).send({ code: 500, message: "Server Error" });
       }
       try {
         // TODO: Update createAppObject and validateAppObject functions
         appData = createAppObject(fields);
         const isValidData = validateAppData(appData);
-
         if (isValidData.length > 0) {
           functions.logger.log(req.user.sub + " Validation Errors " + isValidData);
           return res.status(400).send({ code: 400, message: "Form Validation Failed", errors: isValidData });
         }
-
         const isValidResume = validateResume(files);
         if (isValidResume.length > 0) {
           functions.logger.log(req.user.sub + " Validation Errors " + isValidResume);
           return res.status(400).send({ code: 400, message: "Resume Validation Failed", errors: isValidResume });
         }
-
+        // If bandwidth is too high, remove Auth0id validation
         const token = await getM2MToken();
         if (token === "") {
           functions.logger.log("Failed to retrieve Token");
@@ -80,9 +78,9 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
 
         // Upload Resume Here
         if (files && files.file) {
-          // TODO: Update Resume File Name
           return (
-            uploadFile(storage, "resume", "resume.pdf", files.file)
+            // TODO: update getNewFileName() and replace test.pdf
+            uploadFile(storage, "resume", "test.pdf", files.file)
               .then((filedata) => {
                 // Checks if upload URL exists
                 if (isValidFileData(filedata)) {
