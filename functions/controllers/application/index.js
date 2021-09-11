@@ -55,26 +55,26 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
           return res.status(400).send({ code: 400, message: "Resume Validation Failed", errors: isValidResume });
         }
         // If bandwidth is too high, remove Auth0id validation
-        const token = await getM2MToken();
-        if (token === "") {
-          functions.logger.log("Failed to retrieve Token");
-          return res.status(500).send({ code: 500, message: "Server Error" });
-        }
-        const userInfoOptions = {
-          method: "GET",
-          url: api_url + "users/" + req.user.sub,
-          headers: { authorization: "Bearer " + token },
-        };
+        // const token = await getM2MToken();
+        // if (token === "") {
+        //   functions.logger.log("Failed to retrieve Token");
+        //   return res.status(500).send({ code: 500, message: "Server Error" });
+        // }
+        // const userInfoOptions = {
+        //   method: "GET",
+        //   url: api_url + "users/" + req.user.sub,
+        //   headers: { authorization: "Bearer " + token },
+        // };
 
-        const userInfo = await axios(userInfoOptions);
-        if (!userInfo.data.email_verified) {
-          functions.logger.log("Unauthorized User: " + userInfo.data.email);
-          return res.status(403).send({ code: 403, message: "Unauthorized User" });
-        }
-        if (userInfo.data.email !== appData.email) {
-          functions.logger.log("Email/Authid Mismatch: " + userInfo.data.email + " " + appData.email);
-          return res.status(400).send({ code: 400, message: "Auth0Id discrepancy with Email" });
-        }
+        // const userInfo = await axios(userInfoOptions);
+        // if (!userInfo.data.email_verified) {
+        //   functions.logger.log("Unauthorized User: " + userInfo.data.email);
+        //   return res.status(403).send({ code: 403, message: "Unauthorized User" });
+        // }
+        // if (userInfo.data.email !== appData.email) {
+        //   functions.logger.log("Email/Authid Mismatch: " + userInfo.data.email + " " + appData.email);
+        //   return res.status(400).send({ code: 400, message: "Auth0Id discrepancy with Email" });
+        // }
 
         // Upload Resume Here
         if (files && files.file) {
