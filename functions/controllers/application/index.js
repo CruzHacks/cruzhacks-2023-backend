@@ -6,12 +6,12 @@ const axios = require("axios");
 const formidable = require("formidable-serverless");
 
 const { storage } = require("../../utils/admin");
-const { jwtCheck, hasUpdateApp } = require("../../utils/middleware");
+const { jwtCheck, hasUpdateApp, hasReadApp } = require("../../utils/middleware");
 const { corsConfig, issuer } = require("../../utils/config");
 const { getM2MToken } = require("../../utils/m2m");
 const { createAppObject, validateAppData, validateResume, isValidFileData } = require("../../utils/application");
 const { uploadFile } = require("../../utils/storage");
-const { setDocument } = require("../../utils/database");
+const { queryDocument, setDocument } = require("../../utils/database");
 
 const application = express();
 application.disable("x-powered-by");
@@ -124,6 +124,22 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
   } catch (error) {
     // Log Errors
     return res.status(500).send({ code: 500, message: "Server Error" });
+  }
+});
+
+application.get("/checkApp", jwtCheck, hasReadApp, async (req, res) => {
+  try {
+    console.log(req.user.sub);
+    doc = await queryDocument("applicant", req.user.sub);
+    console.log(doc);
+    if ((status = doc.get("status"))) {
+      res.status(200).send({ code: 200, status: status, exists: true });
+    } else {
+      res.status(200).send({ code: 200, exists: false });
+    }
+  } catch (error) {
+    res.send({ message: error });
+    res.status(500).send({ code: 500, message: "Error Retrieving Application" });
   }
 });
 
