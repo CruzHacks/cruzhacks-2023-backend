@@ -129,17 +129,11 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
 
 application.get("/checkApp", jwtCheck, hasReadApp, async (req, res) => {
   try {
-    console.log(req.user.sub);
-    doc = await queryDocument("applicant", req.user.sub);
-    console.log(doc);
-    if ((status = doc.get("status"))) {
-      res.status(200).send({ code: 200, status: status, exists: true });
-    } else {
-      res.status(200).send({ code: 200, exists: false });
-    }
+    doc = await queryDocument("applicants", req.user.sub);
+    appStatus = doc.get("status");
+    res.status(200).send({ code: 200, status: appStatus, exists: true });
   } catch (error) {
-    res.send({ message: error });
-    res.status(500).send({ code: 500, message: "Error Retrieving Application" });
+    res.status(500).send({ code: 500, exists: false, message: "No Document" });
   }
 });
 
