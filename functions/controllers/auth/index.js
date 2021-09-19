@@ -61,7 +61,7 @@ app.post("/resend", jwtCheck, async (req, res) => {
     if (err === "Email Already Verified") {
       res.status(406).send({ code: 406, message: "Email Already Verified" });
     } else {
-      res.status(500).send({ code: 500, message: "Unable to Send Verification Email", err: err });
+      res.status(500).send({ code: 500, message: "Unable to Send Verification Email" });
     }
   }
 });
