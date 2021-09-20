@@ -6,12 +6,12 @@ const axios = require("axios");
 const formidable = require("formidable-serverless");
 
 const { storage } = require("../../utils/admin");
-const { jwtCheck, hasUpdateApp } = require("../../utils/middleware");
+const { jwtCheck, hasUpdateApp, hasReadApp } = require("../../utils/middleware");
 const { corsConfig, issuer } = require("../../utils/config");
 const { getM2MToken } = require("../../utils/m2m");
 const { createAppObject, validateAppData, validateResume, isValidFileData } = require("../../utils/application");
 const { uploadFile } = require("../../utils/storage");
-const { setDocument } = require("../../utils/database");
+const { queryDocument, setDocument } = require("../../utils/database");
 
 const application = express();
 application.disable("x-powered-by");
@@ -124,6 +124,23 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
   } catch (error) {
     // Log Errors
     return res.status(500).send({ code: 500, message: "Server Error" });
+  }
+});
+
+application.get("/checkApp", jwtCheck, hasReadApp, async (req, res) => {
+  try {
+    doc = await queryDocument("applicants", req.user.sub);
+    appStatus = doc.get("status");
+    if (appStatus === undefined) {
+      throw new Error("No Document");
+    }
+    res.status(200).send({ code: 200, status: appStatus, exists: true, message: "Document Found" });
+  } catch (error) {
+    if (error.message === "No Document") {
+      res.status(200).send({ code: 200, status: "No Document", exists: false, message: "No Document" });
+    } else {
+      res.status(500).send({ code: 500, status: "No Document", exists: false, message: "Internal Server Error" });
+    }
   }
 });
 

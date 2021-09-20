@@ -3710,6 +3710,11 @@ firebase@7.18.0:
     "@firebase/storage" "0.3.42"
     "@firebase/util" "0.3.1"
 
+firestore-mock@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/firestore-mock/-/firestore-mock-1.0.4.tgz#66df19bdc2dcda59b1ab8adf6a26614ee9470f13"
+  integrity sha512-x6JGftVDSm9Fpikjc1Xaq0tLMz3vUQb9cghre/XW2LWp6OzgsjcFUO70h4536Dkz7MnzlmR0+sm+3af9aiie+A==
+
 flat-arguments@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/flat-arguments/-/flat-arguments-1.0.2.tgz#9baa780adf0501f282d726c9c6a038dba44ea76f"
