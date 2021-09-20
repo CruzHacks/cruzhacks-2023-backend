@@ -131,9 +131,9 @@ application.get("/checkApp", jwtCheck, hasReadApp, async (req, res) => {
   try {
     doc = await queryDocument("applicants", req.user.sub);
     appStatus = doc.get("status");
-    res.status(200).send({ code: 200, status: appStatus, exists: true });
+    res.status(200).send({ code: 200, status: appStatus, exists: true, message: "Document Found" });
   } catch (error) {
-    res.status(500).send({ code: 500, exists: false, message: "No Document" });
+    res.status(500).send({ code: 500, status: "No Document", exists: false, message: "No Document" });
   }
 });
 
