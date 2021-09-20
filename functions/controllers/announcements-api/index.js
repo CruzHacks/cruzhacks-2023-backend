@@ -1,10 +1,9 @@
 const functions = require("firebase-functions");
-const { db } = require("../../utils/admin");
 const helmet = require("helmet");
 const express = require("express");
 const cors = require("cors");
 const { corsConfig } = require("../../utils/config");
-const { hasDeleteAnnouncement, hasUpdateAnnouncement } = require("../../utils/middleware");
+const { jwtCheck, validKey, hasDeleteAnnouncement, hasUpdateAnnouncement } = require("../../utils/middleware");
 const { addDocument, queryCollectionSorted, deleteDocument } = require("../../utils/database");
 
 const announcements = express();
@@ -19,53 +18,75 @@ announcements.use(cors(corsOptions));
 announcements.use(express.json());
 
 // Read all
-announcements.get("/", async (req, res) => {
-  const snapshot = await queryCollectionSorted("announcements", "timeStamp");
-  const documents = [];
-  snapshot.forEach((doc) => {
-    const id = doc.id;
-    const data = doc.data();
-    documents.push({ id, ...data });
-  });
-  return res.status(200).send({
-    error: false,
-    status: 200,
-    message: "Request success, announcements retrieved",
-    announcements: JSON.stringify(documents),
-  });
-});
-
-announcements.delete("/:id", hasDeleteAnnouncement, async (req, res) => {
-  deleteDocument("announcements", req.params.id)
-    .then(() => res.status(200).send({
+announcements.get("/", validKey, async (req, res) => {
+  try {
+    const snapshot = await queryCollectionSorted("announcements", "timeStamp");
+    const documents = [];
+    snapshot.forEach((doc) => {
+      const id = doc.id;
+      const data = doc.data();
+      console.log(data);
+      documents.push({ id: id, title: data.title, message: data.message, timeStamp: data.timeStamp });
+    });
+    return res.status(200).send({
       error: false,
       status: 200,
-      message: "Announcement successfully removed!",
-    }))
-    .catch(error => {
-      functions.logger.log(error);
+      message: "Request success, announcements retrieved",
+      announcements: JSON.stringify(documents),
+      count: documents.length,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      error: true,
+      status: 500,
+      message: "Internal Server Error",
+    });
+  }
+});
+
+announcements.delete("/:id", jwtCheck, hasDeleteAnnouncement, async (req, res) => {
+  deleteDocument("announcements", req.params.id)
+    .then(() =>
+      res.status(200).send({
+        error: false,
+        status: 200,
+        message: "Announcement successfully removed!",
+      }),
+    )
+    .catch((error) => {
+      functions.logger.log(error.message);
       return res.status(500).send({
         error: true,
         status: 500,
-        message: "Error occurred upon attempting to remove requested resource ...",
+        message: "Internal Server Error",
       });
     });
 });
 
 // Create
-announcements.post("/", () => hasPermission("update:announcements"), async (req, res) => {
-  const { title, message, timeStamp } = req.body;
+announcements.post("/", jwtCheck, hasUpdateAnnouncement, async (req, res) => {
+  const { title, message } = req.body;
   // check if title matches regex  /^[a-zA-Z0-9 ]
-  if (!/^[a-zA-Z0-9 ]+$/.test(title) || !/^[a-zA-Z0-9 ]+$/.test(message) || !timeStamp) {
-    return res.status(400).send({ error: true, status: 500, message: "Invalid data provided." });
+  if (!title || title.length > 50 || !/^[a-zA-Z0-9 ]+$/.test(title)) {
+    return res.status(400).send({ error: true, status: 400, message: "Invalid title" });
   }
-  const data = { title, message, timeStamp };
-  // ***remember that we need to validate our data
-  addDocument("announcements", data)
+  if (!message || message.length > 200 || !/^[a-zA-Z0-9 ]+$/.test(message)) {
+    return res.status(400).send({ error: true, status: 400, message: "Invalid Message" });
+  }
+  const data = { title: title, message: message, date: Date.now() };
+
+  //return res.status(201).send({ error: false, status: 201, message: "Item successfully added."});
+  return addDocument("announcements", data)
     .then((doc) => {
-      return res.status(201).send({ error: false, status: 201, message: "Item successfully added.", data: doc });
+      if (!doc) {
+        functions.logger.log("Missing Response");
+      }
+      return res.status(201).send({ error: false, status: 201, message: "Item successfully added." });
     })
-    .catch((err) => res.status(500).send({ error: true, status: 500, message: err.message }));
+    .catch((err) => {
+      functions.logger.log(err.message);
+      return res.status(500).send({ error: true, status: 500, message: "Internal Server Error" });
+    });
 });
 
 module.exports = { announcements };
