@@ -48,6 +48,7 @@ describe("Application Test", () => {
       code: 200,
       status: "accepted",
       exists: true,
+      message: "No Document",
     });
   });
 
@@ -72,6 +73,7 @@ describe("Application Test", () => {
       code: 200,
       status: "rejected",
       exists: true,
+      message: "Document Found",
     });
   });
 
@@ -93,6 +95,7 @@ describe("Application Test", () => {
     expect(res.status).toBe(500);
     expect(res.body).toStrictEqual({
       code: 500,
+      status: "No Document",
       exists: false,
       message: "No Document",
     });
