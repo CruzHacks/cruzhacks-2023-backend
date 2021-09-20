@@ -77,6 +77,30 @@ describe("Application Test", () => {
     });
   });
 
+  it("Should Return code 200, and exists: false", async () => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+
+    hasReadApp.mockImplementation((req, res, next) => {
+      next();
+    });
+
+    queryDocument.mockImplementation(() => Promise.reject("No Document"));
+
+    const res = await request(application).get("/checkApp");
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasReadApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({
+      code: 200,
+      status: "No Document",
+      exists: false,
+      message: "No Document",
+    });
+  });
+
   it("Should Return code 500, and exists: false", async () => {
     jwtCheck.mockImplementation((req, res, next) => {
       req.user = { sub: "test user" };
@@ -97,7 +121,7 @@ describe("Application Test", () => {
       code: 500,
       status: "No Document",
       exists: false,
-      message: "No Document",
+      message: "Internal Server Error",
     });
   });
 });
