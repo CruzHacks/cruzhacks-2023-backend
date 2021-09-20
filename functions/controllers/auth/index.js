@@ -70,7 +70,7 @@ app.post("/resend", jwtCheck, async (req, res) => {
         error: err,
         user: req.user.sub,
       });
-      res.status(500).send({ code: 500, message: "Unable to Send Verification Email", err: err });
+      res.status(500).send({ code: 500, message: "Unable to Send Verification Email" });
     }
   }
 });
