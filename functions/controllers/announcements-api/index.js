@@ -17,7 +17,6 @@ announcements.use(helmet());
 announcements.use(cors(corsOptions));
 announcements.use(express.json());
 
-// Read all
 announcements.get("/", validKey, async (req, res) => {
   try {
     const snapshot = await queryCollectionSorted("announcements", "timeStamp");
@@ -62,7 +61,6 @@ announcements.delete("/:id", jwtCheck, hasDeleteAnnouncement, async (req, res) =
     });
 });
 
-// Create
 announcements.post("/", jwtCheck, hasUpdateAnnouncement, async (req, res) => {
   const { title, message } = req.body;
   // check if title matches regex  /^[a-zA-Z0-9 ]
@@ -74,7 +72,6 @@ announcements.post("/", jwtCheck, hasUpdateAnnouncement, async (req, res) => {
   }
   const data = { title: title, message: message, date: Date.now() };
 
-  //return res.status(201).send({ error: false, status: 201, message: "Item successfully added."});
   return addDocument("announcements", data)
     .then((doc) => {
       if (!doc) {
