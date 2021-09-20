@@ -1,14 +1,13 @@
-# CruzHacks Recaptcha Service (In Progress)*
+# CruzHacks Recaptcha Service
 
-This Firebase Function is responsible for the CruzHacks user validation. This service uses the Google's recaptcha service REST API.
-
+This Firebase Function is responsible for the CruzHacks user validation. This service uses cloud firestore.
 
 ## Request Schema
 
 ```shell
 curl --request GET \
   --url http://localhost:5001/<project>/<timezone>/application/checkApp \
-  --header 'authentication: Bearer AUTH_TOKEN' \
+  --header 'authorization: Bearer AUTH_TOKEN' \
   --header 'content-type: application/json' \
 ```
 
@@ -21,9 +20,21 @@ curl --request GET \
   "code": 200,
   "exists": true,
   "status": "Accepted | Pending | Rejected",
-  "message": ""
+  "message": "Document Found"
 }
 ```
+
+### No Document Exists
+
+```json
+{
+  "code": 200,
+  "exists": false,
+  "status": "No Document",
+  "message": "No Document"
+}
+```
+
 
 ### Failed to Retrieve App Status 
 ```json

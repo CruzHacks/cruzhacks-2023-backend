@@ -2,7 +2,6 @@
 
 This Firebase Function is responsible for the CruzHacks user validation. This service uses the Google's recaptcha service.
 
-
 ## Request Schema
 
 ```shell

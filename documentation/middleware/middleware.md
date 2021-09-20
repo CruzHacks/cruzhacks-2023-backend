@@ -2,7 +2,6 @@
 
 The Following Responses may occur if middleware is not satisfied.
 
-
 ## Request Schema
 
 ```shell

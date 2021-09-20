@@ -7,7 +7,7 @@ This Firebase Function is responsible for CruzHacks Verification Emails. This se
 ```shell
 curl --request POST \
   --url http://localhost:5001/<project>/<timezone>/auth/resend \
-  --header 'authentication: Bearer AUTH_TOKEN' \
+  --header 'authorization: Bearer AUTH_TOKEN' \
   --header 'content-type: application/json' \
 ```
 
