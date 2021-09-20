@@ -87,7 +87,7 @@ describe("Application Test", () => {
       next();
     });
 
-    queryDocument.mockImplementation(() => Promise.reject("No Document"));
+    queryDocument.mockImplementation(() => Promise.reject(new Error("No Document")));
 
     const res = await request(application).get("/checkApp");
     expect(jwtCheck).toHaveBeenCalledTimes(1);

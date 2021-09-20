@@ -131,15 +131,16 @@ application.get("/checkApp", jwtCheck, hasReadApp, async (req, res) => {
   try {
     doc = await queryDocument("applicants", req.user.sub);
     appStatus = doc.get("status");
-    if (appStatus == undefined) {
-      throw "No Document"
+    if (appStatus === undefined) {
+      throw new Error("No Document");
     }
     res.status(200).send({ code: 200, status: appStatus, exists: true, message: "Document Found" });
   } catch (error) {
-    if (error === "No Document") {
-      return res.status(200).send({ code: 200, status: "No Document", exists: false, message: "No Document" })
+    if (error.message === "No Document") {
+      res.status(200).send({ code: 200, status: "No Document", exists: false, message: "No Document" });
+    } else {
+      res.status(500).send({ code: 500, status: "No Document", exists: false, message: "Internal Server Error" });
     }
-    res.status(500).send({ code: 500, status: "No Document", exists: false, message: "Internal Server Error" });
   }
 });
 
