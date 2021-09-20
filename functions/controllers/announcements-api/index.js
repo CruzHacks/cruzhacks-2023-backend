@@ -25,7 +25,6 @@ announcements.get("/", validKey, async (req, res) => {
     snapshot.forEach((doc) => {
       const id = doc.id;
       const data = doc.data();
-      console.log(data);
       documents.push({ id: id, title: data.title, message: data.message, timeStamp: data.timeStamp });
     });
     return res.status(200).send({
