@@ -1,3 +1,4 @@
+const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -41,7 +42,7 @@ verifyRecaptcha.post("/submit", validKey, async (req, res) => {
             // if success === false: we respond to each type of error
             if (Object.keys(g_response).includes("error-codes")) {
               const errors = g_response["error-codes"];
-
+              functions.logger.write({ severity: "ERROR", message: "Unable to validate g-response token", error: errors, user: req.user.sub });
               if (errors.includes("invalid-input-response") && errors.includes("invalid-input-secret")) {
                 return res.status(400).send({ error: true, status: 400, message: "Invalid Token or Secret" });
               } else if (errors.includes("invalid-input-response")) {
@@ -56,10 +57,18 @@ verifyRecaptcha.post("/submit", validKey, async (req, res) => {
             }
           }
         }
+        // returning a status 500 really shouldn't occur: in this case something needs attention
+        functions.logger.write({ severity: "ALERT", message: "Unable to validate g-response token", error: "siteVerify response did not include a success field!" });
         return res.status(500).send({ error: true, status: 500, message: "Internal service error" });
       })
-      .catch((error) => res.status(500).send({ error: true, status: 500, message: error.message }));
+      .catch((error) => {
+      // If an error occurs with fetch:
+        functions.logger.write({ severity: "ERROR", message: "Error occurred with fetch when attempting to validate g-response token", error: error });
+        res.status(500).send({ error: true, status: 500, message: error.message })
+      });
   } else {
+    // unauthorized request, Log IP instead of account
+    functions.logger.write({ severity: "ERROR", message: "Unable to validate g-response token", error: "unauthorized request made", user: req.socket.remoteAddress });
     return res.status(401).send({ error: true, status: 401, message: "Unauthorized request" });
   }
 });

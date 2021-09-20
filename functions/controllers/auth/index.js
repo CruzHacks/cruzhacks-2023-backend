@@ -1,3 +1,4 @@
+const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -59,8 +60,10 @@ app.post("/resend", jwtCheck, async (req, res) => {
     }
   } catch (err) {
     if (err === "Email Already Verified") {
+      functions.logger.write({ severity: "INFO", message: "Could not resend verification email", error: err, user: req.user.sub });
       res.status(406).send({ code: 406, message: "Email Already Verified" });
     } else {
+      functions.logger.write({ severity: "ERROR", message: "Could not resend verification email", error: err, user: req.user.sub });
       res.status(500).send({ code: 500, message: "Unable to Send Verification Email", err: err });
     }
   }

@@ -25,7 +25,7 @@ const getM2MToken = () => {
       return data.access_token;
     })
     .catch((err) => {
-      functions.logger.log(`Error: ${err}`);
+      functions.logger.write({ severity: "ERROR", message: "Error occurred while fetching M2M token", error: err });
       return "";
     });
 };
