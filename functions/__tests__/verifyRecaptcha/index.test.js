@@ -22,6 +22,7 @@ describe("POST /submit", () => {
     });
   });
   describe("Test cases with mocked fetching", () => {
+    afterEach(() => fetch.mockClear);
     it("should respond with 500 status code with invalid response", async () => {
       fetch.mockReturnValue(Promise.resolve({ json: () => Promise.resolve() }));
       const response = await supertest(verifyRecaptcha).post("/submit").set({ token: "token" });
