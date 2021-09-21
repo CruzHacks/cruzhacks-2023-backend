@@ -5,8 +5,11 @@ const helmet = require("helmet");
 const axios = require("axios");
 
 const { jwtCheck } = require("../../utils/middleware");
-const { corsConfig, issuer } = require("../../utils/config");
 const { getM2MToken } = require("../../utils/m2m");
+
+const auth0Config = functions.config().auth;
+const corsConfig = auth0Config ? auth0Config.cors : "";
+const issuer = auth0Config ? auth0Config.issuer : "";
 
 const app = express();
 app.disable("x-powered-by");
@@ -75,4 +78,6 @@ app.post("/resend", jwtCheck, async (req, res) => {
   }
 });
 
-module.exports = { app };
+const service = functions.https.onRequest(app);
+
+module.exports = { app, service };

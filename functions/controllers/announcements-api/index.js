@@ -2,9 +2,11 @@ const functions = require("firebase-functions");
 const helmet = require("helmet");
 const express = require("express");
 const cors = require("cors");
-const { corsConfig } = require("../../utils/config");
 const { jwtCheck, validKey, hasDeleteAnnouncement, hasUpdateAnnouncement } = require("../../utils/middleware");
 const { addDocument, queryCollectionSorted, deleteDocument } = require("../../utils/database");
+
+const auth0Config = functions.config().auth;
+const corsConfig = auth0Config ? auth0Config.cors : "";
 
 const announcements = express();
 const corsOptions = {
@@ -84,4 +86,6 @@ announcements.post("/", jwtCheck, hasUpdateAnnouncement, async (req, res) => {
     });
 });
 
-module.exports = { announcements };
+const service = functions.https.onRequest(announcements);
+
+module.exports = { announcements, service };

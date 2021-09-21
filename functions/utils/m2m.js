@@ -1,7 +1,13 @@
 const fetch = require("node-fetch");
 const functions = require("firebase-functions");
 
-const { issuer, client_id, client_secret } = require("./config");
+const client_vars = functions.config().client_vars;
+const auth0Config = functions.config().auth;
+
+const client_id = client_vars ? client_vars.client_id : "";
+const client_secret = client_vars ? client_vars.client_secret : "";
+const issuer = auth0Config ? auth0Config.issuer : "";
+
 const getM2MToken = () => {
   options = {
     method: "POST",

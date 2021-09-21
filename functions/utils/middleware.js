@@ -1,7 +1,14 @@
 /* eslint-disable consistent-return */
+const functions = require("firebase-functions");
 var jwt = require("express-jwt");
 var jwks = require("jwks-rsa");
-const { audience, issuer, jwk_uri, apikey } = require("./config");
+
+const app = functions.config().app;
+const auth0Config = functions.config().auth;
+const apikey = app ? app.apikey : "";
+const audience = auth0Config ? auth0Config.audience : "";
+const issuer = auth0Config ? auth0Config.issuer : "";
+const jwk_uri = auth0Config ? auth0Config.jwk_uri + ".well-known/jwks.json" : ".well-known/jwks.json";
 
 /*
 Validates jwt and parses data into req.user
