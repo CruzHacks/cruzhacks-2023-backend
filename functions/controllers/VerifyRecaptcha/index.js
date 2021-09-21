@@ -5,7 +5,6 @@ const helmet = require("helmet");
 const { validKey } = require("../../utils/middleware");
 const fetch = require("isomorphic-fetch");
 
-
 const recaptchaConfig = functions.config().verify_recaptcha;
 const auth0Config = functions.config().auth;
 
