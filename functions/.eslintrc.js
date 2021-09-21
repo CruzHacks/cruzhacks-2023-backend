@@ -44,5 +44,8 @@ module.exports = {
 
     // Warn against nested then() or catch() statements
     "promise/no-nesting": 1,
+
+    // Require an EOF
+    "eol-last": ["error", "always"],
   },
 };
