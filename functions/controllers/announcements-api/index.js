@@ -63,7 +63,6 @@ announcements.delete("/:id", jwtCheck, hasDeleteAnnouncement, async (req, res) =
 
 announcements.post("/", jwtCheck, hasUpdateAnnouncement, async (req, res) => {
   const { title, message } = req.body;
-  // check if title matches regex  /^[a-zA-Z0-9 ]
   if (!title || title.length > 50 || !/^[a-zA-Z0-9 ]+$/.test(title)) {
     return res.status(400).send({ error: true, status: 400, message: "Invalid title" });
   }
