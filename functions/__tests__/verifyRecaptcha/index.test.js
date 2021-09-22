@@ -18,7 +18,7 @@ describe("POST /submit", () => {
   describe("Given no captcha token", () => {
     it("should respond with a 401 status code", async () => {
       const response = await supertest(verifyRecaptcha).post("/submit").send({});
-      expect(response.statusCode).toBe(401);
+      expect(response.statusCode).toBe(400);
     });
   });
   describe("Test cases with mocked fetching", () => {

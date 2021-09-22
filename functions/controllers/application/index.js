@@ -1,24 +1,24 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
-const helmet = require("helmet");
-const axios = require("axios");
 const formidable = require("formidable-serverless");
 
-const { storage } = require("../../utils/admin");
 const { jwtCheck, hasUpdateApp, hasReadApp } = require("../../utils/middleware");
-const { corsConfig, issuer } = require("../../utils/config");
-const { getM2MToken } = require("../../utils/m2m");
-const { createAppObject, validateAppData, validateResume, isValidFileData } = require("../../utils/application");
-const { uploadFile } = require("../../utils/storage");
-const { queryDocument, setDocument } = require("../../utils/database");
+const {
+  createAppObject,
+  validateAppData,
+  validateResume,
+  isValidFileData,
+  getNewFileName,
+} = require("../../utils/application");
+const { queryDocument, setDocument, uploadFile } = require("../../utils/database");
 
 const application = express();
 application.disable("x-powered-by");
-application.use(helmet());
 application.use(express.json());
 
-const api_url = issuer + "api/v2/";
+const auth0Config = functions.config().auth;
+const corsConfig = auth0Config ? auth0Config.cors : "";
 
 const corsOptions = {
   origin: corsConfig,
@@ -29,7 +29,6 @@ application.use(cors(corsOptions));
 
 /* TODO: 
   Update createAppObject and validateAppObject with schema
-  Update document id posted (if necessary)
   Update getNewFileName to get unique filenames
   Unit Test Functions
 */
@@ -54,33 +53,10 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
           functions.logger.log(req.user.sub + " Validation Errors " + isValidResume);
           return res.status(400).send({ code: 400, message: "Resume Validation Failed", errors: isValidResume });
         }
-        // If bandwidth is too high, remove Auth0id validation
-        const token = await getM2MToken();
-        if (token === "") {
-          functions.logger.log("Failed to retrieve Token");
-          return res.status(500).send({ code: 500, message: "Server Error" });
-        }
-        const userInfoOptions = {
-          method: "GET",
-          url: api_url + "users/" + req.user.sub,
-          headers: { authorization: "Bearer " + token },
-        };
 
-        const userInfo = await axios(userInfoOptions);
-        if (!userInfo.data.email_verified) {
-          functions.logger.log("Unauthorized User: " + userInfo.data.email);
-          return res.status(403).send({ code: 403, message: "Unauthorized User" });
-        }
-        if (userInfo.data.email !== appData.email) {
-          functions.logger.log("Email/Authid Mismatch: " + userInfo.data.email + " " + appData.email);
-          return res.status(400).send({ code: 400, message: "Auth0Id discrepancy with Email" });
-        }
-
-        // Upload Resume Here
         if (files && files.file) {
           return (
-            // TODO: update getNewFileName() and replace test.pdf
-            uploadFile(storage, "resume", "test.pdf", files.file)
+            uploadFile("resume", getNewFileName(appData, files.file.name), files.file)
               .then((filedata) => {
                 // Checks if upload URL exists
                 if (isValidFileData(filedata)) {
@@ -94,7 +70,6 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
                 return res.status(201).send({ code: 201, message: "Successfully Updated Application" });
               })
               .catch((error) => {
-                // Log Errors
                 if (error === "Upload Error") {
                   return res.status(400).send({ code: 400, message: "An Error Occurred Uploading Your Resume" });
                 }
@@ -102,7 +77,6 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
               })
           );
         } else {
-          // TODO: Update Collection
           return (
             setDocument("applicants", req.user.sub, appData)
               // eslint-disable-next-line no-unused-vars
@@ -110,19 +84,16 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
                 return res.status(201).send({ code: 201, message: "Successfully Updated Application" });
               })
               .catch((error) => {
-                // Log Error
                 functions.logger.log(error);
                 return res.status(500).send({ code: 500, message: "Server Error" });
               })
           );
         }
       } catch (error) {
-        // Log Errors
         return res.status(500).send({ code: 500, message: "Server Error" });
       }
     });
   } catch (error) {
-    // Log Errors
     return res.status(500).send({ code: 500, message: "Server Error" });
   }
 });
@@ -144,4 +115,6 @@ application.get("/checkApp", jwtCheck, hasReadApp, async (req, res) => {
   }
 });
 
-module.exports = { application };
+const service = functions.https.onRequest(application);
+
+module.exports = { application, service };

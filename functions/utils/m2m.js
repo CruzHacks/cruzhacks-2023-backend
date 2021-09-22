@@ -1,8 +1,6 @@
 const fetch = require("node-fetch");
-const functions = require("firebase-functions");
 
-const { issuer, client_id, client_secret } = require("./config");
-const getM2MToken = () => {
+const getM2MToken = (client_id, client_secret, issuer) => {
   options = {
     method: "POST",
     headers: {
@@ -17,15 +15,15 @@ const getM2MToken = () => {
   };
   return fetch(`${issuer}oauth/token`, options)
     .then((res) => {
-      //console.log(res)
       return res.json();
     })
     .then((data) => {
-      //console.log(data)
       return data.access_token;
     })
     .catch((err) => {
-      functions.logger.log(`Error: ${err}`);
+      functions.logger.error("Error occurred while fetching M2M token", {
+        error: err,
+      });
       return "";
     });
 };
