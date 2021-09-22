@@ -1,5 +1,4 @@
 const functions = require("firebase-functions");
-const helmet = require("helmet");
 const express = require("express");
 const cors = require("cors");
 const { jwtCheck, validKey, hasDeleteAnnouncement, hasUpdateAnnouncement } = require("../../utils/middleware");
@@ -15,7 +14,6 @@ const corsOptions = {
 };
 
 announcements.disable("x-powered-by");
-announcements.use(helmet());
 announcements.use(cors(corsOptions));
 announcements.use(express.json());
 

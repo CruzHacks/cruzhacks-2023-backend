@@ -1,7 +1,6 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
-const helmet = require("helmet");
 const { validKey } = require("../../utils/middleware");
 const fetch = require("isomorphic-fetch");
 
@@ -15,7 +14,6 @@ const corsConfig = auth0Config ? auth0Config.cors : "";
 const verifyRecaptcha = express();
 
 verifyRecaptcha.disable("x-powered-by");
-verifyRecaptcha.use(helmet());
 
 const corsOptions = {
   origin: corsConfig,
