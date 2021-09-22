@@ -1,16 +1,18 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
-const helmet = require("helmet");
 const axios = require("axios");
 
 const { jwtCheck } = require("../../utils/middleware");
-const { corsConfig, issuer } = require("../../utils/config");
 const { getM2MToken } = require("../../utils/m2m");
+
+const auth0Config = functions.config().auth;
+
+const corsConfig = auth0Config ? auth0Config.cors : "";
+const issuer = auth0Config ? auth0Config.issuer : "";
 
 const app = express();
 app.disable("x-powered-by");
-app.use(helmet());
 app.use(express.json());
 
 const api_url = issuer + "api/v2/";
@@ -26,7 +28,13 @@ app.post("/resend", jwtCheck, async (req, res) => {
   // this endpoint takes in a user_id then converts
   // it into an API call
   try {
-    const token = await getM2MToken();
+    const auth0Config = functions.config().auth;
+    const client_vars = functions.config().client_vars;
+    const issuer = auth0Config ? auth0Config.issuer : "";
+    const client_id = client_vars ? client_vars.client_id : "";
+    const client_secret = client_vars ? client_vars.client_secret : "";
+
+    const token = await getM2MToken(client_id, client_secret, issuer);
     const checkIfVerifiedOptions = {
       // options for the API call
       // to see if email is already verified
@@ -75,4 +83,6 @@ app.post("/resend", jwtCheck, async (req, res) => {
   }
 });
 
-module.exports = { app };
+const service = functions.https.onRequest(app);
+
+module.exports = { app, service };

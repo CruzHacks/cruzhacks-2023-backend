@@ -1,8 +1,10 @@
-const functions = require("firebase-functions");
-const { app } = require("./controllers/auth/index");
-const { verifyRecaptcha } = require("./controllers/VerifyRecaptcha/index");
-const { announcements } = require("./controllers/announcements-api/index");
-
-exports.auth = functions.https.onRequest(app);
-exports.verifyRecaptcha = functions.https.onRequest(verifyRecaptcha);
-exports.announcements = functions.https.onRequest(announcements);
+const function_name = process.env.FUNCTION_NAME || process.env.K_SERVICE;
+if (!function_name || function_name === "auth") {
+  exports.auth = require("./controllers/auth/index").service;
+}
+if (!function_name || function_name === "verifyRecaptcha") {
+  exports.verifyRecaptcha = require("./controllers/VerifyRecaptcha/index").service;
+}
+if (!function_name || function_name === "announcements") {
+  exports.announcements = require("./controllers/announcements-api/index").service;
+}

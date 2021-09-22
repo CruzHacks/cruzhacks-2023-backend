@@ -3,6 +3,7 @@ const request = require("supertest");
 const axios = require("axios");
 const { app } = require("../../../controllers/auth/index");
 const { jwtCheck } = require("../../../utils/middleware");
+const { getM2MToken } = require("../../../utils/m2m");
 
 testConfig.mockConfig({
   auth: {
@@ -15,12 +16,21 @@ testConfig.mockConfig({
     api_token: "sometoken",
     url: "fake_url",
   },
+  client_vars: {
+    client_id: "my-id",
+    client_secret: "my_secret",
+  },
 });
 
 jest.mock("../../../utils/middleware");
+jest.mock("../../../utils/m2m");
 jest.mock("axios", () => jest.fn());
 
 describe("Supertest", () => {
+  beforeEach(() => {
+    // eslint-disable-next-line no-unused-vars
+    getM2MToken.mockImplementationOnce((client_id, client_secret, issuer) => Promise.resolve("token"));
+  });
   afterEach(() => {
     jwtCheck.mockClear();
     axios.mockClear();
@@ -31,6 +41,7 @@ describe("Supertest", () => {
       req.user = { sub: "test user" };
       next();
     });
+
     axios
       .mockImplementationOnce(() => Promise.resolve({ data: { email_verified: false } }))
       .mockImplementationOnce(() => Promise.resolve({ status: 201 }));

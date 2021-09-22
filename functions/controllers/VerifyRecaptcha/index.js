@@ -1,16 +1,19 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
-const helmet = require("helmet");
-const { base_google_endpoint, secretKey } = require("../../utils/config");
-const { corsConfig } = require("../../utils/config");
 const { validKey } = require("../../utils/middleware");
 const fetch = require("isomorphic-fetch");
+
+const recaptchaConfig = functions.config().verify_recaptcha;
+const auth0Config = functions.config().auth;
+
+const base_google_endpoint = recaptchaConfig ? recaptchaConfig.base_google_endpoint : "";
+const secretKey = recaptchaConfig ? recaptchaConfig.secret_key : "";
+const corsConfig = auth0Config ? auth0Config.cors : "";
 
 const verifyRecaptcha = express();
 
 verifyRecaptcha.disable("x-powered-by");
-verifyRecaptcha.use(helmet());
 
 const corsOptions = {
   origin: corsConfig,
@@ -81,4 +84,6 @@ verifyRecaptcha.post("/submit", validKey, async (req, res) => {
   }
 });
 
-module.exports = { verifyRecaptcha };
+const service = functions.https.onRequest(verifyRecaptcha);
+
+module.exports = { verifyRecaptcha, service };
