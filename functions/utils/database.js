@@ -8,8 +8,8 @@ const queryDocument = (collection, id) => {
   return db.collection(collection).doc(id).get();
 };
 
-const setDocument = (collection, id, document) => {
-  return db.collection(collection).doc(id).set(document);
+const setDocument = (collection, id, fields) => {
+  return db.collection(collection).doc(id).set(fields);
 };
 
 const queryCollection = (collection) => {
