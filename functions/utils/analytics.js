@@ -1,5 +1,5 @@
 const functions = require("firebase-functions");
-const { db, admin } = require("./admin")
+const { db, admin } = require("./admin");
 
 /*
     writeToAnalytics adds an event trigger to 'applicants' collection.
@@ -16,7 +16,7 @@ const { db, admin } = require("./admin")
                     
 */
 
-const service = functions.firestore.document("applicants/{docId}").onWrite( async (change, context) => {
+const service = functions.firestore.document("applicants/{docId}").onWrite(async (change, context) => {
   const oldDocument = change.before.exists ? change.before.data() : null;
   const document = change.after.exists ? change.after.data() : null;
   const analyticsDoc = db.collection("analytics").doc("applicant-analytics");
