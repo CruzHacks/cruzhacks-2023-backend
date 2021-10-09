@@ -19,12 +19,12 @@ announcements.use(express.json());
 
 announcements.get("/", validKey, async (req, res) => {
   try {
-    const snapshot = await queryCollectionSorted("announcements", "timeStamp");
+    const snapshot = await queryCollectionSorted("announcements", "date", 4);
     const documents = [];
     snapshot.forEach((doc) => {
       const id = doc.id;
       const data = doc.data();
-      documents.push({ id: id, title: data.title, message: data.message, timeStamp: data.timeStamp });
+      documents.push({ id: id, title: data.title, message: data.message, date: data.date });
     });
     return res.status(200).send({
       error: false,

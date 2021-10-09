@@ -16,10 +16,10 @@ const queryCollection = (collection) => {
   return db.collection(collection).get();
 };
 
-const queryCollectionSorted = (collection, opt) => {
+const queryCollectionSorted = (collection, opt, limit) => {
   // returns sorted in ascending order
   // opt must be a string and it must be a doc field
-  return db.collection(collection).orderBy(opt).get();
+  return db.collection(collection).orderBy(opt).limit(limit).get();
 };
 
 const deleteDocument = (collection, id) => {
