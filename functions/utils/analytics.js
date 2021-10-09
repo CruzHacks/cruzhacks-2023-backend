@@ -16,7 +16,7 @@ const { db, admin } = require("./admin")
                     
 */
 
-const handleOnWrite = (change, context) => {
+const service = functions.firestore.document("applicants/{docId}").onWrite( async (change, context) => {
   const oldDocument = change.before.exists ? change.before.data() : null;
   const document = change.after.exists ? change.after.data() : null;
   const analyticsDoc = db.collection("analytics").doc("applicant-analytics");
@@ -27,8 +27,9 @@ const handleOnWrite = (change, context) => {
       firstTimeIncrement: document.First_CruzHack ? 1 : 0,
       applicantIncrement: 1,
     };
-    const snapShot = analyticsDoc.get();
+    const snapShot = await analyticsDoc.get();
     if (!snapShot.exists) {
+      functions.logger.info("UUUHUHHHH");
       return analyticsDoc.set({
         applicant_count: toUpdate.applicantIncrement,
         firstTime_count: toUpdate.firstTimeIncrement,
@@ -82,7 +83,6 @@ const handleOnWrite = (change, context) => {
       docId: context.params.docId,
     });
   }
-};
+});
 
-const service = functions.firestore.document("applicants/{docId}").onWrite((change, context) => handleOnWrite(change, context));
 module.exports = { service };
