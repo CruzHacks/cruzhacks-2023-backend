@@ -8,4 +8,6 @@ if (!function_name || function_name === "verifyRecaptcha") {
 if (!function_name || function_name === "announcements") {
   exports.announcements = require("./controllers/announcements-api/index").service;
 }
-exports.writeToAnalytics = require("./utils/analytics").service;
+if (!function_name || function_name === "writeToAnalytics") {
+  exports.writeToAnalytics = require("./utils/analytics").service;
+}
