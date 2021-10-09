@@ -19,7 +19,7 @@ const queryCollection = (collection) => {
 const queryCollectionSorted = (collection, opt, limit) => {
   // returns sorted in ascending order
   // opt must be a string and it must be a doc field
-  return db.collection(collection).orderBy(opt).limit(limit).get();
+  return db.collection(collection).orderBy(opt, "desc").limit(limit).get();
 };
 
 const deleteDocument = (collection, id) => {
