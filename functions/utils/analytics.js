@@ -29,7 +29,6 @@ const service = functions.firestore.document("applicants/{docId}").onWrite(async
     };
     const snapShot = await analyticsDoc.get();
     if (!snapShot.exists) {
-      functions.logger.info("UUUHUHHHH");
       return analyticsDoc.set({
         applicant_count: toUpdate.applicantIncrement,
         firstTime_count: toUpdate.firstTimeIncrement,
