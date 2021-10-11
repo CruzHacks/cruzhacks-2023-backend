@@ -19,12 +19,12 @@ announcements.use(express.json());
 
 announcements.get("/", validKey, async (req, res) => {
   try {
-    const snapshot = await queryCollectionSorted("announcements", "timeStamp");
+    const snapshot = await queryCollectionSorted("announcements", "date", 4);
     const documents = [];
     snapshot.forEach((doc) => {
       const id = doc.id;
       const data = doc.data();
-      documents.push({ id: id, title: data.title, message: data.message, timeStamp: data.timeStamp });
+      documents.push({ id: id, title: data.title, message: data.message, date: data.date });
     });
     return res.status(200).send({
       error: false,
@@ -63,10 +63,10 @@ announcements.delete("/:id", jwtCheck, hasDeleteAnnouncement, async (req, res) =
 
 announcements.post("/", jwtCheck, hasUpdateAnnouncement, async (req, res) => {
   const { title, message } = req.body;
-  if (!title || title.length > 50 || !/^[a-zA-Z0-9 ]+$/.test(title)) {
+  if (!title || title.length > 25 || !/^[a-zA-Z0-9 ]+$/.test(title)) {
     return res.status(400).send({ error: true, status: 400, message: "Invalid title" });
   }
-  if (!message || message.length > 200 || !/^[a-zA-Z0-9 ]+$/.test(message)) {
+  if (!message || message.length > 100 || !/^[a-zA-Z0-9 ]+$/.test(message)) {
     return res.status(400).send({ error: true, status: 400, message: "Invalid Message" });
   }
   const data = { title: title, message: message, date: Date.now() };

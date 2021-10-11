@@ -39,13 +39,13 @@ describe("Testing Get All Announcements", () => {
         {
           id: "id",
           data: function () {
-            return { title: "title", message: "message", timeStamp: "today" };
+            return { title: "title", message: "message", date: "today" };
           },
         },
         {
           id: "id2",
           data: function () {
-            return { title: "title2", message: "message2", timeStamp: "tomorrow" };
+            return { title: "title2", message: "message2", date: "tomorrow" };
           },
         },
       ]),
@@ -54,7 +54,7 @@ describe("Testing Get All Announcements", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.message).toBe("Request success, announcements retrieved");
     expect(response.body.announcements).toBe(
-      '[{"id":"id","title":"title","message":"message","timeStamp":"today"},{"id":"id2","title":"title2","message":"message2","timeStamp":"tomorrow"}]',
+      '[{"id":"id","title":"title","message":"message","date":"today"},{"id":"id2","title":"title2","message":"message2","date":"tomorrow"}]',
     );
     expect(response.body.count).toBe(2);
   });
