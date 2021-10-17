@@ -3,4 +3,4 @@ admin.initializeApp();
 db = admin.firestore();
 storage = admin.storage();
 
-module.exports = { db, storage };
+module.exports = { db, admin, storage };
