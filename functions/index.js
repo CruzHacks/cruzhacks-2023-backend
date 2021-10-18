@@ -11,3 +11,6 @@ if (!function_name || function_name === "announcements") {
 if (!function_name || function_name === "writeToAnalytics") {
   exports.writeToAnalytics = require("./utils/analytics").service;
 }
+if (!function_name || function_name === "analytics") {
+  exports.analytics = require("./controllers/analytics/index").service;
+}

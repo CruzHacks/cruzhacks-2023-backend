@@ -54,5 +54,6 @@ const hasPermission = (permission) => {
 
 const hasUpdateAnnouncement = hasPermission("update:announcements");
 const hasDeleteAnnouncement = hasPermission("delete:announcements");
+const hasReadAnalytics = hasPermission("read:analytics");
 
-module.exports = { jwtCheck, validKey, hasPermission, hasUpdateAnnouncement, hasDeleteAnnouncement };
+module.exports = { jwtCheck, validKey, hasPermission, hasUpdateAnnouncement, hasDeleteAnnouncement, hasReadAnalytics };
