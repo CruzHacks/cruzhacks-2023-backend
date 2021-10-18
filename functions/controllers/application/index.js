@@ -42,8 +42,9 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
       }
       try {
         // TODO: Update createAppObject and validateAppObject functions
-        appData = createAppObject(fields);
-        const isValidData = validateAppData(appData);
+        const isPending = fields["submission"] ? fields[submission].toLowerCase() === "submit" : false
+        const appData = createAppObject(fields, isPending);
+        const isValidData = validateAppData(appData, isPending);
         if (isValidData.length > 0) {
           functions.logger.log(req.user.sub + " Validation Errors " + isValidData);
           return res.status(400).send({ code: 400, message: "Form Validation Failed", errors: isValidData });
@@ -56,7 +57,7 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
 
         if (files && files.file) {
           return (
-            uploadFile("resume", getNewFileName(appData, files.file.name), files.file)
+            uploadFile("resume", getNewFileName(appData, files.file.name, req.user.sub), files.file)
               .then((filedata) => {
                 // Checks if upload URL exists
                 if (isValidFileData(filedata)) {
@@ -101,7 +102,7 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
 application.get("/checkApp", jwtCheck, hasReadApp, async (req, res) => {
   try {
     doc = await queryDocument("applicants", req.user.sub);
-    appStatus = doc.get("status");
+    const appStatus = doc.get("status");
     if (appStatus === undefined) {
       throw new Error("No Document");
     }
