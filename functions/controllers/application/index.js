@@ -42,7 +42,7 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
       }
       try {
         // TODO: Update createAppObject and validateAppObject functions
-        const isPending = fields["submission"] ? fields[submission].toLowerCase() === "submit" : false
+        const isPending = fields["submission"] ? fields[submission].toLowerCase() === "submit" : false;
         const appData = createAppObject(fields, isPending);
         const isValidData = validateAppData(appData, isPending);
         if (isValidData.length > 0) {
