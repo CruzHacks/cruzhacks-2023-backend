@@ -1,4 +1,4 @@
-const { alphanumericRegex, alphanumericPunctuationRegex, phoneRegex } = require("./regex");
+const { alphanumericPunctuationRegex, phoneRegex } = require("./regex");
 
 /*
   Return Inteface
@@ -31,53 +31,33 @@ const { alphanumericRegex, alphanumericPunctuationRegex, phoneRegex } = require(
     anythingElse: string
 */
 
-const createAppObject = (body, isPending) => {
+const createAppObject = (body) => {
   const pronouns = [];
-  const sexuality = [];
+  const sexualities = [];
+  const pronounCount = body["pronounCount"] ? parseInt(body["pronounCount"]) : 0;
+  const sexualityCount = body["sexualityCount"] ? parseInt(body["sexualityCount"]) : 0;
+  for (var i = 0; i < pronounCount; i++) {
+    var pronoun = body[`pronouns[${i}]`];
+    if (pronoun !== null) {
+      pronouns.push(pronoun);
+    }
+  }
+  for (var j = 0; j < sexualityCount; j++) {
+    var sexuality = body[`sexuality[${j}]`];
+    if (sexuality !== null) {
+      sexualities.push(sexuality);
+    }
+  }
+
   const isUCSC = body["school"]
     ? body["school"].toLowerCase() === "ucsc" ||
       body["school"].toLowerCase() === "uc santa cruz" ||
       body["school"].toLowerCase() === "university of california, santa cruz"
     : false;
-  // if (body["ptnaPronouns"]) {
-  //   pronouns.push("Prefer Not to Answer")
-  // }
-  // else if (body["otherPronouns"] !== "") {
-  //   pronouns.push(body["otherPronouns"])
-  // }
-  // else {
-  //   if (body["heHimHis"]) {
-  //     pronouns.push("He/Him/His")
-  //   }
-  //   if (body["sheHerHers"]) {
-  //     pronouns.push("She/Her/Hers")
-  //   }
-  //   if (body["theyThemTheir"]){
-  //     pronouns.push("They/Them/Their")
-  //   }
-  // }
-
-  // if (body["ptna"]) {
-  //   pronouns.push("Prefer Not to Answer")
-  // }
-  // else if (body["otherPronouns"] !== "") {
-  //   pronouns.push(body["otherPronouns"])
-  // }
-  // else {
-  //   if (body["heHimHis"]) {
-  //     pronouns.push("He/Him/His")
-  //   }
-  //   if (body["sheHerHers"]) {
-  //     pronouns.push("She/Her/Hers")
-  //   }
-  //   if (body["theyThemTheir"]){
-  //     pronouns.push("They/Them/Their")
-  //   }
-  // }
 
   const appObj = {
     // App Info
-    status: isPending ? "pending" : "No Document",
+    status: "pending",
     // Contact Info
     email: body["email"],
     fname: body["fname"] ? body["fname"] : "",
@@ -87,7 +67,7 @@ const createAppObject = (body, isPending) => {
     // Demographic
     age: body["age"] ? Integer.parseInt(body["age"]) : -1,
     pronouns: pronouns,
-    sexuality: sexuality,
+    sexuality: sexualities,
     race: body["race"] ? body["race"] : "",
     ucscStudent: isUCSC,
     school: body["school"] ? body[school].toLowerCase() : "",
@@ -116,7 +96,7 @@ const createAppObject = (body, isPending) => {
   return appObj;
 };
 
-const validateAppData = (data, isPending) => {
+const validateAppData = (data) => {
   const fields = [
     "email",
     "fname",
@@ -147,9 +127,8 @@ const validateAppData = (data, isPending) => {
   let errors = [];
 
   fields.forEach((key) => {
-    switch (key.toLowerCase()) {
+    switch (key) {
       case "email": {
-        console.log("Test");
         if (data[key] === "" || data[key].length > 100) {
           errors.push("Email is Invalid");
         }
@@ -193,37 +172,69 @@ const validateAppData = (data, isPending) => {
         }
         break;
       }
-      // Need to validate Pronouns, sexuality more in-depth
       case "pronouns": {
-        if (isPending && data[key].length() === 0) {
+        const givenOptions = ["he/him/his", "she/her/hers", "they/them/theirs", "prefer not to answer"];
+        if (data[key].length === 0) {
           errors.push("No Pronouns Selected");
-        }
-        if (data[key.length] >= 5) {
+        } else if (data[key].length >= 5) {
           errors.push("Too Big of an Array");
+        } else {
+          for (var i = 0; i < data[key].length; i++) {
+            if (
+              data[key][i] === "" ||
+              !givenOptions.includes(data[key][i]) ||
+              data[key][i].length > 50 ||
+              alphanumericPunctuationRegex(data[key[i]])
+            ) {
+              errors.push("Pronoun Input Not Parsable");
+              break;
+            }
+          }
         }
         break;
       }
       case "sexuality": {
-        if (isPending && data[key].length() === 0) {
+        const givenOptions = [
+          "bisexual",
+          "cisgender",
+          "gay",
+          "heterosexual",
+          "lesbian",
+          "transgender",
+          "queer",
+          "prefer not to answer",
+        ];
+        if (data[key].length === 0) {
           errors.push("No Sexuality Selected");
-        }
-        if (data[key.length] >= 5) {
+        } else if (data[key].length >= 5) {
           errors.push("Too Big of an Array");
+        } else {
+          for (var j = 0; j < data[key].length; j++) {
+            if (
+              data[key][j] === "" ||
+              !givenOptions.includes(data[key][j]) ||
+              data[key][j].length > 50 ||
+              alphanumericPunctuationRegex(data[key[j]])
+            ) {
+              errors.push("Sexuality Input Not Parsable");
+              break;
+            }
+          }
         }
         break;
       }
       case "race": {
-        if (isPending && data[key].length() === 0) {
+        if (data[key] === "") {
           errors.push("No Race Inputted");
-        } else if (data[key].length() > 50) {
+        } else if (data[key].length > 50) {
           errors.push("Race String Too Long");
-        } else if (alphanumericRegex(data[key])) {
+        } else if (alphanumericPunctuationRegex(data[key])) {
           errors.push("Race is not alphanumeric");
         }
         break;
       }
       case "school": {
-        if (isPending && data[key].length === 0) {
+        if (data[key].length === 0) {
           errors.push("No School Inputted");
         } else if (data[key].length > 100) {
           errors.push("School is Missing");
@@ -231,23 +242,36 @@ const validateAppData = (data, isPending) => {
         break;
       }
       case "collegeAffiliation": {
-        const validOptions = [""];
-        if (isPending && data["ucscStudent"] && !validOptions.includes(data[key])) {
+        const validOptions = [
+          "i am not a ucsc student",
+          "i am a UCSC grad student with no college affiliation",
+          "college 9",
+          "college 10",
+          "cowell",
+          "stevenson",
+          "crown",
+          "merrill",
+          "kresge",
+          "porter",
+          "rachel carson college",
+          "oakes",
+        ];
+        if (data["ucscStudent"] && !validOptions.includes(data[key])) {
           errors.push("Invalid College Affiliation");
         }
         break;
       }
       case "eventLocation": {
         const validOptions = ["On-campus at UC Santa Cruz", "Santa Cruz County", "Other", "Unsure"];
-        if (isPending && !validOptions.includes(data[key])) {
+        if (!validOptions.includes(data[key])) {
           errors.push("Not a valid event location");
         }
         break;
       }
       case "major": {
-        if (isPending && data[key] === "") {
+        if (data[key] === "") {
           errors.push("No major inputted");
-        } else if (data[key].length() > 50) {
+        } else if (data[key].length > 50) {
           errors.push("Major Name Too Long");
         } else if (alphanumericPunctuationRegex(data[key])) {
           errors.push("Major name is not alphanumeric");
@@ -255,33 +279,29 @@ const validateAppData = (data, isPending) => {
         break;
       }
       case "currentStanding": {
-        if (isPending && data[key] === "") {
+        if (data[key] === "") {
           errors.push("No standing inputted");
-        }
-        if (data[key].length() > 50) {
+        } else if (data[key].length > 50) {
           errors.push("Standing Name Too Long");
-        }
-        if (alphanumericRegex(data[key])) {
+        } else if (alphanumericPunctuationRegex(data[key])) {
           errors.push("Standing name is not alphanumeric");
         }
         break;
       }
       case "country": {
-        if (isPending && data[key] === "") {
+        if (data[key] === "") {
           errors.push("No country inputted");
-        }
-        if (data[key].length() > 50) {
+        } else if (data[key].length > 50) {
           errors.push("Country Name Too Long");
-        }
-        if (alphanumericRegex(data[key])) {
+        } else if (alphanumericPunctuationRegex(data[key])) {
           errors.push("Country name is not alphanumeric");
         }
         break;
       }
       case "whyCruzHacks": {
-        if (isPending && data[key] === "") {
+        if (data[key] === "") {
           errors.push("No response for Why CruzHacks");
-        } else if (data[key].length() > 250) {
+        } else if (data[key].length > 250) {
           errors.push("Why Cruzhacks response too Long");
         } else if (alphanumericPunctuationRegex(data[key])) {
           errors.push("Why CruzHacks is not alphanumeric with punctuation");
@@ -289,9 +309,9 @@ const validateAppData = (data, isPending) => {
         break;
       }
       case "newThisYear": {
-        if (isPending && data[key] === "") {
+        if (data[key] === "") {
           errors.push("No response for New This Year");
-        } else if (data[key].length() > 250) {
+        } else if (data[key].length > 250) {
           errors.push("New This Year response too Long");
         } else if (alphanumericPunctuationRegex(data[key])) {
           errors.push("New This Year is not alphanumeric with punctuation");
@@ -299,9 +319,9 @@ const validateAppData = (data, isPending) => {
         break;
       }
       case "grandestInvention": {
-        if (isPending && data[key] === "") {
+        if (data[key] === "") {
           errors.push("No response for Grandest Invention");
-        } else if (data[key].length() > 250) {
+        } else if (data[key].length > 250) {
           errors.push("Grandest Invention response too Long");
         } else if (alphanumericPunctuationRegex(data[key])) {
           errors.push("Grandest Invention is not alphanumeric with punctuation");
@@ -309,7 +329,7 @@ const validateAppData = (data, isPending) => {
         break;
       }
       case "hackathonCount": {
-        if (isPending && data[key] < 0) {
+        if (data[key] < 0) {
           errors.push("Invalid Hackathon Count");
         } else if (data[key] > 100) {
           errors.push("Too many hackathons attended");
@@ -317,7 +337,7 @@ const validateAppData = (data, isPending) => {
         break;
       }
       case "priorExperience": {
-        if (data[key].length() > 100) {
+        if (data[key].length > 100) {
           errors.push("Prior Experience response too Long");
         } else if (alphanumericPunctuationRegex(data[key])) {
           errors.push("Prior Experience is not alphanumeric with punctuation");
@@ -325,7 +345,7 @@ const validateAppData = (data, isPending) => {
         break;
       }
       case "linkedin": {
-        if (data[key].length() > 100) {
+        if (data[key].length > 100) {
           errors.push("LinkedIn Id too Long");
         } else if (alphanumericPunctuationRegex(data[key])) {
           errors.push("LinkedIn is not alphanumeric with punctuation");
@@ -333,7 +353,7 @@ const validateAppData = (data, isPending) => {
         break;
       }
       case "github": {
-        if (data[key].length() > 100) {
+        if (data[key].length > 100) {
           errors.push("GitHub Id too Long");
         } else if (alphanumericPunctuationRegex(data[key])) {
           errors.push("GitHub Id is not alphanumeric with punctuation");
@@ -341,7 +361,7 @@ const validateAppData = (data, isPending) => {
         break;
       }
       case "cruzCoins": {
-        if (data[key].length() > 100) {
+        if (data[key].length > 100) {
           errors.push("CruzCoins response too Long");
         } else if (alphanumericPunctuationRegex(data[key])) {
           errors.push("CruzCoins is not alphanumeric with punctuation");
@@ -349,7 +369,7 @@ const validateAppData = (data, isPending) => {
         break;
       }
       case "anythingElse": {
-        if (data[key].length() > 100) {
+        if (data[key].length > 100) {
           errors.push("Anything Else response too Long");
         } else if (alphanumericPunctuationRegex(data[key])) {
           errors.push("Anything Else is not alphanumeric with punctuation");
@@ -396,15 +416,15 @@ const isValidFileData = (filedata) => {
 };
 
 const getNewFileName = (data, filename, user) => {
-  // const lname = data.lname.replace(/[^0-9a-z]/gi, '').toLowerCase();
-  // const fname = data.fname.replace(/[^0-9a-z]/gi, '').toLowerCase();
+  const lname = data.lname.replace(/[^0-9a-z]/gi, "").toLowerCase();
+  const fname = data.fname.replace(/[^0-9a-z]/gi, "").toLowerCase();
   const uid = user.split("|").slice(1).join("");
-  //const file = lname + "_" + fname + "_" + uid
+  const file = lname + "_" + fname + "_" + uid;
   var extension = filename.split(".").pop();
   if (extension === "") {
     extension = "pdf";
   }
-  return uid + "." + extension;
+  return file + "." + extension;
 };
 
 module.exports = { createAppObject, validateAppData, validateResume, isValidFileData, getNewFileName };

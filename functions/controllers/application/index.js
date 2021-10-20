@@ -28,8 +28,6 @@ const corsOptions = {
 application.use(cors(corsOptions));
 
 /* TODO: 
-  Update createAppObject and validateAppObject with schema
-  Update getNewFileName to get unique filenames
   Unit Test Functions
 */
 application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
@@ -41,10 +39,8 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
         return res.status(500).send({ code: 500, message: "Server Error" });
       }
       try {
-        // TODO: Update createAppObject and validateAppObject functions
-        const isPending = fields["submission"] ? fields[submission].toLowerCase() === "submit" : false;
-        const appData = createAppObject(fields, isPending);
-        const isValidData = validateAppData(appData, isPending);
+        const appData = createAppObject(fields);
+        const isValidData = validateAppData(appData);
         if (isValidData.length > 0) {
           functions.logger.log(req.user.sub + " Validation Errors " + isValidData);
           return res.status(400).send({ code: 400, message: "Form Validation Failed", errors: isValidData });
