@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const formidable = require("formidable-serverless");
 
-const { jwtCheck, hasUpdateApp, hasReadApp } = require("../../utils/middleware");
+const { jwtCheck, hasUpdateApp, hasReadApp, hasReadAnalytics } = require("../../utils/middleware");
 const {
   createAppObject,
   validateAppData,
@@ -109,6 +109,27 @@ application.get("/checkApp", jwtCheck, hasReadApp, async (req, res) => {
     } else {
       res.status(500).send({ code: 500, status: "No Document", exists: false, message: "Internal Server Error" });
     }
+  }
+});
+
+application.get("/analytics", jwtCheck, hasReadAnalytics, async (req, res) => {
+  try {
+    const analyticsSnapshot = await queryDocument("analytics", "applicant-analytics");
+    if (!analyticsSnapshot.exists) {
+      throw "No Doc";
+    }
+    res.status(201).send({
+      message: {
+        ucscApplicants: analyticsSnapshot.get("ucscStudentCount"),
+        firstTime: analyticsSnapshot.get("firstTimeStudentCount"),
+        applicantCount: analyticsSnapshot.get("applicantCount"),
+      },
+    });
+  } catch (err) {
+    if (err === "No Doc") {
+      res.status(404).send({ status: 404, message: "No Document" });
+    }
+    res.status(500).send({ status: 500, message: "Insufficient Permissions" });
   }
 });
 
