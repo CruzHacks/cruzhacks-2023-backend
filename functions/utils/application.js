@@ -70,7 +70,7 @@ const createAppObject = (body) => {
     sexuality: sexualities,
     race: body["race"] ? body["race"] : "",
     ucscStudent: isUCSC,
-    school: body["school"] ? body[school].toLowerCase() : "",
+    school: body["school"] ? body["school"].toLowerCase() : "",
     collegeAffiliation: body["collegeAffiliation"] ? body["collegeAffiliation"] : "", //Fix to to deal with ucsc
     eventLocation: body["eventLocation"] ? body["eventLocation"] : "",
     major: body["major"] ? body["major"] : "",
@@ -84,7 +84,7 @@ const createAppObject = (body) => {
 
     // Prior Experience
     firstCruzHack: body["firstCruzHack"] === true,
-    hackathonCount: body["hackathonCount"] ? Integer.parseInt(body["hackathonCount"]) : -1,
+    hackathonCount: body["hackathonCount"] ? parseInt(body["hackathonCount"]) : -1,
     priorExperience: body["priorExperience"] ? body["priorExperience"] : "",
 
     // Connected
@@ -237,7 +237,7 @@ const validateAppData = (data) => {
         if (data[key].length === 0) {
           errors.push("No School Inputted");
         } else if (data[key].length > 100) {
-          errors.push("School is Missing");
+          errors.push("School Input too Long");
         }
         break;
       }
