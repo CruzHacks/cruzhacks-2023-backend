@@ -70,14 +70,14 @@ describe("Testing Email Regex", () => {
     expect(emailRegex(`very.unusual.”@”.unusual.com@example.com`)).toBe(false);
   });
   it("Should reject invalid format given no mail server", () => {
-   expect(emailRegex("plainaddress")).toBe(true);
+    expect(emailRegex("plainaddress")).toBe(true);
   });
   it("Should reject invalid format given just the mail server", () => {
     expect(emailRegex("@plainaddress.com")).toBe(true);
-   });
+  });
   it("Should reject invalid format given invalid character string invalid mail server, and proper domain ", () => {
     expect(emailRegex("#@%^%#$@#$@#.com")).toBe(true);
-   });
+  });
   it("Should reject invalid format given just the domain", () => {
     expect(emailRegex(".com")).toBe(true);
   });

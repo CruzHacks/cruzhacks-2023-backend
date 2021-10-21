@@ -65,7 +65,7 @@ const createAppObject = (body) => {
     phone: body["phone"] ? body["phone"] : "",
 
     // Demographic
-    age: body["age"] ? Integer.parseInt(body["age"]) : -1,
+    age: body["age"] ? parseInt(body["age"]) : -1,
     pronouns: pronouns,
     sexuality: sexualities,
     race: body["race"] ? body["race"] : "",
