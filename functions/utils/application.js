@@ -80,7 +80,7 @@ const createAppObject = (body) => {
     // Short Answer
     whyCruzHacks: body["whyCruzHacks"] ? body["whyCruzHacks"] : "",
     newThisYear: body["newThisYear"] ? body["newThisYear"] : "",
-    grandestInvention: body["grandestInvention"] ? body["grandInvention"] : "",
+    grandestInvention: body["grandestInvention"] ? body["grandestInvention"] : "",
 
     // Prior Experience
     firstCruzHack: body["firstCruzHack"] === true,

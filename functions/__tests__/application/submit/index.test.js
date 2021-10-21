@@ -22,6 +22,9 @@ jest.mock("../../../utils/middleware");
 jest.mock("../../../utils/database");
 
 describe("Given submit invalid form data", () => {
+  beforeAll(() => {
+    setDocument.mockImplementation((collection, id, fields) => Promise.resolve("success"));
+  })
   afterEach(() => {
     jwtCheck.mockClear();
     hasUpdateApp.mockClear();
@@ -743,4 +746,577 @@ describe("Given submit invalid form data", () => {
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Country Name Too Long");
   });
+
+  it("Should return 400 and proper error-codes given empty Why CruzHacks", async () => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+    hasUpdateApp.mockImplementation((req, res, next) => {
+      next();
+    });
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("country", "USA")
+      .field("whyCruzHacks", "");
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("Form Validation Failed");
+    expect(res.body.errors[0]).toStrictEqual("No response for Why CruzHacks");
+  });
+
+  it("Should return 400 and proper error-codes given Long Why CruzHacks", async () => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+    hasUpdateApp.mockImplementation((req, res, next) => {
+      next();
+    });
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("country", "USA")
+      .field("whyCruzHacks", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("Form Validation Failed");
+    expect(res.body.errors[0]).toStrictEqual("Why Cruzhacks response too Long");
+  });
+
+  it("Should return 400 and proper error-codes given empty New This Year", async () => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+    hasUpdateApp.mockImplementation((req, res, next) => {
+      next();
+    });
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("country", "USA")
+      .field("whyCruzHacks", "Yes")
+      .field("newThisYear", "");
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("Form Validation Failed");
+    expect(res.body.errors[0]).toStrictEqual("No response for New This Year");
+  });
+
+  it("Should return 400 and proper error-codes given Long New This Year", async () => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+    hasUpdateApp.mockImplementation((req, res, next) => {
+      next();
+    });
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("country", "USA")
+      .field("whyCruzHacks", "Yes")
+      .field("newThisYear", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("Form Validation Failed");
+    expect(res.body.errors[0]).toStrictEqual("New This Year response too Long");
+  });
+
+  it("Should return 400 and proper error-codes given empty Grandest Invention", async () => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+    hasUpdateApp.mockImplementation((req, res, next) => {
+      next();
+    });
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("country", "USA")
+      .field("whyCruzHacks", "Yes")
+      .field("newThisYear", "2022 Hackathon")
+      .field("grandestInvention", "");
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("Form Validation Failed");
+    expect(res.body.errors[0]).toStrictEqual("No response for Grandest Invention");
+  });
+
+  it("Should return 400 and proper error-codes given Long Grandest Invention", async () => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+    hasUpdateApp.mockImplementation((req, res, next) => {
+      next();
+    });
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("country", "USA")
+      .field("whyCruzHacks", "Yes")
+      .field("newThisYear", "2022 Hackathon")
+      .field("grandestInvention", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("Form Validation Failed");
+    expect(res.body.errors[0]).toStrictEqual("Grandest Invention response too Long");
+  });
+
+  it("Should return 400 and proper error-codes given Missing Hackathon Count", async () => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+    hasUpdateApp.mockImplementation((req, res, next) => {
+      next();
+    });
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("country", "USA")
+      .field("whyCruzHacks", "Yes")
+      .field("newThisYear", "2022 Hackathon")
+      .field("grandestInvention", "Jest Test")
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("Form Validation Failed");
+    expect(res.body.errors[0]).toStrictEqual("Invalid Hackathon Count");
+  });
+
+  it("Should return 400 and proper error-codes given Negative Hackathon Count", async () => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+    hasUpdateApp.mockImplementation((req, res, next) => {
+      next();
+    });
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("country", "USA")
+      .field("whyCruzHacks", "Yes")
+      .field("newThisYear", "2022 Hackathon")
+      .field("grandestInvention", "Jest Test")
+      .field("hackathonCount", "-5")
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("Form Validation Failed");
+    expect(res.body.errors[0]).toStrictEqual("Invalid Hackathon Count");
+  });
+
+  it("Should return 400 and proper error-codes given Large Hackathon Count", async () => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+    hasUpdateApp.mockImplementation((req, res, next) => {
+      next();
+    });
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("country", "USA")
+      .field("whyCruzHacks", "Yes")
+      .field("newThisYear", "2022 Hackathon")
+      .field("grandestInvention", "Jest Test")
+      .field("hackathonCount", "1000")
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("Form Validation Failed");
+    expect(res.body.errors[0]).toStrictEqual("Too many hackathons attended");
+  });
+
+  it("Should return 400 and proper error-codes given Large Hackathon Count", async () => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+    hasUpdateApp.mockImplementation((req, res, next) => {
+      next();
+    });
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("country", "USA")
+      .field("whyCruzHacks", "Yes")
+      .field("newThisYear", "2022 Hackathon")
+      .field("grandestInvention", "Jest Test")
+      .field("hackathonCount", "1000")
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("Form Validation Failed");
+    expect(res.body.errors[0]).toStrictEqual("Too many hackathons attended");
+  });
+
+  it("Should return 400 and proper error-codes given Long Prior Experience", async () => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+    hasUpdateApp.mockImplementation((req, res, next) => {
+      next();
+    });
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("country", "USA")
+      .field("whyCruzHacks", "Yes")
+      .field("newThisYear", "2022 Hackathon")
+      .field("grandestInvention", "Jest Test")
+      .field("hackathonCount", "0")
+      .field("priorExperience", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("Form Validation Failed");
+    expect(res.body.errors[0]).toStrictEqual("Prior Experience response too Long");
+  });
+  
+  it("Should return 400 and proper error-codes given Long LinkedIn Id", async () => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+    hasUpdateApp.mockImplementation((req, res, next) => {
+      next();
+    });
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("country", "USA")
+      .field("whyCruzHacks", "Yes")
+      .field("newThisYear", "2022 Hackathon")
+      .field("grandestInvention", "Jest Test")
+      .field("hackathonCount", "0")
+      .field("linkedin", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("Form Validation Failed");
+    expect(res.body.errors[0]).toStrictEqual("LinkedIn Id too Long");
+  });
+
+  
+  it("Should return 400 and proper error-codes given Long Github Id", async () => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+    hasUpdateApp.mockImplementation((req, res, next) => {
+      next();
+    });
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("country", "USA")
+      .field("whyCruzHacks", "Yes")
+      .field("newThisYear", "2022 Hackathon")
+      .field("grandestInvention", "Jest Test")
+      .field("hackathonCount", "0")
+      .field("github", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("Form Validation Failed");
+    expect(res.body.errors[0]).toStrictEqual("GitHub Id too Long");
+  });
+
+  
+  it("Should return 400 and proper error-codes given Long Cruz Coins Reponse", async () => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+    hasUpdateApp.mockImplementation((req, res, next) => {
+      next();
+    });
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("country", "USA")
+      .field("whyCruzHacks", "Yes")
+      .field("newThisYear", "2022 Hackathon")
+      .field("grandestInvention", "Jest Test")
+      .field("hackathonCount", "0")
+      .field("cruzCoins", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("Form Validation Failed");
+    expect(res.body.errors[0]).toStrictEqual("CruzCoins response too Long");
+  });
+
+  
+  it("Should return 400 and proper error-codes given Long Anything Else", async () => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+    hasUpdateApp.mockImplementation((req, res, next) => {
+      next();
+    });
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("country", "USA")
+      .field("whyCruzHacks", "Yes")
+      .field("newThisYear", "2022 Hackathon")
+      .field("grandestInvention", "Jest Test")
+      .field("hackathonCount", "0")
+      .field("anythingElse", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("Form Validation Failed");
+    expect(res.body.errors[0]).toStrictEqual("Anything Else response too Long");
+  });
+
+  it("Should return 200 given Valid Response with No File", async () => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+    hasUpdateApp.mockImplementation((req, res, next) => {
+      next();
+    });
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("country", "USA")
+      .field("whyCruzHacks", "Yes")
+      .field("newThisYear", "2022 Hackathon")
+      .field("grandestInvention", "Jest Test")
+      .field("hackathonCount", "0")
+      .field("anythingElse", "")
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(201);
+    expect(res.body.message).toBe("Successfully Updated Application");
+    expect(res.body.errors).toStrictEqual(undefined);
+  });
 });
+
