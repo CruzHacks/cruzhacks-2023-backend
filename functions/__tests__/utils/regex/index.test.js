@@ -1,4 +1,4 @@
-const { phoneRegex, alphanumericPunctuationRegex } = require("../../../utils/regex");
+const { phoneRegex, alphanumericPunctuationRegex, emailRegex } = require("../../../utils/regex");
 
 describe("Testing AlphanumericRegex", () => {
   it("Should Pass given the Alphabet", () => {
@@ -52,5 +52,36 @@ describe("Testing Phone Regex", () => {
   });
   it("Should Fail given that invalid Phone format", () => {
     expect(phoneRegex("123-456-7890-1023")).toBe(true);
+  });
+});
+
+describe("Testing Email Regex", () => {
+  it("Should pass given standard email address", () => {
+    expect(emailRegex("email@example.com")).toBe(false);
+  });
+  it("Should pass given ip mail server address", () => {
+    expect(emailRegex("email@123.123.123.123")).toBe(false);
+  });
+  it("Should pass given email @ business domain address", () => {
+    expect(emailRegex("email@subdomain.example.com")).toBe(false);
+  });
+  it("Should pass strange but valid emails", () => {
+    expect(emailRegex(`very.”(),:;<>[]”.VERY.”very@\\ "very”.unusual@strange.example.com`)).toBe(false);
+    expect(emailRegex(`very.unusual.”@”.unusual.com@example.com`)).toBe(false);
+  });
+  it("Should reject invalid format given no mail server", () => {
+   expect(emailRegex("plainaddress")).toBe(true);
+  });
+  it("Should reject invalid format given just the mail server", () => {
+    expect(emailRegex("@plainaddress.com")).toBe(true);
+   });
+  it("Should reject invalid format given invalid character string invalid mail server, and proper domain ", () => {
+    expect(emailRegex("#@%^%#$@#$@#.com")).toBe(true);
+   });
+  it("Should reject invalid format given just the domain", () => {
+    expect(emailRegex(".com")).toBe(true);
+  });
+  it("Should reject invalid mail server format", () => {
+    expect(emailRegex("email@-example.com")).toBe(true);
   });
 });
