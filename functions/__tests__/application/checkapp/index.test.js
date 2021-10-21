@@ -1,7 +1,7 @@
 const testConfig = require("firebase-functions-test")();
 const request = require("supertest");
 const { application } = require("../../../controllers/application/index");
-const { jwtCheck, hasReadApp, hasUpdateApp } = require("../../../utils/middleware");
+const { jwtCheck, hasReadApp } = require("../../../utils/middleware");
 const { queryDocument } = require("../../../utils/database");
 const { makeDocumentSnapshot } = require("firebase-functions-test/lib/providers/firestore");
 
