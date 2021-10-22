@@ -3,7 +3,6 @@ const request = require("supertest");
 const { application } = require("../../../controllers/application/index");
 const { jwtCheck, hasUpdateApp } = require("../../../utils/middleware");
 const { setDocument } = require("../../../utils/database");
-const { makeDocumentSnapshot } = require("firebase-functions-test/lib/providers/firestore");
 
 testConfig.mockConfig({
   auth: {
@@ -23,8 +22,8 @@ jest.mock("../../../utils/database");
 
 describe("Given submit invalid form data", () => {
   beforeAll(() => {
-    setDocument.mockImplementation((collection, id, fields) => Promise.resolve("success"));
-  })
+    setDocument.mockImplementation(() => Promise.resolve("success"));
+  });
   afterEach(() => {
     jwtCheck.mockClear();
     hasUpdateApp.mockClear();
@@ -805,7 +804,10 @@ describe("Given submit invalid form data", () => {
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
       .field("country", "USA")
-      .field("whyCruzHacks", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+      .field(
+        "whyCruzHacks",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      );
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(400);
@@ -873,7 +875,10 @@ describe("Given submit invalid form data", () => {
       .field("currentStanding", "I am actually sitting")
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
-      .field("newThisYear", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+      .field(
+        "newThisYear",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      );
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(400);
@@ -943,7 +948,10 @@ describe("Given submit invalid form data", () => {
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
-      .field("grandestInvention", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+      .field(
+        "grandestInvention",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      );
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(400);
@@ -978,7 +986,7 @@ describe("Given submit invalid form data", () => {
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
-      .field("grandestInvention", "Jest Test")
+      .field("grandestInvention", "Jest Test");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(400);
@@ -1014,7 +1022,7 @@ describe("Given submit invalid form data", () => {
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
       .field("grandestInvention", "Jest Test")
-      .field("hackathonCount", "-5")
+      .field("hackathonCount", "-5");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(400);
@@ -1050,7 +1058,7 @@ describe("Given submit invalid form data", () => {
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
       .field("grandestInvention", "Jest Test")
-      .field("hackathonCount", "1000")
+      .field("hackathonCount", "1000");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(400);
@@ -1086,7 +1094,7 @@ describe("Given submit invalid form data", () => {
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
       .field("grandestInvention", "Jest Test")
-      .field("hackathonCount", "1000")
+      .field("hackathonCount", "1000");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(400);
@@ -1123,14 +1131,17 @@ describe("Given submit invalid form data", () => {
       .field("newThisYear", "2022 Hackathon")
       .field("grandestInvention", "Jest Test")
       .field("hackathonCount", "0")
-      .field("priorExperience", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+      .field(
+        "priorExperience",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      );
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Prior Experience response too Long");
   });
-  
+
   it("Should return 400 and proper error-codes given Long LinkedIn Id", async () => {
     jwtCheck.mockImplementation((req, res, next) => {
       req.user = { sub: "test user" };
@@ -1160,7 +1171,10 @@ describe("Given submit invalid form data", () => {
       .field("newThisYear", "2022 Hackathon")
       .field("grandestInvention", "Jest Test")
       .field("hackathonCount", "0")
-      .field("linkedin", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+      .field(
+        "linkedin",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      );
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(400);
@@ -1168,7 +1182,6 @@ describe("Given submit invalid form data", () => {
     expect(res.body.errors[0]).toStrictEqual("LinkedIn Id too Long");
   });
 
-  
   it("Should return 400 and proper error-codes given Long Github Id", async () => {
     jwtCheck.mockImplementation((req, res, next) => {
       req.user = { sub: "test user" };
@@ -1198,7 +1211,10 @@ describe("Given submit invalid form data", () => {
       .field("newThisYear", "2022 Hackathon")
       .field("grandestInvention", "Jest Test")
       .field("hackathonCount", "0")
-      .field("github", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+      .field(
+        "github",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      );
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(400);
@@ -1206,7 +1222,6 @@ describe("Given submit invalid form data", () => {
     expect(res.body.errors[0]).toStrictEqual("GitHub Id too Long");
   });
 
-  
   it("Should return 400 and proper error-codes given Long Cruz Coins Reponse", async () => {
     jwtCheck.mockImplementation((req, res, next) => {
       req.user = { sub: "test user" };
@@ -1236,7 +1251,10 @@ describe("Given submit invalid form data", () => {
       .field("newThisYear", "2022 Hackathon")
       .field("grandestInvention", "Jest Test")
       .field("hackathonCount", "0")
-      .field("cruzCoins", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+      .field(
+        "cruzCoins",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      );
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(400);
@@ -1244,7 +1262,6 @@ describe("Given submit invalid form data", () => {
     expect(res.body.errors[0]).toStrictEqual("CruzCoins response too Long");
   });
 
-  
   it("Should return 400 and proper error-codes given Long Anything Else", async () => {
     jwtCheck.mockImplementation((req, res, next) => {
       req.user = { sub: "test user" };
@@ -1274,7 +1291,10 @@ describe("Given submit invalid form data", () => {
       .field("newThisYear", "2022 Hackathon")
       .field("grandestInvention", "Jest Test")
       .field("hackathonCount", "0")
-      .field("anythingElse", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+      .field(
+        "anythingElse",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      );
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(400);
@@ -1311,7 +1331,7 @@ describe("Given submit invalid form data", () => {
       .field("newThisYear", "2022 Hackathon")
       .field("grandestInvention", "Jest Test")
       .field("hackathonCount", "0")
-      .field("anythingElse", "")
+      .field("anythingElse", "");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(201);
@@ -1319,4 +1339,3 @@ describe("Given submit invalid form data", () => {
     expect(res.body.errors).toStrictEqual(undefined);
   });
 });
-

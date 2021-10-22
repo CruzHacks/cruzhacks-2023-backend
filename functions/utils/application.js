@@ -32,68 +32,72 @@ const { alphanumericPunctuationRegex, phoneRegex, emailRegex } = require("./rege
 */
 
 const createAppObject = (body) => {
-  const pronouns = [];
-  const sexualities = [];
-  const pronounCount = body["pronounCount"] ? parseInt(body["pronounCount"]) : 0;
-  const sexualityCount = body["sexualityCount"] ? parseInt(body["sexualityCount"]) : 0;
-  for (var i = 0; i < pronounCount; i++) {
-    var pronoun = body[`pronouns[${i}]`];
-    if (pronoun !== null) {
-      pronouns.push(pronoun);
+  try {
+    const pronouns = [];
+    const sexualities = [];
+    const pronounCount = body["pronounCount"] ? parseInt(body["pronounCount"]) : 0;
+    const sexualityCount = body["sexualityCount"] ? parseInt(body["sexualityCount"]) : 0;
+    for (var i = 0; i < pronounCount; i++) {
+      var pronoun = body[`pronouns[${i}]`];
+      if (pronoun !== null) {
+        pronouns.push(pronoun);
+      }
     }
-  }
-  for (var j = 0; j < sexualityCount; j++) {
-    var sexuality = body[`sexuality[${j}]`];
-    if (sexuality !== null) {
-      sexualities.push(sexuality);
+    for (var j = 0; j < sexualityCount; j++) {
+      var sexuality = body[`sexuality[${j}]`];
+      if (sexuality !== null) {
+        sexualities.push(sexuality);
+      }
     }
+
+    const isUCSC = body["school"]
+      ? body["school"].toLowerCase() === "ucsc" ||
+        body["school"].toLowerCase() === "uc santa cruz" ||
+        body["school"].toLowerCase() === "university of california, santa cruz"
+      : false;
+    const school = isUCSC ? "ucsc" : body["school"] ? body["school"] : "";
+    const appObj = {
+      // App Info
+      status: "pending",
+      // Contact Info
+      email: body["email"],
+      fname: body["fname"] ? body["fname"] : "",
+      lname: body["lname"] ? body["lname"] : "",
+      phone: body["phone"] ? body["phone"] : "",
+
+      // Demographic
+      age: body["age"] ? parseInt(body["age"]) : -1,
+      pronouns: pronouns,
+      sexuality: sexualities,
+      race: body["race"] ? body["race"] : "",
+      ucscStudent: isUCSC,
+      school: school,
+      collegeAffiliation: body["collegeAffiliation"] ? body["collegeAffiliation"] : "", //Fix to to deal with ucsc
+      eventLocation: body["eventLocation"] ? body["eventLocation"] : "",
+      major: body["major"] ? body["major"] : "",
+      currentStanding: body["currentStanding"] ? body["currentStanding"] : "",
+      country: body["country"] ? body["country"] : "",
+
+      // Short Answer
+      whyCruzHacks: body["whyCruzHacks"] ? body["whyCruzHacks"] : "",
+      newThisYear: body["newThisYear"] ? body["newThisYear"] : "",
+      grandestInvention: body["grandestInvention"] ? body["grandestInvention"] : "",
+
+      // Prior Experience
+      firstCruzHack: body["firstCruzHack"] === true,
+      hackathonCount: body["hackathonCount"] ? parseInt(body["hackathonCount"]) : -1,
+      priorExperience: body["priorExperience"] ? body["priorExperience"] : "",
+
+      // Connected
+      linkedin: body["linkedin"] ? body["linkedin"] : "",
+      github: body["github"] ? body["github"] : "",
+      cruzCoins: body["cruzCoins"] ? body["cruzCoins"] : "",
+      anythingElse: body["anythingElse"] ? body["anythingElse"] : "",
+    };
+    return appObj;
+  } catch (error) {
+    return null;
   }
-
-  const isUCSC = body["school"]
-    ? body["school"].toLowerCase() === "ucsc" ||
-      body["school"].toLowerCase() === "uc santa cruz" ||
-      body["school"].toLowerCase() === "university of california, santa cruz"
-    : false;
-
-  const appObj = {
-    // App Info
-    status: "pending",
-    // Contact Info
-    email: body["email"],
-    fname: body["fname"] ? body["fname"] : "",
-    lname: body["lname"] ? body["lname"] : "",
-    phone: body["phone"] ? body["phone"] : "",
-
-    // Demographic
-    age: body["age"] ? parseInt(body["age"]) : -1,
-    pronouns: pronouns,
-    sexuality: sexualities,
-    race: body["race"] ? body["race"] : "",
-    ucscStudent: isUCSC,
-    school: body["school"] ? body["school"].toLowerCase() : "",
-    collegeAffiliation: body["collegeAffiliation"] ? body["collegeAffiliation"] : "", //Fix to to deal with ucsc
-    eventLocation: body["eventLocation"] ? body["eventLocation"] : "",
-    major: body["major"] ? body["major"] : "",
-    currentStanding: body["currentStanding"] ? body["currentStanding"] : "",
-    country: body["country"] ? body["country"] : "",
-
-    // Short Answer
-    whyCruzHacks: body["whyCruzHacks"] ? body["whyCruzHacks"] : "",
-    newThisYear: body["newThisYear"] ? body["newThisYear"] : "",
-    grandestInvention: body["grandestInvention"] ? body["grandestInvention"] : "",
-
-    // Prior Experience
-    firstCruzHack: body["firstCruzHack"] === true,
-    hackathonCount: body["hackathonCount"] ? parseInt(body["hackathonCount"]) : -1,
-    priorExperience: body["priorExperience"] ? body["priorExperience"] : "",
-
-    // Connected
-    linkedin: body["linkedin"] ? body["linkedin"] : "",
-    github: body["github"] ? body["github"] : "",
-    cruzCoins: body["cruzCoins"] ? body["cruzCoins"] : "",
-    anythingElse: body["anythingElse"] ? body["anythingElse"] : "",
-  };
-  return appObj;
 };
 
 const validateAppData = (data) => {
