@@ -120,9 +120,9 @@ application.get("/analytics", jwtCheck, hasReadAnalytics, async (req, res) => {
     }
     res.status(201).send({
       message: {
-        ucscApplicants: analyticsSnapshot.get("ucscStudentCount"),
-        firstTime: analyticsSnapshot.get("firstTimeStudentCount"),
         applicantCount: analyticsSnapshot.get("applicantCount"),
+        firstTime: analyticsSnapshot.get("firstTimeCount"),
+        ucscApplicants: analyticsSnapshot.get("ucscStudentCount"),
       },
     });
   } catch (err) {
