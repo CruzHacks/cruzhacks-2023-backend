@@ -7,7 +7,7 @@ const alphanumericRegex = (message) => {
 };
 
 const alphanumericPunctuationRegex = (message) => {
-  return !/^[ A-Za-z0-9_@.,/(){}*:$%;"'^/\\#&+-]*$/.test(message);
+  return ! /^[\x00-\x7E]*$/.test(message);
 };
 
 const emailRegex = (email) => {
