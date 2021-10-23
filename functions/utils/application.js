@@ -187,8 +187,7 @@ const validateAppData = (data) => {
             if (
               data[key][i] === "" ||
               (!givenOptions.includes(data[key][i]) &&
-                data[key][i].length > 50 &&
-                alphanumericPunctuationRegex(data[key[i]]))
+                (data[key][i].length > 50 || alphanumericPunctuationRegex(data[key[i]])))
             ) {
               errors.push("Pronoun Input Not Parsable");
               break;
@@ -217,8 +216,7 @@ const validateAppData = (data) => {
             if (
               data[key][j] === "" ||
               (!givenOptions.includes(data[key][j]) &&
-                data[key][j].length > 50 &&
-                alphanumericPunctuationRegex(data[key[j]]))
+                (data[key][j].length > 50 || alphanumericPunctuationRegex(data[key[j]])))
             ) {
               errors.push("Sexuality Input Not Parsable");
               break;
