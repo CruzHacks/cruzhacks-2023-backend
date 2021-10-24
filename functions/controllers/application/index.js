@@ -40,6 +40,9 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
       }
       try {
         const appData = createAppObject(fields);
+        if (appData === null) {
+          return res.status(400).send({ code: 400, message: "Form Validation Failed", errors: isValidData });
+        }
         const isValidData = validateAppData(appData);
         if (isValidData.length > 0) {
           functions.logger.log(req.user.sub + " Validation Errors " + isValidData);

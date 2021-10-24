@@ -2,8 +2,11 @@ const testConfig = require("firebase-functions-test")();
 const request = require("supertest");
 const { application } = require("../../../controllers/application/index");
 const { jwtCheck, hasUpdateApp } = require("../../../utils/middleware");
-const { setDocument } = require("../../../utils/database");
-const { makeDocumentSnapshot } = require("firebase-functions-test/lib/providers/firestore");
+const { setDocument, uploadFile } = require("../../../utils/database");
+const { isValidFileData, getNewFileName } = require("../../../utils/application");
+
+const pdf500kb = "__tests__/application/submit/500kb.pdf";
+const pdf4mb = "__tests__/application/submit/4mb.pdf";
 
 testConfig.mockConfig({
   auth: {
@@ -20,24 +23,35 @@ testConfig.mockConfig({
 
 jest.mock("../../../utils/middleware");
 jest.mock("../../../utils/database");
+jest.mock("../../../utils/application", () => ({
+  ...jest.requireActual("../../../utils/application"),
+  isValidFileData: jest.fn(),
+  getNewFileName: jest.fn(),
+}));
 
 describe("Given submit invalid form data", () => {
-  beforeAll(() => {
-    setDocument.mockImplementation((collection, id, fields) => Promise.resolve("success"));
+  beforeEach(() => {
+    setDocument.mockImplementation(() => Promise.resolve("success"));
+    uploadFile.mockImplementation(() => Promise.resolve("success"));
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "Auth0|12345" };
+      next();
+    });
+    hasUpdateApp.mockImplementation((req, res, next) => {
+      next();
+    });
+    isValidFileData.mockImplementation(() => true);
+    getNewFileName.mockImplementation(() => "test.pdf");
   });
   afterEach(() => {
     jwtCheck.mockClear();
     hasUpdateApp.mockClear();
+    setDocument.mockClear();
+    uploadFile.mockClear();
+    isValidFileData.mockClear();
+    getNewFileName.mockClear();
   });
   it("Should return 500 and proper error-code given nothing", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application).post("/submit");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
@@ -46,13 +60,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given empty email", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application).post("/submit").field("email", "");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
@@ -62,13 +69,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given email > 100chars", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field(
@@ -83,13 +83,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given valid email", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application).post("/submit").field("email", "user@example.com");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
@@ -99,13 +92,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given empty first and last name", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -120,13 +106,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given first and last name too long", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -141,13 +120,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given first and last name valid but other invalid fields", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -164,13 +136,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given empty phone number", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -185,13 +150,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given phone number too long", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -206,13 +164,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given age too low", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -228,13 +179,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given age too high", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -250,13 +194,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given no pronouns selected", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -273,13 +210,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes too many pronouns", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -296,13 +226,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes pronouns not parseable", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -320,13 +243,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes sexuality empty", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -345,13 +261,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes too many sexualities", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -370,13 +279,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes sexuality cant be parsed", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -396,13 +298,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes race is empty", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -422,13 +317,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes race is too long", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -449,13 +337,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes school empty", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -477,13 +358,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes school too long", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -508,13 +382,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes UCSC student but no college specified", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -536,13 +403,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes invalid event location", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -565,13 +425,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes major is empty", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -594,13 +447,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes major name too long", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -624,13 +470,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given currentStanding empty", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -654,13 +493,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given currentStanding too long", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -685,13 +517,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given country empty", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -716,13 +541,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given country name too long", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -748,13 +566,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given empty Why CruzHacks", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -781,13 +592,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given Long Why CruzHacks", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -817,13 +621,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given empty New This Year", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -851,13 +648,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given Long New This Year", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -888,13 +678,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given empty Grandest Invention", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -923,13 +706,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given Long Grandest Invention", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -961,13 +737,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given Missing Hackathon Count", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -996,13 +765,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given Negative Hackathon Count", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -1032,13 +794,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given Large Hackathon Count", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -1068,13 +823,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given Large Hackathon Count", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -1104,13 +852,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given Long Prior Experience", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -1144,13 +885,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given Long LinkedIn Id", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -1184,13 +918,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given Long Github Id", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -1224,13 +951,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given Long Cruz Coins Reponse", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -1264,13 +984,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 400 and proper error-codes given Long Anything Else", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -1304,13 +1017,6 @@ describe("Given submit invalid form data", () => {
   });
 
   it("Should return 200 given Valid Response with No File", async () => {
-    jwtCheck.mockImplementation((req, res, next) => {
-      req.user = { sub: "test user" };
-      next();
-    });
-    hasUpdateApp.mockImplementation((req, res, next) => {
-      next();
-    });
     const res = await request(application)
       .post("/submit")
       .field("email", "user@example.com")
@@ -1333,6 +1039,133 @@ describe("Given submit invalid form data", () => {
       .field("grandestInvention", "Jest Test")
       .field("hackathonCount", "0")
       .field("anythingElse", "");
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(201);
+    expect(res.body.message).toBe("Successfully Updated Application");
+    expect(res.body.errors).toStrictEqual(undefined);
+  });
+
+  it("Should return 200 given Valid Response with No File", async () => {
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("country", "USA")
+      .field("whyCruzHacks", "Yes")
+      .field("newThisYear", "2022 Hackathon")
+      .field("grandestInvention", "Jest Test")
+      .field("hackathonCount", "0")
+      .field("anythingElse", "");
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(201);
+    expect(res.body.message).toBe("Successfully Updated Application");
+    expect(res.body.errors).toStrictEqual(undefined);
+  });
+
+  it("Should return 500 given Valid Response but Database Error", async () => {
+    setDocument.mockImplementation(() => Promise.reject(new Error("Faild to Store")));
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("country", "USA")
+      .field("whyCruzHacks", "Yes")
+      .field("newThisYear", "2022 Hackathon")
+      .field("grandestInvention", "Jest Test")
+      .field("hackathonCount", "0")
+      .field("anythingElse", "");
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(500);
+    expect(res.body.message).toBe("Server Error");
+    expect(res.body.errors).toStrictEqual(undefined);
+  });
+
+  it("Should return 400 given Valid Response with Large File", async () => {
+    setDocument.mockImplementation(() => Promise.reject(new Error("Failed to Store")));
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("country", "USA")
+      .field("whyCruzHacks", "Yes")
+      .field("newThisYear", "2022 Hackathon")
+      .field("grandestInvention", "Jest Test")
+      .field("hackathonCount", "0")
+      .field("anythingElse", "")
+      .attach("file", pdf4mb)
+      .set({ connection: "keep-alive" });
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("Resume Validation Failed");
+    expect(res.body.errors).toStrictEqual(["Document is greater than 1mb"]);
+  });
+
+  it("Should return 201 given Valid Response with Valid File", async () => {
+    setDocument.mockImplementation(() => Promise.resolve("Successfully Uploaded"));
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("country", "USA")
+      .field("whyCruzHacks", "Yes")
+      .field("newThisYear", "2022 Hackathon")
+      .field("grandestInvention", "Jest Test")
+      .field("hackathonCount", "0")
+      .field("anythingElse", "")
+      .attach("file", pdf500kb)
+      .set({ connection: "keep-alive" });
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(201);
