@@ -31,67 +31,63 @@ application.use(cors(corsOptions));
   Unit Test Functions
 */
 application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
-  try {
-    const form = new formidable.IncomingForm();
-    return await form.parse(req, async (err, fields, files) => {
-      if (err) {
-        functions.logger.log("Form Error: " + err);
-        return res.status(500).send({ code: 500, message: "Server Error" });
-      }
-      const appData = createAppObject(fields);
-      if (appData === null) {
-        return res.status(400).send({ code: 400, message: "Form Validation Failed", errors: isValidData });
-      }
-      const isValidData = validateAppData(appData);
-      if (isValidData.length > 0) {
-        functions.logger.log(req.user.sub + " Validation Errors " + isValidData);
-        return res.status(400).send({ code: 400, message: "Form Validation Failed", errors: isValidData });
-      }
-      const isValidResume = validateResume(files);
-      if (isValidResume.length > 0) {
-        functions.logger.log(req.user.sub + " Validation Errors " + isValidResume);
-        return res.status(400).send({ code: 400, message: "Resume Validation Failed", errors: isValidResume });
-      }
+  const form = new formidable.IncomingForm();
+  return await form.parse(req, async (err, fields, files) => {
+    if (err) {
+      functions.logger.log("Form Error: " + err);
+      return res.status(500).send({ code: 500, message: "Server Error" });
+    }
+    const appData = createAppObject(fields);
+    if (appData === null) {
+      return res.status(400).send({ code: 400, message: "Form Validation Failed", errors: isValidData });
+    }
+    const isValidData = validateAppData(appData);
+    if (isValidData.length > 0) {
+      functions.logger.log(req.user.sub + " Validation Errors " + isValidData);
+      return res.status(400).send({ code: 400, message: "Form Validation Failed", errors: isValidData });
+    }
+    const isValidResume = validateResume(files);
+    if (isValidResume.length > 0) {
+      functions.logger.log(req.user.sub + " Validation Errors " + isValidResume);
+      return res.status(400).send({ code: 400, message: "Resume Validation Failed", errors: isValidResume });
+    }
 
-      if (files && files.file) {
-        return (
-          uploadFile("resume", getNewFileName(appData, files.file.name, req.user.sub), files.file)
-            .then((filedata) => {
-              // Checks if upload URL exists
-              if (isValidFileData(filedata)) {
-                return setDocument("applicants", req.user.sub, appData);
-              } else {
-                throw "Upload Error";
-              }
-            })
-            // eslint-disable-next-line no-unused-vars
-            .then((data) => {
-              return res.status(201).send({ code: 201, message: "Successfully Updated Application" });
-            })
-            .catch((error) => {
-              if (error === "Upload Error") {
-                return res.status(400).send({ code: 400, message: "An Error Occurred Uploading Your Resume" });
-              }
-              return res.status(500).send({ code: 500, message: "Server Error" });
-            })
-        );
-      } else {
-        return (
-          setDocument("applicants", req.user.sub, appData)
-            // eslint-disable-next-line no-unused-vars
-            .then((data) => {
-              return res.status(201).send({ code: 201, message: "Successfully Updated Application" });
-            })
-            .catch((error) => {
-              functions.logger.log(error);
-              return res.status(500).send({ code: 500, message: "Server Error" });
-            })
-        );
-      }
-    });
-  } catch (error) {
-    return res.status(500).send({ code: 500, message: "Server Error" });
-  }
+    if (files && files.file) {
+      return (
+        uploadFile("resume", getNewFileName(appData, files.file.name, req.user.sub), files.file)
+          .then((filedata) => {
+            // Checks if upload URL exists
+            if (isValidFileData(filedata)) {
+              return setDocument("applicants", req.user.sub, appData);
+            } else {
+              throw "Upload Error";
+            }
+          })
+          // eslint-disable-next-line no-unused-vars
+          .then((data) => {
+            return res.status(201).send({ code: 201, message: "Successfully Updated Application" });
+          })
+          .catch((error) => {
+            if (error === "Upload Error") {
+              return res.status(400).send({ code: 400, message: "An Error Occurred Uploading Your Resume" });
+            }
+            return res.status(500).send({ code: 500, message: "Server Error" });
+          })
+      );
+    } else {
+      return (
+        setDocument("applicants", req.user.sub, appData)
+          // eslint-disable-next-line no-unused-vars
+          .then((data) => {
+            return res.status(201).send({ code: 201, message: "Successfully Updated Application" });
+          })
+          .catch((error) => {
+            functions.logger.log(error);
+            return res.status(500).send({ code: 500, message: "Server Error" });
+          })
+      );
+    }
+  });
 });
 
 application.get("/checkApp", jwtCheck, hasReadApp, async (req, res) => {
