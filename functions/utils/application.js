@@ -72,7 +72,7 @@ const createAppObject = (body) => {
       race: body["race"] ? body["race"] : "",
       ucscStudent: isUCSC,
       school: school,
-      collegeAffiliation: school,
+      collegeAffiliation: isUCSC ? body["collegeAffiliation"] : "i am not a ucsc student",
       eventLocation: body["eventLocation"] ? body["eventLocation"] : "",
       major: body["major"] ? body["major"] : "",
       currentStanding: body["currentStanding"] ? body["currentStanding"] : "",
@@ -84,7 +84,7 @@ const createAppObject = (body) => {
       grandestInvention: body["grandestInvention"] ? body["grandestInvention"] : "",
 
       // Prior Experience
-      firstCruzHack: body["firstCruzHack"] === true,
+      firstCruzHack: body["firstCruzHack"] === "yes",
       hackathonCount: body["hackathonCount"] ? parseInt(body["hackathonCount"]) : -1,
       priorExperience: body["priorExperience"] ? body["priorExperience"] : "",
 

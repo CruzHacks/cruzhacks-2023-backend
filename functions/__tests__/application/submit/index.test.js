@@ -785,6 +785,35 @@ describe("Given submit invalid form data", () => {
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
       .field("grandestInvention", "Jest Test")
+      .field("firstCruzHack", "yes");
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("Form Validation Failed");
+    expect(res.body.errors[0]).toStrictEqual("Invalid Hackathon Count");
+  });
+
+  it("Should return 400 and proper error-codes given Negative Hackathon Count", async () => {
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("country", "USA")
+      .field("whyCruzHacks", "Yes")
+      .field("newThisYear", "2022 Hackathon")
+      .field("grandestInvention", "Jest Test")
       .field("hackathonCount", "-5");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
