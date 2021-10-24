@@ -394,8 +394,6 @@ const validateResume = (files) => {
     const resume = files.file;
     const fileExtensions = {
       pdf: "application/pdf",
-      docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      doc: "application/msword",
     };
 
     if (resume) {
