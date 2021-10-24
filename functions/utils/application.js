@@ -1,4 +1,4 @@
-const { alphanumericPunctuationRegex, phoneRegex, emailRegex } = require("./regex");
+const { alphanumericPunctuationRegex, phoneRegex } = require("./regex");
 
 /*
   Return Inteface
@@ -60,7 +60,7 @@ const createAppObject = (body) => {
       // App Info
       status: "pending",
       // Contact Info
-      email: body["email"],
+      email: body["email"] ? body["email"] : "",
       fname: body["fname"] ? body["fname"] : "",
       lname: body["lname"] ? body["lname"] : "",
       phone: body["phone"] ? body["phone"] : "",
@@ -133,7 +133,7 @@ const validateAppData = (data) => {
   fields.forEach((key) => {
     switch (key) {
       case "email": {
-        if (data[key] === "" || data[key].length > 100 || emailRegex(data[key])) {
+        if (data[key] === "" || data[key].length > 100 || alphanumericPunctuationRegex(data[key])) {
           errors.push("Email is Invalid");
         }
         break;

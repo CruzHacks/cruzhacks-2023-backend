@@ -51,12 +51,12 @@ describe("Given submit invalid form data", () => {
     isValidFileData.mockClear();
     getNewFileName.mockClear();
   });
-  it("Should return 500 and proper error-code given nothing", async () => {
+  it("Should return 400 and proper error-code given nothing", async () => {
     const res = await request(application).post("/submit");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
-    expect(res.status).toBe(500);
-    expect(res.body.message).toBe("Server Error");
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("Form Validation Failed");
   });
 
   it("Should return 400 and proper error-codes given empty email", async () => {
