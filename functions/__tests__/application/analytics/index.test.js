@@ -1,17 +1,35 @@
+const testConfig = require("firebase-functions-test")();
+
+const request = require("supertest");
 const { queryDocument } = require("../../../utils/database");
 const { jwtCheck, hasReadAnalytics } = require("../../../utils/middleware");
 const { makeDocumentSnapshot } = require("firebase-functions-test/lib/providers/firestore");
-const { application } = require("../../../functions/controllers/application/index");
+const { application } = require("../../../controllers/application/index");
 
-jwtCheck.mockImplementation((req, res, next) => {
-  next();
+testConfig.mockConfig({
+  auth: {
+    cors: "site",
+    audience: "audience",
+    issuer: "issuer",
+    jwk_uri: "some uri",
+  },
 });
 
-hasReadAnalytics.mockImplementation((req, res, next) => {
-  next();
-});
+jest.mock("../../../utils/middleware");
+jest.mock("../../../utils/database");
 
 describe("Analytics test", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jwtCheck.mockImplementation((req, res, next) => {
+      next();
+    });
+
+    hasReadAnalytics.mockImplementation((req, res, next) => {
+      next();
+    });
+  });
+
   it("Should return analytics", async (done) => {
     fakeDoc = makeDocumentSnapshot({
       applicantCount: 100,
@@ -24,29 +42,6 @@ describe("Analytics test", () => {
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasReadAnalytics).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(201);
-    done();
-  });
-  it("Should return no document", async (done) => {
-    const res = await request(application).get("/analytics");
-    expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasReadAnalytics).toHaveBeenCalledTimes(1);
-    expect(res.status).toBe(404);
-    expect(res.body).toBe({ status: 404, message: "No Document" });
-    done();
-  });
-  it("Should return invalid permissions", async (done) => {
-    fakeDoc = makeDocumentSnapshot({
-      applicantCount: 100,
-      firstTimeCount: 100,
-      ucscStudentCount: 100,
-    });
-    queryDocument.mockImplementationOnce(() => Promise.resolve(fakeDoc));
-    
-    const res = await request(application).get("/analytics");
-    expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasReadAnalytics).toHaveBeenCalledTimes(1);
-    expect(res.status).toBe(404);
-    expect(res.body).toBe({ status: 404, message: "No Document" });
     done();
   });
 });
