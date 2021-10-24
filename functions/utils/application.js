@@ -420,15 +420,15 @@ const isValidFileData = (filedata) => {
 };
 
 const getNewFileName = (data, filename, user) => {
-  const lname = data.lname.replace(/[^0-9a-z]/gi, "").toLowerCase();
-  const fname = data.fname.replace(/[^0-9a-z]/gi, "").toLowerCase();
+  // const lname = data.lname.replace(/[^0-9a-z]/gi, "").toLowerCase();
+  // const fname = data.fname.replace(/[^0-9a-z]/gi, "").toLowerCase();
   const uid = user.split("|").slice(1).join("");
-  const file = lname + "_" + fname + "_" + uid;
+  // const file = lname + "_" + fname + "_" + uid;
   var extension = filename.split(".").pop();
   if (extension === "") {
     extension = "pdf";
   }
-  return file + "." + extension;
+  return uid + "." + extension;
 };
 
 module.exports = { createAppObject, validateAppData, validateResume, isValidFileData, getNewFileName };
