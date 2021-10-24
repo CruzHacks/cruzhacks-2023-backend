@@ -32,68 +32,72 @@ const { alphanumericPunctuationRegex, phoneRegex, emailRegex } = require("./rege
 */
 
 const createAppObject = (body) => {
-  const pronouns = [];
-  const sexualities = [];
-  const pronounCount = body["pronounCount"] ? parseInt(body["pronounCount"]) : 0;
-  const sexualityCount = body["sexualityCount"] ? parseInt(body["sexualityCount"]) : 0;
-  for (var i = 0; i < pronounCount; i++) {
-    var pronoun = body[`pronouns[${i}]`];
-    if (pronoun !== null) {
-      pronouns.push(pronoun);
+  try {
+    const pronouns = [];
+    const sexualities = [];
+    const pronounCount = body["pronounCount"] ? parseInt(body["pronounCount"]) : 0;
+    const sexualityCount = body["sexualityCount"] ? parseInt(body["sexualityCount"]) : 0;
+    for (var i = 0; i < pronounCount; i++) {
+      var pronoun = body[`pronouns[${i}]`];
+      if (pronoun !== null) {
+        pronouns.push(pronoun);
+      }
     }
-  }
-  for (var j = 0; j < sexualityCount; j++) {
-    var sexuality = body[`sexuality[${j}]`];
-    if (sexuality !== null) {
-      sexualities.push(sexuality);
+    for (var j = 0; j < sexualityCount; j++) {
+      var sexuality = body[`sexuality[${j}]`];
+      if (sexuality !== null) {
+        sexualities.push(sexuality);
+      }
     }
+
+    const isUCSC = body["school"]
+      ? body["school"].toLowerCase() === "ucsc" ||
+        body["school"].toLowerCase() === "uc santa cruz" ||
+        body["school"].toLowerCase() === "university of california, santa cruz"
+      : false;
+    const school = isUCSC ? "ucsc" : body["school"] ? body["school"] : "";
+    const appObj = {
+      // App Info
+      status: "pending",
+      // Contact Info
+      email: body["email"],
+      fname: body["fname"] ? body["fname"] : "",
+      lname: body["lname"] ? body["lname"] : "",
+      phone: body["phone"] ? body["phone"] : "",
+
+      // Demographic
+      age: body["age"] ? parseInt(body["age"]) : -1,
+      pronouns: pronouns,
+      sexuality: sexualities,
+      race: body["race"] ? body["race"] : "",
+      ucscStudent: isUCSC,
+      school: school,
+      collegeAffiliation: school,
+      eventLocation: body["eventLocation"] ? body["eventLocation"] : "",
+      major: body["major"] ? body["major"] : "",
+      currentStanding: body["currentStanding"] ? body["currentStanding"] : "",
+      country: body["country"] ? body["country"] : "",
+
+      // Short Answer
+      whyCruzHacks: body["whyCruzHacks"] ? body["whyCruzHacks"] : "",
+      newThisYear: body["newThisYear"] ? body["newThisYear"] : "",
+      grandestInvention: body["grandestInvention"] ? body["grandestInvention"] : "",
+
+      // Prior Experience
+      firstCruzHack: body["firstCruzHack"] === true,
+      hackathonCount: body["hackathonCount"] ? parseInt(body["hackathonCount"]) : -1,
+      priorExperience: body["priorExperience"] ? body["priorExperience"] : "",
+
+      // Connected
+      linkedin: body["linkedin"] ? body["linkedin"] : "",
+      github: body["github"] ? body["github"] : "",
+      cruzCoins: body["cruzCoins"] ? body["cruzCoins"] : "",
+      anythingElse: body["anythingElse"] ? body["anythingElse"] : "",
+    };
+    return appObj;
+  } catch (error) {
+    return null;
   }
-
-  const isUCSC = body["school"]
-    ? body["school"].toLowerCase() === "ucsc" ||
-      body["school"].toLowerCase() === "uc santa cruz" ||
-      body["school"].toLowerCase() === "university of california, santa cruz"
-    : false;
-
-  const appObj = {
-    // App Info
-    status: "pending",
-    // Contact Info
-    email: body["email"],
-    fname: body["fname"] ? body["fname"] : "",
-    lname: body["lname"] ? body["lname"] : "",
-    phone: body["phone"] ? body["phone"] : "",
-
-    // Demographic
-    age: body["age"] ? parseInt(body["age"]) : -1,
-    pronouns: pronouns,
-    sexuality: sexualities,
-    race: body["race"] ? body["race"] : "",
-    ucscStudent: isUCSC,
-    school: body["school"] ? body["school"].toLowerCase() : "",
-    collegeAffiliation: body["collegeAffiliation"] ? body["collegeAffiliation"] : "", //Fix to to deal with ucsc
-    eventLocation: body["eventLocation"] ? body["eventLocation"] : "",
-    major: body["major"] ? body["major"] : "",
-    currentStanding: body["currentStanding"] ? body["currentStanding"] : "",
-    country: body["country"] ? body["country"] : "",
-
-    // Short Answer
-    whyCruzHacks: body["whyCruzHacks"] ? body["whyCruzHacks"] : "",
-    newThisYear: body["newThisYear"] ? body["newThisYear"] : "",
-    grandestInvention: body["grandestInvention"] ? body["grandestInvention"] : "",
-
-    // Prior Experience
-    firstCruzHack: body["firstCruzHack"] === true,
-    hackathonCount: body["hackathonCount"] ? parseInt(body["hackathonCount"]) : -1,
-    priorExperience: body["priorExperience"] ? body["priorExperience"] : "",
-
-    // Connected
-    linkedin: body["linkedin"] ? body["linkedin"] : "",
-    github: body["github"] ? body["github"] : "",
-    cruzCoins: body["cruzCoins"] ? body["cruzCoins"] : "",
-    anythingElse: body["anythingElse"] ? body["anythingElse"] : "",
-  };
-  return appObj;
 };
 
 const validateAppData = (data) => {
@@ -139,7 +143,7 @@ const validateAppData = (data) => {
           errors.push("First Name is Empty");
         } else if (data[key].length > 25) {
           errors.push("First Name is Too Long");
-        } else if (alphanumericPunctuationRegex(data[key])) {
+        } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
           errors.push("First Name Invalid Alphanumeric");
         }
         break;
@@ -149,7 +153,7 @@ const validateAppData = (data) => {
           errors.push("Last Name is Empty");
         } else if (data[key].length > 25) {
           errors.push("Last Name is Too Long");
-        } else if (alphanumericPunctuationRegex(data[key])) {
+        } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
           errors.push("Last Name Invalid Alphanumeric");
         }
         break;
@@ -182,9 +186,8 @@ const validateAppData = (data) => {
           for (var i = 0; i < data[key].length; i++) {
             if (
               data[key][i] === "" ||
-              !givenOptions.includes(data[key][i]) ||
-              data[key][i].length > 50 ||
-              alphanumericPunctuationRegex(data[key[i]])
+              (!givenOptions.includes(data[key][i]) &&
+                (data[key][i].length > 50 || alphanumericPunctuationRegex(data[key[i]])))
             ) {
               errors.push("Pronoun Input Not Parsable");
               break;
@@ -212,9 +215,8 @@ const validateAppData = (data) => {
           for (var j = 0; j < data[key].length; j++) {
             if (
               data[key][j] === "" ||
-              !givenOptions.includes(data[key][j]) ||
-              data[key][j].length > 50 ||
-              alphanumericPunctuationRegex(data[key[j]])
+              (!givenOptions.includes(data[key][j]) &&
+                (data[key][j].length > 50 || alphanumericPunctuationRegex(data[key[j]])))
             ) {
               errors.push("Sexuality Input Not Parsable");
               break;
@@ -228,7 +230,7 @@ const validateAppData = (data) => {
           errors.push("No Race Inputted");
         } else if (data[key].length > 50) {
           errors.push("Race String Too Long");
-        } else if (alphanumericPunctuationRegex(data[key])) {
+        } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
           errors.push("Race is not alphanumeric");
         }
         break;
@@ -238,6 +240,8 @@ const validateAppData = (data) => {
           errors.push("No School Inputted");
         } else if (data[key].length > 100) {
           errors.push("School Input too Long");
+        } else if (alphanumericPunctuationRegex(data[key])) {
+          errors.push("School is not Alphanumeric");
         }
         break;
       }
@@ -273,7 +277,7 @@ const validateAppData = (data) => {
           errors.push("No major inputted");
         } else if (data[key].length > 50) {
           errors.push("Major Name Too Long");
-        } else if (alphanumericPunctuationRegex(data[key])) {
+        } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
           errors.push("Major name is not alphanumeric");
         }
         break;
@@ -283,7 +287,7 @@ const validateAppData = (data) => {
           errors.push("No standing inputted");
         } else if (data[key].length > 50) {
           errors.push("Standing Name Too Long");
-        } else if (alphanumericPunctuationRegex(data[key])) {
+        } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
           errors.push("Standing name is not alphanumeric");
         }
         break;
@@ -293,7 +297,7 @@ const validateAppData = (data) => {
           errors.push("No country inputted");
         } else if (data[key].length > 50) {
           errors.push("Country Name Too Long");
-        } else if (alphanumericPunctuationRegex(data[key])) {
+        } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
           errors.push("Country name is not alphanumeric");
         }
         break;
@@ -303,7 +307,7 @@ const validateAppData = (data) => {
           errors.push("No response for Why CruzHacks");
         } else if (data[key].length > 250) {
           errors.push("Why Cruzhacks response too Long");
-        } else if (alphanumericPunctuationRegex(data[key])) {
+        } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
           errors.push("Why CruzHacks is not alphanumeric with punctuation");
         }
         break;
@@ -313,7 +317,7 @@ const validateAppData = (data) => {
           errors.push("No response for New This Year");
         } else if (data[key].length > 250) {
           errors.push("New This Year response too Long");
-        } else if (alphanumericPunctuationRegex(data[key])) {
+        } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
           errors.push("New This Year is not alphanumeric with punctuation");
         }
         break;
@@ -323,7 +327,7 @@ const validateAppData = (data) => {
           errors.push("No response for Grandest Invention");
         } else if (data[key].length > 250) {
           errors.push("Grandest Invention response too Long");
-        } else if (alphanumericPunctuationRegex(data[key])) {
+        } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
           errors.push("Grandest Invention is not alphanumeric with punctuation");
         }
         break;
@@ -339,7 +343,7 @@ const validateAppData = (data) => {
       case "priorExperience": {
         if (data[key].length > 100) {
           errors.push("Prior Experience response too Long");
-        } else if (alphanumericPunctuationRegex(data[key])) {
+        } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
           errors.push("Prior Experience is not alphanumeric with punctuation");
         }
         break;
@@ -347,7 +351,7 @@ const validateAppData = (data) => {
       case "linkedin": {
         if (data[key].length > 100) {
           errors.push("LinkedIn Id too Long");
-        } else if (alphanumericPunctuationRegex(data[key])) {
+        } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
           errors.push("LinkedIn is not alphanumeric with punctuation");
         }
         break;
@@ -355,7 +359,7 @@ const validateAppData = (data) => {
       case "github": {
         if (data[key].length > 100) {
           errors.push("GitHub Id too Long");
-        } else if (alphanumericPunctuationRegex(data[key])) {
+        } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
           errors.push("GitHub Id is not alphanumeric with punctuation");
         }
         break;
@@ -363,7 +367,7 @@ const validateAppData = (data) => {
       case "cruzCoins": {
         if (data[key].length > 100) {
           errors.push("CruzCoins response too Long");
-        } else if (alphanumericPunctuationRegex(data[key])) {
+        } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
           errors.push("CruzCoins is not alphanumeric with punctuation");
         }
         break;
@@ -371,7 +375,7 @@ const validateAppData = (data) => {
       case "anythingElse": {
         if (data[key].length > 100) {
           errors.push("Anything Else response too Long");
-        } else if (alphanumericPunctuationRegex(data[key])) {
+        } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
           errors.push("Anything Else is not alphanumeric with punctuation");
         }
         break;
