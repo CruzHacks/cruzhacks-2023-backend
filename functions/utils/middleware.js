@@ -13,6 +13,7 @@ const jwk_uri = auth0Config ? auth0Config.jwk_uri + ".well-known/jwks.json" : ".
 /*
 Validates jwt and parses data into req.user
 */
+
 const jwtCheck = jwt({
   secret: jwks.expressJwtSecret({
     cache: true,
@@ -30,6 +31,7 @@ Additional Middleware for Non-Authenticated Requests
 Authentication field must be included with correct key
 You cannot use this Middleware with this jwtCheck
 */
+
 const validKey = (req, res, next) => {
   if (!req.headers.authentication || req.headers.authentication !== apikey || apikey === "") {
     return res.status(403).send({ message: "Invalid Api Key" });
@@ -52,7 +54,19 @@ const hasPermission = (permission) => {
   };
 };
 
+const hasUpdateApp = hasPermission("update:app");
+const hasReadApp = hasPermission("read:app");
 const hasUpdateAnnouncement = hasPermission("update:announcements");
 const hasDeleteAnnouncement = hasPermission("delete:announcements");
+const hasReadAnalytics = hasPermission("read:stats");
 
-module.exports = { jwtCheck, validKey, hasPermission, hasUpdateAnnouncement, hasDeleteAnnouncement };
+module.exports = {
+  jwtCheck,
+  validKey,
+  hasPermission,
+  hasUpdateApp,
+  hasReadApp,
+  hasUpdateAnnouncement,
+  hasDeleteAnnouncement,
+  hasReadAnalytics,
+};

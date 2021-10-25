@@ -1,4 +1,4 @@
-const { db } = require("./admin");
+require("./admin");
 
 const addDocument = (collection, document) => {
   return db.collection(collection).add(document);
@@ -26,4 +26,19 @@ const deleteDocument = (collection, id) => {
   return db.collection(collection).doc(id).delete();
 };
 
-module.exports = { addDocument, queryDocument, setDocument, queryCollection, queryCollectionSorted, deleteDocument };
+const uploadFile = (bucketName, filename, file) => {
+  const bucket = storage.bucket(bucketName);
+  return bucket.upload(file.path, {
+    destination: filename,
+  });
+};
+
+module.exports = {
+  addDocument,
+  queryDocument,
+  setDocument,
+  queryCollection,
+  queryCollectionSorted,
+  deleteDocument,
+  uploadFile,
+};
