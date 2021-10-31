@@ -92,7 +92,7 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
 
 application.get("/checkApp", jwtCheck, hasReadApp, async (req, res) => {
   try {
-    doc = await queryDocument("applicants", req.user.sub);
+    const doc = await queryDocument("applicants", req.user.sub);
     const appStatus = doc.get("status");
     if (appStatus === undefined) {
       throw new Error("No Document");
@@ -100,7 +100,7 @@ application.get("/checkApp", jwtCheck, hasReadApp, async (req, res) => {
     res.status(200).send({ code: 200, status: appStatus, exists: true, message: "Document Found" });
   } catch (error) {
     if (error.message === "No Document") {
-      res.status(200).send({ code: 404, status: "No Document", exists: false, message: "No Document" });
+      res.status(200).send({ code: 200, status: "No Document", exists: false, message: "No Document" });
     } else {
       res.status(500).send({ code: 500, status: "No Document", exists: false, message: "Internal Server Error" });
     }
@@ -115,6 +115,7 @@ application.get("/analytics", jwtCheck, hasReadAnalytics, async (req, res) => {
     }
 
     res.status(201).send({
+      status: 201,
       message: {
         applicantCount: analyticsSnapshot.get("applicantCount"),
         firstTime: analyticsSnapshot.get("firstTimeCount"),
@@ -123,7 +124,7 @@ application.get("/analytics", jwtCheck, hasReadAnalytics, async (req, res) => {
     });
   } catch (error) {
     if (error.message === "No Document") {
-      res.status(200).send({ status: 404, message: "No Document" });
+      res.status(200).send({ status: 200, message: "No Document" });
     }
     res.status(500).send({ status: 500, message: "Insufficient Permissions" });
   }
