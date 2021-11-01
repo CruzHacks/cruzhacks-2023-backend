@@ -92,7 +92,7 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
 
 application.get("/checkApp", jwtCheck, hasReadApp, async (req, res) => {
   try {
-    doc = await queryDocument("applicants", req.user.sub);
+    const doc = await queryDocument("applicants", req.user.sub);
     const appStatus = doc.get("status");
     if (appStatus === undefined) {
       throw new Error("No Document");
@@ -111,18 +111,20 @@ application.get("/analytics", jwtCheck, hasReadAnalytics, async (req, res) => {
   try {
     const analyticsSnapshot = await queryDocument("analytics", "applicant-analytics");
     if (!analyticsSnapshot.exists) {
-      throw "No Doc";
+      throw new Error("No Document");
     }
+
     res.status(201).send({
+      status: 201,
       message: {
         applicantCount: analyticsSnapshot.get("applicantCount"),
         firstTime: analyticsSnapshot.get("firstTimeCount"),
         ucscApplicants: analyticsSnapshot.get("ucscStudentCount"),
       },
     });
-  } catch (err) {
-    if (err === "No Doc") {
-      res.status(404).send({ status: 404, message: "No Document" });
+  } catch (error) {
+    if (error.message === "No Document") {
+      res.status(200).send({ status: 200, message: "No Document" });
     }
     res.status(500).send({ status: 500, message: "Insufficient Permissions" });
   }
