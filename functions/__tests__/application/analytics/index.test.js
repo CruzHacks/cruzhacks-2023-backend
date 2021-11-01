@@ -31,7 +31,7 @@ describe("Analytics test", () => {
   });
 
   it("Should return analytics", async (done) => {
-    fakeDoc = makeDocumentSnapshot({
+    const fakeDoc = makeDocumentSnapshot({
       applicantCount: 100,
       firstTimeCount: 100,
       ucscStudentCount: 100,
