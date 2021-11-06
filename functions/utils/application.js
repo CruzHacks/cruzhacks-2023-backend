@@ -1,4 +1,9 @@
-const { alphanumericPunctuationRegex, alphanumericPunctuationRegexWithNewLine, phoneRegex, emailRegex } = require("./regex");
+const {
+  alphanumericPunctuationRegex,
+  alphanumericPunctuationRegexWithNewLine,
+  phoneRegex,
+  emailRegex,
+} = require("./regex");
 
 /*
   Return Inteface

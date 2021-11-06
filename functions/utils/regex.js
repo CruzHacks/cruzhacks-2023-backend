@@ -18,4 +18,10 @@ const emailRegex = (email) => {
   return !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(email);
 };
 
-module.exports = { phoneRegex, alphanumericPunctuationRegex, alphanumericRegex, alphanumericPunctuationRegexWithNewLine, emailRegex };
+module.exports = {
+  phoneRegex,
+  alphanumericPunctuationRegex,
+  alphanumericRegex,
+  alphanumericPunctuationRegexWithNewLine,
+  emailRegex,
+};
