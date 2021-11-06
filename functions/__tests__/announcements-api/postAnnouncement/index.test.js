@@ -94,8 +94,8 @@ describe("Testing Post Announcement", () => {
       .post("/")
       .set("Accept", "application/json")
       .send({ message: "?!()ad", title: "A title" });
-    expect(response.statusCode).toBe(400);
-    expect(response.body.message).toBe("Invalid Message");
+    expect(response.statusCode).toBe(201);
+    expect(response.body.message).toBe("Item successfully added.");
   });
 
   it("Should fail with 500", async () => {
