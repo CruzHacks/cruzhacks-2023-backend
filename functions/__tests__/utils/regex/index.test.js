@@ -1,4 +1,9 @@
-const { phoneRegex, alphanumericPunctuationRegex, emailRegex } = require("../../../utils/regex");
+const {
+  phoneRegex,
+  alphanumericPunctuationRegex,
+  alphanumericPunctuationRegexWithNewLine,
+  emailRegex,
+} = require("../../../utils/regex");
 
 describe("Testing AlphanumericRegex", () => {
   it("Should Pass given the Alphabet", () => {
@@ -73,5 +78,29 @@ describe("Testing Email Regex", () => {
   });
   it("Should reject invalid format given just the domain", () => {
     expect(emailRegex(".com")).toBe(true);
+  });
+});
+
+describe("Testing alphanumeric with punctuation and newline Regex", () => {
+  it("Should pass given paragraph", () => {
+    expect(
+      alphanumericPunctuationRegexWithNewLine(
+        "I like to eat \n Chicken and Rice because \n it is ever so nice \n + it tastes good",
+      ),
+    ).toBe(false);
+  });
+  it("Should pass given paragraph with symbols", () => {
+    expect(
+      alphanumericPunctuationRegexWithNewLine(
+        "!@#^&)() \n !@*&(#$)@!#*()(@*!#_!@*#(_)) \n _++(&*^&'';```~~(%%$%$*_()_&$%%)) \n !@#$%^..&*()_///+==={}{}{",
+      ),
+    ).toBe(false);
+  });
+  it("Should fail given paragraph with invalid symbols", () => {
+    expect(
+      alphanumericPunctuationRegexWithNewLine(
+        '😀 😃 😄 😁 😆 😅 😂 🤣 🥲 ☺️ 😊 😇 🙂 🙃 😉 😌 😍 🥰 😘 😗 😙 😚 😋 😛 😝 😜 🤪 🤨 🧐 🤓 😎 🥸 🤩 🥳 😏 😒 😞 😔 😟 😕 🙁 ☹️ 😣 😖 😫 😩 🥺 😢 😭 😤 😠 😡 🤬 🤯 😳 🥵 🥶 😱 😨 😰 😥 😓 🤗 🤔 🤭 🤫 🤥 😶 😐 😑 😬 🙄 😯 😦 😧 😮 😲 🥱 😴 🤤 😪 😵  \n !@#$%^..&*()_///+==={}{}{"',
+      ),
+    ).toBe(true);
   });
 });
