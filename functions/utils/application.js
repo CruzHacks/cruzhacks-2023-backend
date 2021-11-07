@@ -1,4 +1,9 @@
-const { alphanumericPunctuationRegex, phoneRegex } = require("./regex");
+const {
+  alphanumericPunctuationRegex,
+  alphanumericPunctuationRegexWithNewLine,
+  phoneRegex,
+  emailRegex,
+} = require("./regex");
 
 /*
   Return Inteface
@@ -133,7 +138,7 @@ const validateAppData = (data) => {
   fields.forEach((key) => {
     switch (key) {
       case "email": {
-        if (data[key] === "" || data[key].length > 100 || alphanumericPunctuationRegex(data[key])) {
+        if (data[key] === "" || data[key].length > 100 || emailRegex(data[key])) {
           errors.push("Email is Invalid");
         }
         break;
@@ -307,7 +312,7 @@ const validateAppData = (data) => {
           errors.push("No response for Why CruzHacks");
         } else if (data[key].length > 250) {
           errors.push("Why Cruzhacks response too Long");
-        } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
+        } else if (data[key] && alphanumericPunctuationRegexWithNewLine(data[key])) {
           errors.push("Why CruzHacks is not alphanumeric with punctuation");
         }
         break;
@@ -317,7 +322,7 @@ const validateAppData = (data) => {
           errors.push("No response for New This Year");
         } else if (data[key].length > 250) {
           errors.push("New This Year response too Long");
-        } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
+        } else if (data[key] && alphanumericPunctuationRegexWithNewLine(data[key])) {
           errors.push("New This Year is not alphanumeric with punctuation");
         }
         break;
@@ -327,7 +332,7 @@ const validateAppData = (data) => {
           errors.push("No response for Grandest Invention");
         } else if (data[key].length > 250) {
           errors.push("Grandest Invention response too Long");
-        } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
+        } else if (data[key] && alphanumericPunctuationRegexWithNewLine(data[key])) {
           errors.push("Grandest Invention is not alphanumeric with punctuation");
         }
         break;
@@ -343,7 +348,7 @@ const validateAppData = (data) => {
       case "priorExperience": {
         if (data[key].length > 100) {
           errors.push("Prior Experience response too Long");
-        } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
+        } else if (data[key] && alphanumericPunctuationRegexWithNewLine(data[key])) {
           errors.push("Prior Experience is not alphanumeric with punctuation");
         }
         break;
@@ -367,7 +372,7 @@ const validateAppData = (data) => {
       case "cruzCoins": {
         if (data[key].length > 100) {
           errors.push("CruzCoins response too Long");
-        } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
+        } else if (data[key] && alphanumericPunctuationRegexWithNewLine(data[key])) {
           errors.push("CruzCoins is not alphanumeric with punctuation");
         }
         break;
@@ -375,7 +380,7 @@ const validateAppData = (data) => {
       case "anythingElse": {
         if (data[key].length > 100) {
           errors.push("Anything Else response too Long");
-        } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
+        } else if (data[key] && alphanumericPunctuationRegexWithNewLine(data[key])) {
           errors.push("Anything Else is not alphanumeric with punctuation");
         }
         break;
