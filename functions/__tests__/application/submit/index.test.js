@@ -217,7 +217,7 @@ describe("Given submit invalid form data", () => {
       .field("lname", "Jacobi")
       .field("phone", "925-111-1111")
       .field("age", "24")
-      .field("pronounCount", 5);
+      .field("pronounCount", 6);
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(400);
@@ -234,7 +234,7 @@ describe("Given submit invalid form data", () => {
       .field("phone", "925-111-1111")
       .field("age", "24")
       .field("pronounCount", 1)
-      .field("pronouns[0]", "");
+      .field("pronouns[0]", "dsjfklsdajflksdjklsdfjklsdjlksajdflkjsdalfkjsdaljdslkjdsflkdsjalksdafjlkdsfj");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(400);
@@ -289,7 +289,7 @@ describe("Given submit invalid form data", () => {
       .field("pronounCount", 1)
       .field("pronouns[0]", "he/him/his")
       .field("sexualityCount", 1)
-      .field("sexuality[0]", "");
+      .field("sexuality[0]", "sdjkljsdalkjfasdkfjlkdsjlkfsadjlkdsfjlksdajflksdjaflkadsjflkjsdfalkjsdflkjdsfalkjsdfkjsdfkljdsfkljdsflkjsdfalkjsdfl");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(400);
@@ -394,7 +394,7 @@ describe("Given submit invalid form data", () => {
       .field("sexualityCount", 1)
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
-      .field("school", "ucsc");
+      .field("school", "ucsc")
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(400);
@@ -416,6 +416,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", 5);
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
@@ -438,6 +439,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
@@ -460,6 +462,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "agricultural psychological computational anthropological engineering BSC");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
@@ -483,6 +486,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
@@ -506,6 +510,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "Standing on a shelf in my kitchenette, oh you meant academic standing whoops");
@@ -530,6 +535,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting");
@@ -554,6 +560,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
@@ -579,6 +586,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
@@ -605,6 +613,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
@@ -634,6 +643,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
@@ -661,6 +671,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
@@ -691,6 +702,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
@@ -719,6 +731,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
@@ -750,6 +763,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
@@ -778,6 +792,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
@@ -807,6 +822,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
@@ -836,6 +852,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
@@ -865,6 +882,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
@@ -894,6 +912,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
@@ -927,6 +946,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
@@ -960,6 +980,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
@@ -993,6 +1014,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
@@ -1026,6 +1048,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
@@ -1059,6 +1082,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
@@ -1089,6 +1113,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
@@ -1120,6 +1145,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
@@ -1151,6 +1177,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
@@ -1184,6 +1211,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
       .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")

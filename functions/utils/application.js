@@ -44,13 +44,13 @@ const createAppObject = (body) => {
     const sexualityCount = body["sexualityCount"] ? parseInt(body["sexualityCount"]) : 0;
     for (var i = 0; i < pronounCount; i++) {
       var pronoun = body[`pronouns[${i}]`];
-      if (pronoun !== null) {
+      if (pronoun !== null && pronoun !== "") {
         pronouns.push(pronoun);
       }
     }
     for (var j = 0; j < sexualityCount; j++) {
       var sexuality = body[`sexuality[${j}]`];
-      if (sexuality !== null) {
+      if (sexuality !== null && sexuality !== "") {
         sexualities.push(sexuality);
       }
     }
@@ -58,7 +58,8 @@ const createAppObject = (body) => {
     const isUCSC = body["school"]
       ? body["school"].toLowerCase() === "ucsc" ||
         body["school"].toLowerCase() === "uc santa cruz" ||
-        body["school"].toLowerCase() === "university of california, santa cruz"
+        body["school"].toLowerCase() === "university of california, santa cruz" ||
+        body["school"].toLowerCase() === "university of california-santa cruz"
       : false;
     const school = isUCSC ? "ucsc" : body["school"] ? body["school"] : "";
     const appObj = {
@@ -77,7 +78,7 @@ const createAppObject = (body) => {
       race: body["race"] ? body["race"] : "",
       ucscStudent: isUCSC,
       school: school,
-      collegeAffiliation: isUCSC ? body["collegeAffiliation"] : "i am not a ucsc student",
+      collegeAffiliation: body["collegeAffiliation"],
       eventLocation: body["eventLocation"] ? body["eventLocation"] : "",
       major: body["major"] ? body["major"] : "",
       currentStanding: body["currentStanding"] ? body["currentStanding"] : "",
@@ -89,7 +90,7 @@ const createAppObject = (body) => {
       grandestInvention: body["grandestInvention"] ? body["grandestInvention"] : "",
 
       // Prior Experience
-      firstCruzHack: body["firstCruzHack"] === "yes",
+      firstCruzHack: body["firstCruzHack"] ? body["firstCruzHack"].toLowerCase() === "yes" : false,
       hackathonCount: body["hackathonCount"] ? parseInt(body["hackathonCount"]) : -1,
       priorExperience: body["priorExperience"] ? body["priorExperience"] : "",
 
@@ -174,7 +175,7 @@ const validateAppData = (data) => {
         break;
       }
       case "age": {
-        if (data[key] < 5) {
+        if (data[key] < 13) {
           errors.push("Age is Too Low");
         } else if (data[key] > 99) {
           errors.push("Age is Too High");
@@ -185,15 +186,11 @@ const validateAppData = (data) => {
         const givenOptions = ["he/him/his", "she/her/hers", "they/them/theirs", "prefer not to answer"];
         if (data[key].length === 0) {
           errors.push("No Pronouns Selected");
-        } else if (data[key].length >= 5) {
+        } else if (data[key].length > 5) {
           errors.push("Too Big of an Array");
         } else {
           for (var i = 0; i < data[key].length; i++) {
-            if (
-              data[key][i] === "" ||
-              (!givenOptions.includes(data[key][i]) &&
-                (data[key][i].length > 50 || alphanumericPunctuationRegex(data[key[i]])))
-            ) {
+            if (data[key][i] === "" || data[key][i].length > 50 || alphanumericPunctuationRegex(data[key[i]])) {
               errors.push("Pronoun Input Not Parsable");
               break;
             }
@@ -218,11 +215,7 @@ const validateAppData = (data) => {
           errors.push("Too Big of an Array");
         } else {
           for (var j = 0; j < data[key].length; j++) {
-            if (
-              data[key][j] === "" ||
-              (!givenOptions.includes(data[key][j]) &&
-                (data[key][j].length > 50 || alphanumericPunctuationRegex(data[key[j]])))
-            ) {
+            if (data[key][j] === "" || data[key][j].length > 50 || alphanumericPunctuationRegex(data[key[j]])) {
               errors.push("Sexuality Input Not Parsable");
               break;
             }
@@ -265,14 +258,14 @@ const validateAppData = (data) => {
           "rachel carson college",
           "oakes",
         ];
-        if (data["ucscStudent"] && !validOptions.includes(data[key])) {
+        if (data[key] === undefined || !validOptions.includes(data[key].toLowerCase())) {
           errors.push("Invalid College Affiliation");
         }
         break;
       }
       case "eventLocation": {
-        const validOptions = ["On-campus at UC Santa Cruz", "Santa Cruz County", "Other", "Unsure"];
-        if (!validOptions.includes(data[key])) {
+        const validOptions = ["on-campus at uc santa cruz", "santa cruz county", "other", "unsure"];
+        if (data[key] == undefined || !validOptions.includes(data[key].toLowerCase())) {
           errors.push("Not a valid event location");
         }
         break;
