@@ -289,7 +289,10 @@ describe("Given submit invalid form data", () => {
       .field("pronounCount", 1)
       .field("pronouns[0]", "he/him/his")
       .field("sexualityCount", 1)
-      .field("sexuality[0]", "sdjkljsdalkjfasdkfjlkdsjlkfsadjlkdsfjlksdajflksdjaflkadsjflkjsdfalkjsdflkjdsfalkjsdfkjsdfkljdsfkljdsflkjsdfalkjsdfl");
+      .field(
+        "sexuality[0]",
+        "sdjkljsdalkjfasdkfjlkdsjlkfsadjlkdsfjlksdajflksdjaflkadsjflkjsdfalkjsdflkjdsfalkjsdfkjsdfkljdsfkljdsflkjsdfalkjsdfl",
+      );
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(400);
@@ -394,7 +397,7 @@ describe("Given submit invalid form data", () => {
       .field("sexualityCount", 1)
       .field("sexuality[0]", "bisexual")
       .field("race", "Turkey man")
-      .field("school", "ucsc")
+      .field("school", "ucsc");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(400);

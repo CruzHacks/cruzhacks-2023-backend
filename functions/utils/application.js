@@ -183,7 +183,6 @@ const validateAppData = (data) => {
         break;
       }
       case "pronouns": {
-        const givenOptions = ["he/him/his", "she/her/hers", "they/them/theirs", "prefer not to answer"];
         if (data[key].length === 0) {
           errors.push("No Pronouns Selected");
         } else if (data[key].length > 5) {
@@ -199,16 +198,6 @@ const validateAppData = (data) => {
         break;
       }
       case "sexuality": {
-        const givenOptions = [
-          "bisexual",
-          "cisgender",
-          "gay",
-          "heterosexual",
-          "lesbian",
-          "transgender",
-          "queer",
-          "prefer not to answer",
-        ];
         if (data[key].length === 0) {
           errors.push("No Sexuality Selected");
         } else if (data[key].length >= 5) {
@@ -265,7 +254,7 @@ const validateAppData = (data) => {
       }
       case "eventLocation": {
         const validOptions = ["on-campus at uc santa cruz", "santa cruz county", "other", "unsure"];
-        if (data[key] == undefined || !validOptions.includes(data[key].toLowerCase())) {
+        if (data[key] === undefined || !validOptions.includes(data[key].toLowerCase())) {
           errors.push("Not a valid event location");
         }
         break;
