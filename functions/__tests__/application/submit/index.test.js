@@ -155,7 +155,7 @@ describe("Given submit invalid form data", () => {
       .field("email", "user@example.com")
       .field("fname", "Jacob")
       .field("lname", "Jacobi")
-      .field("phone", "+1 (925)-111-1111");
+      .field("phone", "+1 (925)-111-11111111111111");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasUpdateApp).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(400);
