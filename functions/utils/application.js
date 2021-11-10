@@ -167,7 +167,7 @@ const validateAppData = (data) => {
       case "phone": {
         if (data[key] === "") {
           errors.push("Phone Number is Empty");
-        } else if (data[key].length > 12) {
+        } else if (data[key].length > 20) {
           errors.push("Phone Number is Too Long");
         } else if (phoneRegex(data[key])) {
           errors.push("Phone Number Invalid");
