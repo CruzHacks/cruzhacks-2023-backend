@@ -96,6 +96,9 @@ describe("Testing alphanumeric with punctuation and newline Regex", () => {
       ),
     ).toBe(false);
   });
+  it("Should pass given \r\n", () => {
+    expect(alphanumericPunctuationRegexWithNewLine("test\r\n")).toBe(false);
+  });
   it("Should fail given paragraph with invalid symbols", () => {
     expect(
       alphanumericPunctuationRegexWithNewLine(
