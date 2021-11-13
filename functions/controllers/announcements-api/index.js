@@ -4,6 +4,9 @@ const cors = require("cors");
 const { jwtCheck, validKey, hasDeleteAnnouncement, hasUpdateAnnouncement } = require("../../utils/middleware");
 const { addDocument, queryCollectionSorted, deleteDocument } = require("../../utils/database");
 const { alphanumericRegex, alphanumericPunctuationRegexWithNewLine } = require("../../utils/regex");
+const admin = require("firebase-admin");
+admin.initializeApp();
+firedb = admin.firestore();
 
 const auth0Config = functions.config().auth;
 const corsConfig = auth0Config ? auth0Config.cors : "";
@@ -20,7 +23,7 @@ announcements.use(express.json());
 
 announcements.get("/", validKey, async (req, res) => {
   try {
-    const snapshot = await queryCollectionSorted("announcements", "date", 4);
+    const snapshot = await queryCollectionSorted(firedb, "announcements", "date", 4);
     const documents = [];
     snapshot.forEach((doc) => {
       const id = doc.id;
@@ -44,7 +47,7 @@ announcements.get("/", validKey, async (req, res) => {
 });
 
 announcements.delete("/:id", jwtCheck, hasDeleteAnnouncement, async (req, res) => {
-  deleteDocument("announcements", req.params.id)
+  deleteDocument(firedb, "announcements", req.params.id)
     .then(() =>
       res.status(200).send({
         error: false,
@@ -72,7 +75,7 @@ announcements.post("/", jwtCheck, hasUpdateAnnouncement, async (req, res) => {
   }
   const data = { title: title, message: message, date: Date.now() };
 
-  return addDocument("announcements", data)
+  return addDocument(firedb, "announcements", data)
     .then((doc) => {
       if (!doc) {
         functions.logger.log("Missing Response");

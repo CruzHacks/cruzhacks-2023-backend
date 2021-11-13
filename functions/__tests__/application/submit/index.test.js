@@ -2,7 +2,8 @@ const testConfig = require("firebase-functions-test")();
 const request = require("supertest");
 const { application } = require("../../../controllers/application/index");
 const { jwtCheck, hasUpdateApp } = require("../../../utils/middleware");
-const { setDocument, uploadFile } = require("../../../utils/database");
+const { setDocument } = require("../../../utils/database");
+const { uploadFile } = require("../../../utils/storage");
 const { isValidFileData, getNewFileName } = require("../../../utils/application");
 
 const pdf500kb = "__tests__/application/submit/500kb.pdf";
@@ -23,6 +24,7 @@ testConfig.mockConfig({
 
 jest.mock("../../../utils/middleware");
 jest.mock("../../../utils/database");
+jest.mock("../../../utils/storage");
 jest.mock("../../../utils/application", () => ({
   ...jest.requireActual("../../../utils/application"),
   isValidFileData: jest.fn(),

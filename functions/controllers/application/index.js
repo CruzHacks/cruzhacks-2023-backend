@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const formidable = require("formidable-serverless");
 
-const { jwtCheck, hasUpdateApp, hasReadApp, hasReadAnalytics } = require("../../utils/middleware");
+const { jwtCheck, hasUpdateApp, hasReadAnalytics } = require("../../utils/middleware");
 const {
   createAppObject,
   validateAppData,
@@ -11,7 +11,12 @@ const {
   isValidFileData,
   getNewFileName,
 } = require("../../utils/application");
-const { queryDocument, setDocument, uploadFile } = require("../../utils/database");
+const { queryDocument, setDocument } = require("../../utils/database");
+const { uploadFile } = require("../../utils/storage");
+const admin = require("firebase-admin");
+admin.initializeApp();
+firedb = admin.firestore();
+firestorage = admin.storage();
 
 const application = express();
 application.disable("x-powered-by");
@@ -54,11 +59,11 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
 
     if (files && files.file) {
       return (
-        uploadFile("resume", getNewFileName(appData, files.file.name, req.user.sub), files.file)
+        uploadFile(firestorage, "resume", getNewFileName(appData, files.file.name, req.user.sub), files.file)
           .then((filedata) => {
             // Checks if upload URL exists
             if (isValidFileData(filedata)) {
-              return setDocument("applicants", req.user.sub, appData);
+              return setDocument(firedb, "applicants", req.user.sub, appData);
             } else {
               throw "Upload Error";
             }
@@ -76,7 +81,7 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
       );
     } else {
       return (
-        setDocument("applicants", req.user.sub, appData)
+        setDocument(firedb, "applicants", req.user.sub, appData)
           // eslint-disable-next-line no-unused-vars
           .then((data) => {
             return res.status(201).send({ code: 201, message: "Successfully Updated Application" });
@@ -90,26 +95,9 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
   });
 });
 
-application.get("/checkApp", jwtCheck, hasReadApp, async (req, res) => {
-  try {
-    const doc = await queryDocument("applicants", req.user.sub);
-    const appStatus = doc.get("status");
-    if (appStatus === undefined) {
-      throw new Error("No Document");
-    }
-    res.status(200).send({ code: 200, status: appStatus, exists: true, message: "Document Found" });
-  } catch (error) {
-    if (error.message === "No Document") {
-      res.status(200).send({ code: 200, status: "No Document", exists: false, message: "No Document" });
-    } else {
-      res.status(500).send({ code: 500, status: "No Document", exists: false, message: "Internal Server Error" });
-    }
-  }
-});
-
 application.get("/analytics", jwtCheck, hasReadAnalytics, async (req, res) => {
   try {
-    const analyticsSnapshot = await queryDocument("analytics", "applicant-analytics");
+    const analyticsSnapshot = await queryDocument(firedb, "analytics", "applicant-analytics");
     if (!analyticsSnapshot.exists) {
       throw new Error("No Document");
     }
