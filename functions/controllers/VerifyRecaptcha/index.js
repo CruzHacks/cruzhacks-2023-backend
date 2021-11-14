@@ -1,11 +1,20 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
-const { validKey } = require("../../utils/middleware");
 const fetch = require("isomorphic-fetch");
 
 const recaptchaConfig = functions.config().verify_recaptcha;
 const auth0Config = functions.config().auth;
+const app = functions.config().app;
+
+const apikey = app ? app.apikey : "";
+
+const validKey = (req, res, next) => {
+  if (!req.headers.authentication || req.headers.authentication !== apikey || apikey === "") {
+    return res.status(403).send({ message: "Invalid Api Key" });
+  }
+  next();
+};
 
 const base_google_endpoint = recaptchaConfig ? recaptchaConfig.base_google_endpoint : "";
 const secretKey = recaptchaConfig ? recaptchaConfig.secret_key : "";
@@ -86,4 +95,4 @@ verifyRecaptcha.post("/submit", validKey, async (req, res) => {
 
 const service = functions.https.onRequest(verifyRecaptcha);
 
-module.exports = { verifyRecaptcha, service };
+module.exports = { verifyRecaptcha, service, validKey };

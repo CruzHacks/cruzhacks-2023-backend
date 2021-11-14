@@ -2,14 +2,28 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
-
-const { jwtCheck } = require("../../utils/middleware");
 const { getM2MToken } = require("../../utils/m2m");
+var jwt = require("express-jwt");
+var { expressJwtSecret } = require("jwks-rsa");
 
 const auth0Config = functions.config().auth;
 
 const corsConfig = auth0Config ? auth0Config.cors : "";
+const audience = auth0Config ? auth0Config.audience : "";
 const issuer = auth0Config ? auth0Config.issuer : "";
+const jwk_uri = auth0Config ? auth0Config.jwk_uri + ".well-known/jwks.json" : ".well-known/jwks.json";
+
+const jwtCheck = jwt({
+  secret: expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: jwk_uri,
+  }),
+  audience: audience,
+  issuer: issuer,
+  algorithms: ["RS256"],
+});
 
 const app = express();
 app.disable("x-powered-by");
@@ -85,4 +99,4 @@ app.post("/resend", jwtCheck, async (req, res) => {
 
 const service = functions.https.onRequest(app);
 
-module.exports = { app, service };
+module.exports = { app, service, jwtCheck };

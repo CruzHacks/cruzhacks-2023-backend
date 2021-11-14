@@ -1,7 +1,7 @@
 const testConfig = require("firebase-functions-test")();
 const request = require("supertest");
-const { application } = require("../../../controllers/application/index");
-const { jwtCheck, hasUpdateApp } = require("../../../utils/middleware");
+const { application, jwtCheck } = require("../../../controllers/application/index");
+const { hasUpdateApp } = require("../../../utils/middleware");
 const { setDocument, uploadFile } = require("../../../utils/database");
 const { isValidFileData, getNewFileName } = require("../../../utils/application");
 
@@ -27,6 +27,10 @@ jest.mock("../../../utils/application", () => ({
   ...jest.requireActual("../../../utils/application"),
   isValidFileData: jest.fn(),
   getNewFileName: jest.fn(),
+}));
+jest.mock("../../../controllers/application/index", () => ({
+  ...jest.requireActual("../../../controllers/application/index"),
+  jwtCheck: jest.fn(),
 }));
 
 describe("Given submit invalid form data", () => {

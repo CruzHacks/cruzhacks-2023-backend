@@ -1,7 +1,7 @@
 const testConfig = require("firebase-functions-test")();
 const request = require("supertest");
-const { application } = require("../../../controllers/application/index");
-const { jwtCheck, hasReadApp } = require("../../../utils/middleware");
+const { application, jwtCheck } = require("../../../controllers/application/index");
+const { hasReadApp } = require("../../../utils/middleware");
 const { queryDocument } = require("../../../utils/database");
 const { makeDocumentSnapshot } = require("firebase-functions-test/lib/providers/firestore");
 
@@ -20,7 +20,10 @@ testConfig.mockConfig({
 
 jest.mock("../../../utils/middleware");
 jest.mock("../../../utils/database");
-
+jest.mock("../../../controllers/application/index", () => ({
+  ...jest.requireActual("../../controllers/application/index"),
+  jwtCheck: jest.fn(),
+}));
 describe("Application Test", () => {
   afterEach(() => {
     jwtCheck.mockClear();

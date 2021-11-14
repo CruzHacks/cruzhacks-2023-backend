@@ -1,43 +1,45 @@
 /* eslint-disable consistent-return */
-const functions = require("firebase-functions");
-var jwt = require("express-jwt");
-var jwks = require("jwks-rsa");
+// const functions = require("firebase-functions");
+// var jwt = require("express-jwt");
+// var { expressJwtSecret } = require("jwks-rsa");
 
-const app = functions.config().app;
-const auth0Config = functions.config().auth;
-const apikey = app ? app.apikey : "";
-const audience = auth0Config ? auth0Config.audience : "";
-const issuer = auth0Config ? auth0Config.issuer : "";
-const jwk_uri = auth0Config ? auth0Config.jwk_uri + ".well-known/jwks.json" : ".well-known/jwks.json";
+// const app = functions.config().app;
+// const auth0Config = functions.config().auth;
+// const apikey = app ? app.apikey : "";
+// const audience = auth0Config ? auth0Config.audience : "";
+// const issuer = auth0Config ? auth0Config.issuer : "";
+// const jwk_uri = auth0Config ? auth0Config.jwk_uri + ".well-known/jwks.json" : ".well-known/jwks.json";
 
 /*
 Validates jwt and parses data into req.user
 */
 
-const jwtCheck = jwt({
-  secret: jwks.expressJwtSecret({
-    cache: true,
-    rateLimit: true,
-    jwksRequestsPerMinute: 5,
-    jwksUri: jwk_uri,
-  }),
-  audience: audience,
-  issuer: issuer,
-  algorithms: ["RS256"],
-});
+// var jwt = require("express-jwt");
+// var { expressJwtSecret } = require("jwks-rsa");
+// const jwtCheck = jwt({
+//   secret: expressJwtSecret({
+//     cache: true,
+//     rateLimit: true,
+//     jwksRequestsPerMinute: 5,
+//     jwksUri: jwk_uri,
+//   }),
+//   audience: audience,
+//   issuer: issuer,
+//   algorithms: ["RS256"],
+// });
 
-/*
-Additional Middleware for Non-Authenticated Requests
-Authentication field must be included with correct key
-You cannot use this Middleware with this jwtCheck
-*/
+// /*
+// Additional Middleware for Non-Authenticated Requests
+// Authentication field must be included with correct key
+// You cannot use this Middleware with this jwtCheck
+// */
 
-const validKey = (req, res, next) => {
-  if (!req.headers.authentication || req.headers.authentication !== apikey || apikey === "") {
-    return res.status(403).send({ message: "Invalid Api Key" });
-  }
-  next();
-};
+// const validKey = (req, res, next) => {
+//   if (!req.headers.authentication || req.headers.authentication !== apikey || apikey === "") {
+//     return res.status(403).send({ message: "Invalid Api Key" });
+//   }
+//   next();
+// };
 
 /*
 Middleware that checks if custom API specified Auth0 permissions exist on a jwt
@@ -61,8 +63,8 @@ const hasDeleteAnnouncement = hasPermission("delete:announcements");
 const hasReadAnalytics = hasPermission("read:stats");
 
 module.exports = {
-  jwtCheck,
-  validKey,
+  //jwtCheck,
+  //validKey,
   hasPermission,
   hasUpdateApp,
   hasReadApp,

@@ -1,9 +1,9 @@
 const testConfig = require("firebase-functions-test")();
 const supertest = require("supertest");
-const { verifyRecaptcha } = require("../../controllers/VerifyRecaptcha/index");
+const { verifyRecaptcha, validKey } = require("../../controllers/VerifyRecaptcha/index");
 jest.mock("isomorphic-fetch");
 const fetch = require("isomorphic-fetch");
-const { validKey } = require("../../utils/middleware");
+// const { validKey } = require("../../utils/middleware");
 
 testConfig.mockConfig({
   verify_recaptcha: {
@@ -11,7 +11,10 @@ testConfig.mockConfig({
     secret_key: "token",
   },
 });
-jest.mock("../../utils/middleware");
+jest.mock("../../controllers/VerifyRecaptcha/index", () => ({
+  ...jest.requireActual("../../controllers/VerifyRecaptcha/index"),
+  validKey: jest.fn(),
+}));
 
 describe("POST /submit", () => {
   validKey.mockImplementation((req, res, next) => next());

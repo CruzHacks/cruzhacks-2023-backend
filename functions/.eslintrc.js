@@ -18,9 +18,6 @@ module.exports = {
     // Removed rule "disallow the use of undeclared variables unless mentioned in /*global */ comments" from recommended eslint rules
     "no-undef": "off",
 
-    // Warn if return statements do not either always or never specify values
-    "consistent-return": 1,
-
     // Warn if no return statements in callbacks of array methods
     "array-callback-return": 1,
 

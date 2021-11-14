@@ -2,8 +2,10 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const formidable = require("formidable-serverless");
+var jwt = require("express-jwt");
+var { expressJwtSecret } = require("jwks-rsa");
 
-const { jwtCheck, hasReadAnalytics } = require("../../utils/middleware");
+const { hasReadAnalytics } = require("../../utils/middleware");
 const {
   createAppObject,
   validateAppData,
@@ -20,13 +22,29 @@ application.use(express.json());
 const auth0Config = functions.config().auth;
 const corsConfig = auth0Config ? auth0Config.cors : "";
 
+const audience = auth0Config ? auth0Config.audience : "";
+const issuer = auth0Config ? auth0Config.issuer : "";
+const jwk_uri = auth0Config ? auth0Config.jwk_uri + ".well-known/jwks.json" : ".well-known/jwks.json";
+
+const jwtCheck = jwt({
+  secret: expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: jwk_uri,
+  }),
+  audience: audience,
+  issuer: issuer,
+  algorithms: ["RS256"],
+});
+
 const corsOptions = {
   origin: corsConfig,
   optionsSuccessStatus: 200,
 };
 
 application.use(cors(corsOptions));
-
+// application.use(jwtCheck)
 /* TODO: 
   Unit Test Functions
 */
@@ -134,4 +152,4 @@ application.get("/analytics", jwtCheck, hasReadAnalytics, async (req, res) => {
 
 const service = functions.https.onRequest(application);
 
-module.exports = { application, service };
+module.exports = { application, service, jwtCheck };

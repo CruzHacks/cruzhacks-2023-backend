@@ -1,12 +1,40 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
-const { jwtCheck, validKey, hasDeleteAnnouncement, hasUpdateAnnouncement } = require("../../utils/middleware");
+const { hasDeleteAnnouncement, hasUpdateAnnouncement } = require("../../utils/middleware");
 const { addDocument, queryCollectionSorted, deleteDocument } = require("../../utils/database");
 const { alphanumericRegex, alphanumericPunctuationRegexWithNewLine } = require("../../utils/regex");
 
 const auth0Config = functions.config().auth;
+const app = functions.config().app;
 const corsConfig = auth0Config ? auth0Config.cors : "";
+
+const apikey = app ? app.apikey : "";
+const audience = auth0Config ? auth0Config.audience : "";
+const issuer = auth0Config ? auth0Config.issuer : "";
+const jwk_uri = auth0Config ? auth0Config.jwk_uri + ".well-known/jwks.json" : ".well-known/jwks.json";
+
+var jwt = require("express-jwt");
+var { expressJwtSecret } = require("jwks-rsa");
+
+const jwtCheck = jwt({
+  secret: expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: jwk_uri,
+  }),
+  audience: audience,
+  issuer: issuer,
+  algorithms: ["RS256"],
+});
+
+const validKey = (req, res, next) => {
+  if (!req.headers.authentication || req.headers.authentication !== apikey || apikey === "") {
+    return res.status(403).send({ message: "Invalid Api Key" });
+  }
+  next();
+};
 
 const announcements = express();
 const corsOptions = {
@@ -87,4 +115,4 @@ announcements.post("/", jwtCheck, hasUpdateAnnouncement, async (req, res) => {
 
 const service = functions.https.onRequest(announcements);
 
-module.exports = { announcements, service };
+module.exports = { announcements, service, jwtCheck, validKey };
