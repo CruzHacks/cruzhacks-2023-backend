@@ -24,7 +24,7 @@ application.use(cors(corsOptions));
 
 application.get("/checkApp", jwtCheck, hasReadApp, async (req, res) => {
   try {
-    const doc = await queryDocument("applicants", req.user.sub);
+    const doc = await queryDocument(firedb, "applicants", req.user.sub);
     const appStatus = doc.get("status");
     if (appStatus === undefined) {
       throw new Error("No Document");
