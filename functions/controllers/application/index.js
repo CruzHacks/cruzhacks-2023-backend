@@ -60,7 +60,7 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
             if (isValidFileData(filedata)) {
               return setDocument("applicants", req.user.sub, appData);
             } else {
-              throw "Upload Error";
+              throw new Error("Upload Error");
             }
           })
           // eslint-disable-next-line no-unused-vars
@@ -68,7 +68,8 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
             return res.status(201).send({ code: 201, message: "Successfully Updated Application" });
           })
           .catch((error) => {
-            if (error === "Upload Error") {
+            functions.logger.log("Resume Upload: " + error.message);
+            if (error.message === "Upload Error") {
               return res.status(400).send({ code: 400, message: "An Error Occurred Uploading Your Resume" });
             }
             return res.status(500).send({ code: 500, message: "Server Error" });
