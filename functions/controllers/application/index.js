@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const formidable = require("formidable-serverless");
 
-const { jwtCheck,hasReadAnalytics } = require("../../utils/middleware");
+const { jwtCheck, hasReadAnalytics } = require("../../utils/middleware");
 const {
   createAppObject,
   validateAppData,
