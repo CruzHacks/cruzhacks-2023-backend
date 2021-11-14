@@ -85,20 +85,20 @@ const createAppObject = (body) => {
       country: body["country"] ? body["country"] : "",
 
       // Short Answer
-      whyCruzHacks: body["whyCruzHacks"] ? body["whyCruzHacks"] : "",
-      newThisYear: body["newThisYear"] ? body["newThisYear"] : "",
-      grandestInvention: body["grandestInvention"] ? body["grandestInvention"] : "",
+      whyCruzHacks: body["whyCruzHacks"] ? body["whyCruzHacks"].replace(/(\r\n|\n|\r)/gm, " ") : "",
+      newThisYear: body["newThisYear"] ? body["newThisYear"].replace(/(\r\n|\n|\r)/gm, " ") : "",
+      grandestInvention: body["grandestInvention"] ? body["grandestInvention"].replace(/(\r\n|\n|\r)/gm, " ") : "",
 
       // Prior Experience
       firstCruzHack: body["firstCruzHack"] ? body["firstCruzHack"].toLowerCase() === "yes" : false,
       hackathonCount: body["hackathonCount"] ? parseInt(body["hackathonCount"]) : -1,
-      priorExperience: body["priorExperience"] ? body["priorExperience"] : "",
+      priorExperience: body["priorExperience"] ? body["priorExperience"].replace(/(\r\n|\n|\r)/gm, " ") : "",
 
       // Connected
       linkedin: body["linkedin"] ? body["linkedin"] : "",
       github: body["github"] ? body["github"] : "",
-      cruzCoins: body["cruzCoins"] ? body["cruzCoins"] : "",
-      anythingElse: body["anythingElse"] ? body["anythingElse"] : "",
+      cruzCoins: body["cruzCoins"] ? body["cruzCoins"].replace(/(\r\n|\n|\r)/gm, " ") : "",
+      anythingElse: body["anythingElse"] ? body["anythingElse"].replace(/(\r\n|\n|\r)/gm, " ") : "",
     };
     return appObj;
   } catch (error) {
