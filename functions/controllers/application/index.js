@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const formidable = require("formidable-serverless");
 
-const { jwtCheck, hasUpdateApp, hasReadApp, hasReadAnalytics } = require("../../utils/middleware");
+const { jwtCheck,hasReadAnalytics } = require("../../utils/middleware");
 const {
   createAppObject,
   validateAppData,
@@ -30,7 +30,7 @@ application.use(cors(corsOptions));
 /* TODO: 
   Unit Test Functions
 */
-application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
+application.post("/submit", jwtCheck, async (req, res) => {
   const form = new formidable.IncomingForm();
   return await form.parse(req, async (err, fields, files) => {
     if (err) {
@@ -90,7 +90,7 @@ application.post("/submit", jwtCheck, hasUpdateApp, async (req, res) => {
   });
 });
 
-application.get("/checkApp", jwtCheck, hasReadApp, async (req, res) => {
+application.get("/checkApp", jwtCheck, async (req, res) => {
   try {
     const doc = await queryDocument("applicants", req.user.sub);
     const appStatus = doc.get("status");

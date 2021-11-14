@@ -42,7 +42,7 @@ describe("Application Test", () => {
 
     const res = await request(application).get("/checkApp");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasReadApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(200);
     expect(res.body).toStrictEqual({
       code: 200,
@@ -67,7 +67,7 @@ describe("Application Test", () => {
 
     const res = await request(application).get("/checkApp");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasReadApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(200);
     expect(res.body).toStrictEqual({
       code: 200,
@@ -91,7 +91,7 @@ describe("Application Test", () => {
 
     const res = await request(application).get("/checkApp");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasReadApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(200);
     expect(res.body).toStrictEqual({
       code: 200,
@@ -115,7 +115,7 @@ describe("Application Test", () => {
 
     const res = await request(application).get("/checkApp");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasReadApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(500);
     expect(res.body).toStrictEqual({
       code: 500,
