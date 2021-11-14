@@ -54,7 +54,7 @@ describe("Given submit invalid form data", () => {
   it("Should return 400 and proper error-code given nothing", async () => {
     const res = await request(application).post("/submit");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
   });
@@ -62,7 +62,7 @@ describe("Given submit invalid form data", () => {
   it("Should return 400 and proper error-codes given empty email", async () => {
     const res = await request(application).post("/submit").field("email", "");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Email is Invalid");
@@ -76,7 +76,7 @@ describe("Given submit invalid form data", () => {
         "oooooooooonnnnnnnnnneeeeeeeeeehhhhhhhhhhuuuuuuuuuunnnnnnnnnnddddddddddrrrrrrrrrreeeeeeeeeeddddddddddchars@email.com",
       );
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Email is Invalid");
@@ -85,7 +85,7 @@ describe("Given submit invalid form data", () => {
   it("Should return 400 and proper error-codes given valid email", async () => {
     const res = await request(application).post("/submit").field("email", "user@example.com");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).not.toStrictEqual("Email is Invalid");
@@ -98,7 +98,7 @@ describe("Given submit invalid form data", () => {
       .field("fname", "")
       .field("lname", "");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("First Name is Empty");
@@ -112,7 +112,7 @@ describe("Given submit invalid form data", () => {
       .field("fname", "JohnPaulJacobTheThirdFourthAndFifthButSometimesTheSixth")
       .field("lname", "PeabodyPearcexxxxxxxxxxxxxxxxx");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("First Name is Too Long");
@@ -126,7 +126,7 @@ describe("Given submit invalid form data", () => {
       .field("fname", "Jacob")
       .field("lname", "Jacobi");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).not.toStrictEqual("First Name is Too Long");
@@ -143,7 +143,7 @@ describe("Given submit invalid form data", () => {
       .field("lname", "Jacobi")
       .field("phone", "");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Phone Number is Empty");
@@ -157,7 +157,7 @@ describe("Given submit invalid form data", () => {
       .field("lname", "Jacobi")
       .field("phone", "+1 (925)-111-11111111111111");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Phone Number is Too Long");
@@ -172,7 +172,7 @@ describe("Given submit invalid form data", () => {
       .field("phone", "925-111-1111")
       .field("age", "3");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Age is Too Low");
@@ -187,7 +187,7 @@ describe("Given submit invalid form data", () => {
       .field("phone", "925-111-1111")
       .field("age", "100");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Age is Too High");
@@ -203,7 +203,7 @@ describe("Given submit invalid form data", () => {
       .field("age", "24")
       .field("pronouns", "");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("No Pronouns Selected");
@@ -219,7 +219,7 @@ describe("Given submit invalid form data", () => {
       .field("age", "24")
       .field("pronounCount", 6);
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Too Big of an Array");
@@ -236,7 +236,7 @@ describe("Given submit invalid form data", () => {
       .field("pronounCount", 1)
       .field("pronouns[0]", "dsjfklsdajflksdjklsdfjklsdjlksajdflkjsdalfkjsdaljdslkjdsflkdsjalksdafjlkdsfj");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Pronoun Input Not Parsable");
@@ -254,7 +254,7 @@ describe("Given submit invalid form data", () => {
       .field("pronouns[0]", "he/him/his")
       .field("sexualityCount", 0);
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[1]).toStrictEqual("No Sexuality Selected");
@@ -272,7 +272,7 @@ describe("Given submit invalid form data", () => {
       .field("pronouns[0]", "he/him/his")
       .field("sexualityCount", 9);
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[1]).toStrictEqual("Too Big of an Array");
@@ -294,7 +294,7 @@ describe("Given submit invalid form data", () => {
         "sdjkljsdalkjfasdkfjlkdsjlkfsadjlkdsfjlksdajflksdjaflkadsjflkjsdfalkjsdflkjdsfalkjsdfkjsdfkljdsfkljdsflkjsdfalkjsdfl",
       );
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[1]).toStrictEqual("Sexuality Input Not Parsable");
@@ -313,7 +313,7 @@ describe("Given submit invalid form data", () => {
       .field("sexualityCount", 1)
       .field("sexuality[0]", "bisexual");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("No Race Inputted");
@@ -333,7 +333,7 @@ describe("Given submit invalid form data", () => {
       .field("sexuality[0]", "bisexual")
       .field("race", "RedOrangeYellowGreenBlueIndigoViolet if that isn't 50 chars long I give up");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Race String Too Long");
@@ -354,7 +354,7 @@ describe("Given submit invalid form data", () => {
       .field("race", "Turkey man")
       .field("school", "");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("No School Inputted");
@@ -378,7 +378,7 @@ describe("Given submit invalid form data", () => {
         "University of the northwestern part of central alaska of the eastern seaboard's charcuterie board's smorgesbrod",
       );
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("School Input too Long");
@@ -399,7 +399,7 @@ describe("Given submit invalid form data", () => {
       .field("race", "Turkey man")
       .field("school", "ucsc");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Invalid College Affiliation");
@@ -422,7 +422,7 @@ describe("Given submit invalid form data", () => {
       .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", 5);
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Not a valid event location");
@@ -445,7 +445,7 @@ describe("Given submit invalid form data", () => {
       .field("collegeAffiliation", "i am not a ucsc student")
       .field("eventLocation", "On-campus at UC Santa Cruz");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("No major inputted");
@@ -469,7 +469,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "agricultural psychological computational anthropological engineering BSC");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Major Name Too Long");
@@ -493,7 +493,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("No standing inputted");
@@ -518,7 +518,7 @@ describe("Given submit invalid form data", () => {
       .field("major", "Computer Science")
       .field("currentStanding", "Standing on a shelf in my kitchenette, oh you meant academic standing whoops");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Standing Name Too Long");
@@ -543,7 +543,7 @@ describe("Given submit invalid form data", () => {
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("No country inputted");
@@ -569,7 +569,7 @@ describe("Given submit invalid form data", () => {
       .field("currentStanding", "I am actually sitting")
       .field("country", "The United Kingdom of Great Britain and Northern Ireland");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Country Name Too Long");
@@ -596,7 +596,7 @@ describe("Given submit invalid form data", () => {
       .field("country", "USA")
       .field("whyCruzHacks", "");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("No response for Why CruzHacks");
@@ -626,7 +626,7 @@ describe("Given submit invalid form data", () => {
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       );
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Why Cruzhacks response too Long");
@@ -654,7 +654,7 @@ describe("Given submit invalid form data", () => {
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("No response for New This Year");
@@ -685,7 +685,7 @@ describe("Given submit invalid form data", () => {
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       );
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("New This Year response too Long");
@@ -714,7 +714,7 @@ describe("Given submit invalid form data", () => {
       .field("newThisYear", "2022 Hackathon")
       .field("grandestInvention", "");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("No response for Grandest Invention");
@@ -746,7 +746,7 @@ describe("Given submit invalid form data", () => {
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       );
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Grandest Invention response too Long");
@@ -775,7 +775,7 @@ describe("Given submit invalid form data", () => {
       .field("newThisYear", "2022 Hackathon")
       .field("grandestInvention", "Jest Test");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Invalid Hackathon Count");
@@ -805,7 +805,7 @@ describe("Given submit invalid form data", () => {
       .field("grandestInvention", "Jest Test")
       .field("firstCruzHack", "yes");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Invalid Hackathon Count");
@@ -835,7 +835,7 @@ describe("Given submit invalid form data", () => {
       .field("grandestInvention", "Jest Test")
       .field("hackathonCount", "-5");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Invalid Hackathon Count");
@@ -865,7 +865,7 @@ describe("Given submit invalid form data", () => {
       .field("grandestInvention", "Jest Test")
       .field("hackathonCount", "1000");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Too many hackathons attended");
@@ -895,7 +895,7 @@ describe("Given submit invalid form data", () => {
       .field("grandestInvention", "Jest Test")
       .field("hackathonCount", "1000");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Too many hackathons attended");
@@ -929,7 +929,7 @@ describe("Given submit invalid form data", () => {
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       );
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Prior Experience response too Long");
@@ -963,7 +963,7 @@ describe("Given submit invalid form data", () => {
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       );
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("LinkedIn Id too Long");
@@ -997,7 +997,7 @@ describe("Given submit invalid form data", () => {
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       );
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("GitHub Id too Long");
@@ -1031,7 +1031,7 @@ describe("Given submit invalid form data", () => {
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       );
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("CruzCoins response too Long");
@@ -1065,7 +1065,7 @@ describe("Given submit invalid form data", () => {
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       );
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("Anything Else response too Long");
@@ -1096,7 +1096,7 @@ describe("Given submit invalid form data", () => {
       .field("hackathonCount", "0")
       .field("anythingElse", "");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(201);
     expect(res.body.message).toBe("Successfully Updated Application");
     expect(res.body.errors).toStrictEqual(undefined);
@@ -1127,7 +1127,7 @@ describe("Given submit invalid form data", () => {
       .field("hackathonCount", "0")
       .field("anythingElse", "");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(201);
     expect(res.body.message).toBe("Successfully Updated Application");
     expect(res.body.errors).toStrictEqual(undefined);
@@ -1159,7 +1159,7 @@ describe("Given submit invalid form data", () => {
       .field("hackathonCount", "0")
       .field("anythingElse", "");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(500);
     expect(res.body.message).toBe("Server Error");
     expect(res.body.errors).toStrictEqual(undefined);
@@ -1193,7 +1193,7 @@ describe("Given submit invalid form data", () => {
       .attach("file", pdf4mb)
       .set({ connection: "keep-alive" });
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Resume Validation Failed");
     expect(res.body.errors).toStrictEqual(["Document is greater than 1mb"]);
@@ -1227,7 +1227,7 @@ describe("Given submit invalid form data", () => {
       .attach("file", pdf500kb)
       .set({ connection: "keep-alive" });
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasUpdateApp).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(201);
     expect(res.body.message).toBe("Successfully Updated Application");
     expect(res.body.errors).toStrictEqual(undefined);
