@@ -13,6 +13,9 @@ testConfig.mockConfig({
     issuer: "issuer",
     jwk_uri: "some uri",
   },
+  app: {
+    bucket: "resume",
+  },
 });
 
 jest.mock("../../../utils/middleware");
