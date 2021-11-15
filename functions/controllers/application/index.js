@@ -26,7 +26,7 @@ const corsOptions = {
 };
 
 const app = functions.config().app;
-const bucket = app.bucket;
+const bucket = app ? app.bucket: "";
 
 application.use(cors(corsOptions));
 
