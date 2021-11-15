@@ -25,6 +25,9 @@ const corsOptions = {
   optionsSuccessStatus: 200,
 };
 
+const app = functions.config().app;
+const bucket = app.bucket;
+
 application.use(cors(corsOptions));
 
 /* TODO: 
@@ -56,7 +59,7 @@ application.post("/submit", jwtCheck, async (req, res) => {
 
     if (files && files.file) {
       return (
-        uploadFile("resume", getNewFileName(appData, files.file.name, req.user.sub), files.file)
+        uploadFile(bucket, getNewFileName(appData, files.file.name, req.user.sub), files.file)
           .then((filedata) => {
             // Checks if upload URL exists
             if (isValidFileData(filedata)) {
