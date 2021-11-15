@@ -19,6 +19,9 @@ testConfig.mockConfig({
     api_token: "sometoken",
     url: "fake_url",
   },
+  app: {
+    bucket: "resume",
+  },
 });
 
 jest.mock("../../../utils/middleware");
