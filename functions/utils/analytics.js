@@ -1,5 +1,5 @@
 const functions = require("firebase-functions");
-const { db, admin } = require("./admin");
+const { db } = require("./database");
 
 /*
     writeToAnalytics adds an event trigger to 'applicants' collection.
@@ -26,9 +26,9 @@ const service = functions.firestore.document("applicants/{docId}").onCreate(asyn
   };
   try {
     await analyticsDoc.update({
-      applicantCount: admin.firestore.FieldValue.increment(toUpdate.applicantIncrement),
-      firstTimeCount: admin.firestore.FieldValue.increment(toUpdate.firstTimeIncrement),
-      ucscStudentCount: admin.firestore.FieldValue.increment(toUpdate.ucscIncrement),
+      applicantCount: db.FieldValue.increment(toUpdate.applicantIncrement),
+      firstTimeCount: db.FieldValue.increment(toUpdate.firstTimeIncrement),
+      ucscStudentCount: db.FieldValue.increment(toUpdate.ucscIncrement),
     });
   } catch (error) {
     functions.logger.error(error.message);

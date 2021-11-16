@@ -1,9 +1,10 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
-const formidable = require("formidable-serverless");
 
 const { jwtCheck, hasReadAnalytics } = require("../../utils/middleware");
+const { queryDocument, setDocument, uploadFile } = require("../../utils/database");
+
 const {
   createAppObject,
   validateAppData,
@@ -11,7 +12,7 @@ const {
   isValidFileData,
   getNewFileName,
 } = require("../../utils/application");
-const { queryDocument, setDocument, uploadFile } = require("../../utils/database");
+const formidable = require("formidable-serverless");
 
 const application = express();
 application.disable("x-powered-by");
@@ -30,9 +31,6 @@ const bucket = app ? app.bucket : "";
 
 application.use(cors(corsOptions));
 
-/* TODO: 
-  Unit Test Functions
-*/
 application.post("/submit", jwtCheck, async (req, res) => {
   const form = new formidable.IncomingForm();
   return await form.parse(req, async (err, fields, files) => {
