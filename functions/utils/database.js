@@ -44,6 +44,7 @@ module.exports = {
   queryCollectionSorted,
   deleteDocument,
   uploadFile,
+  admin,
   db,
   storage,
 };
