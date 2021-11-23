@@ -2,7 +2,7 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 
-const { jwtCheck, hasReadAnalytics } = require("../../utils/middleware");
+const { jwtCheck } = require("../../utils/middleware");
 const { queryDocument, setDocument, uploadFile } = require("../../utils/database");
 
 const {
@@ -108,29 +108,6 @@ application.get("/checkApp", jwtCheck, async (req, res) => {
     } else {
       res.status(500).send({ code: 500, status: "No Document", exists: false, message: "Internal Server Error" });
     }
-  }
-});
-
-application.get("/analytics", jwtCheck, hasReadAnalytics, async (req, res) => {
-  try {
-    const analyticsSnapshot = await queryDocument("analytics", "applicant-analytics");
-    if (!analyticsSnapshot.exists) {
-      throw new Error("No Document");
-    }
-
-    res.status(201).send({
-      status: 201,
-      message: {
-        applicantCount: analyticsSnapshot.get("applicantCount"),
-        firstTime: analyticsSnapshot.get("firstTimeCount"),
-        ucscApplicants: analyticsSnapshot.get("ucscStudentCount"),
-      },
-    });
-  } catch (error) {
-    if (error.message === "No Document") {
-      res.status(200).send({ status: 200, message: "No Document" });
-    }
-    res.status(500).send({ status: 500, message: "Insufficient Permissions" });
   }
 });
 
