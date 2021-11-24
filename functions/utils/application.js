@@ -82,6 +82,7 @@ const createAppObject = (body) => {
       eventLocation: body["eventLocation"] ? body["eventLocation"] : "",
       major: body["major"] ? body["major"] : "",
       currentStanding: body["currentStanding"] ? body["currentStanding"] : "",
+      graduation: body["graduation"] ? parseInt(body["graduation"]) : -1,
       country: body["country"] ? body["country"] : "",
 
       // Short Answer
@@ -99,6 +100,7 @@ const createAppObject = (body) => {
       github: body["github"] ? body["github"] : "",
       cruzCoins: body["cruzCoins"] ? body["cruzCoins"].replace(/(\r\n|\n|\r)/gm, " ") : "",
       anythingElse: body["anythingElse"] ? body["anythingElse"].replace(/(\r\n|\n|\r)/gm, " ") : "",
+      submission: Date.now(),
     };
     return appObj;
   } catch (error) {
@@ -122,6 +124,7 @@ const validateAppData = (data) => {
     "eventLocation",
     "major",
     "currentStanding",
+    "graduation",
     "country",
     "whyCruzHacks",
     "newThisYear",
@@ -276,6 +279,14 @@ const validateAppData = (data) => {
           errors.push("Standing Name Too Long");
         } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
           errors.push("Standing name is not alphanumeric");
+        }
+        break;
+      }
+      case "graduation": {
+        if (data[key] < 1950) {
+          errors.push("Invalid Graduation Year");
+        } else if (data[key] > 2050) {
+          errors.push("Invalid Graduation Year");
         }
         break;
       }
