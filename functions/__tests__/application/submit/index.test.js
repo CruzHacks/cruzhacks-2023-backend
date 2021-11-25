@@ -549,6 +549,32 @@ describe("Given submit invalid form data", () => {
 
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("Form Validation Failed");
+    expect(res.body.errors[0]).toStrictEqual("Invalid Graduation Year");
+  });
+
+  it("Should return 400 and proper error-codes given country empty", async () => {
+    const res = await request(application)
+      .post("/submit")
+      .field("email", "user@example.com")
+      .field("fname", "Jacob")
+      .field("lname", "Jacobi")
+      .field("phone", "925-111-1111")
+      .field("age", "24")
+      .field("pronounCount", 1)
+      .field("pronouns[0]", "he/him/his")
+      .field("sexualityCount", 1)
+      .field("sexuality[0]", "bisexual")
+      .field("race", "Turkey man")
+      .field("school", "UOP")
+      .field("collegeAffiliation", "i am not a ucsc student")
+      .field("eventLocation", "On-campus at UC Santa Cruz")
+      .field("major", "Computer Science")
+      .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020");
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("Form Validation Failed");
     expect(res.body.errors[0]).toStrictEqual("No country inputted");
   });
 
@@ -570,6 +596,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020")
       .field("country", "The United Kingdom of Great Britain and Northern Ireland");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
 
@@ -597,6 +624,7 @@ describe("Given submit invalid form data", () => {
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
       .field("country", "USA")
+      .field("graduation", "2020")
       .field("whyCruzHacks", "");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
 
@@ -623,6 +651,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020")
       .field("country", "USA")
       .field(
         "whyCruzHacks",
@@ -653,6 +682,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020")
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "");
@@ -681,6 +711,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020")
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
       .field(
@@ -712,6 +743,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020")
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
@@ -741,6 +773,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020")
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
@@ -773,6 +806,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020")
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
@@ -802,6 +836,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020")
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
@@ -832,6 +867,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020")
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
@@ -862,6 +898,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020")
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
@@ -892,6 +929,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020")
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
@@ -922,6 +960,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020")
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
@@ -956,6 +995,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020")
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
@@ -990,6 +1030,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020")
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
@@ -1024,6 +1065,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020")
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
@@ -1058,6 +1100,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020")
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
@@ -1092,6 +1135,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020")
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
@@ -1123,6 +1167,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020")
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
@@ -1155,6 +1200,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020")
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
@@ -1187,6 +1233,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020")
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
@@ -1221,6 +1268,7 @@ describe("Given submit invalid form data", () => {
       .field("eventLocation", "On-campus at UC Santa Cruz")
       .field("major", "Computer Science")
       .field("currentStanding", "I am actually sitting")
+      .field("graduation", "2020")
       .field("country", "USA")
       .field("whyCruzHacks", "Yes")
       .field("newThisYear", "2022 Hackathon")
