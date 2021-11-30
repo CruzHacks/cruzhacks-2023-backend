@@ -59,9 +59,10 @@ const createAppObject = (body) => {
       ? body["school"].toLowerCase() === "ucsc" ||
         body["school"].toLowerCase() === "uc santa cruz" ||
         body["school"].toLowerCase() === "university of california, santa cruz" ||
-        body["school"].toLowerCase() === "university of california-santa cruz"
+        body["school"].toLowerCase() === "university of california-santa cruz" ||
+        body["school"].toLowerCase() === "the university of california, santa cruz"
       : false;
-    const school = isUCSC ? "ucsc" : body["school"] ? body["school"] : "";
+    const school = isUCSC ? "The University of California, Santa Cruz" : body["school"] ? body["school"] : "";
     const appObj = {
       // App Info
       status: "pending",
