@@ -59,9 +59,10 @@ const createAppObject = (body) => {
       ? body["school"].toLowerCase() === "ucsc" ||
         body["school"].toLowerCase() === "uc santa cruz" ||
         body["school"].toLowerCase() === "university of california, santa cruz" ||
-        body["school"].toLowerCase() === "university of california-santa cruz"
+        body["school"].toLowerCase() === "university of california-santa cruz" ||
+        body["school"].toLowerCase() === "the university of california, santa cruz"
       : false;
-    const school = isUCSC ? "ucsc" : body["school"] ? body["school"] : "";
+    const school = isUCSC ? "The University of California, Santa Cruz" : body["school"] ? body["school"] : "";
     const appObj = {
       // App Info
       status: "pending",
@@ -82,6 +83,7 @@ const createAppObject = (body) => {
       eventLocation: body["eventLocation"] ? body["eventLocation"] : "",
       major: body["major"] ? body["major"] : "",
       currentStanding: body["currentStanding"] ? body["currentStanding"] : "",
+      graduation: body["graduation"] ? parseInt(body["graduation"]) : -1,
       country: body["country"] ? body["country"] : "",
 
       // Short Answer
@@ -99,6 +101,7 @@ const createAppObject = (body) => {
       github: body["github"] ? body["github"] : "",
       cruzCoins: body["cruzCoins"] ? body["cruzCoins"].replace(/(\r\n|\n|\r)/gm, " ") : "",
       anythingElse: body["anythingElse"] ? body["anythingElse"].replace(/(\r\n|\n|\r)/gm, " ") : "",
+      submission: Date.now(),
     };
     return appObj;
   } catch (error) {
@@ -122,6 +125,7 @@ const validateAppData = (data) => {
     "eventLocation",
     "major",
     "currentStanding",
+    "graduation",
     "country",
     "whyCruzHacks",
     "newThisYear",
@@ -235,7 +239,7 @@ const validateAppData = (data) => {
       case "collegeAffiliation": {
         const validOptions = [
           "i am not a ucsc student",
-          "i am a UCSC grad student with no college affiliation",
+          "i am a ucsc grad student with no college affiliation",
           "college 9",
           "college 10",
           "cowell",
@@ -276,6 +280,14 @@ const validateAppData = (data) => {
           errors.push("Standing Name Too Long");
         } else if (data[key] && alphanumericPunctuationRegex(data[key])) {
           errors.push("Standing name is not alphanumeric");
+        }
+        break;
+      }
+      case "graduation": {
+        if (data[key] < 1950) {
+          errors.push("Invalid Graduation Year");
+        } else if (data[key] > 2050) {
+          errors.push("Invalid Graduation Year");
         }
         break;
       }
