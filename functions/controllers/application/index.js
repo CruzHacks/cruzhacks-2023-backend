@@ -54,8 +54,8 @@ application.post("/submit", jwtCheck, async (req, res) => {
       functions.logger.log(req.user.sub + " Validation Errors " + isValidResume);
       return res.status(400).send({ code: 400, message: "Resume Validation Failed", errors: isValidResume });
     }
-
     if (files && files.file) {
+      functions.logger.log(req.user.sub + "is submitting with a resume");
       return (
         uploadFile(bucket, getNewFileName(appData, files.file.name, req.user.sub), files.file)
           .then((filedata) => {
@@ -79,6 +79,7 @@ application.post("/submit", jwtCheck, async (req, res) => {
           })
       );
     } else {
+      functions.logger.log(req.user.sub + "is submitting without a resume");
       return (
         setDocument("applicants", req.user.sub, appData)
           // eslint-disable-next-line no-unused-vars
