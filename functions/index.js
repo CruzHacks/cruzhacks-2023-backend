@@ -11,6 +11,9 @@ if (!function_name || function_name === "announcements") {
 if (!function_name || function_name === "application") {
   exports.application = require("./controllers/application/index").service;
 }
+if (!function_name || function_name === "analytics") {
+  exports.analytics = require("./controllers/analytics/index").service;
+}
 if (!function_name || function_name === "writeToAnalytics") {
   exports.writeToAnalytics = require("./utils/analytics").service;
 }

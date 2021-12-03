@@ -1,5 +1,5 @@
 const functions = require("firebase-functions");
-const { db, admin } = require("./admin");
+const { admin, db } = require("./database");
 
 /*
     writeToAnalytics adds an event trigger to 'applicants' collection.
