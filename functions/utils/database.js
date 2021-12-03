@@ -1,4 +1,7 @@
-require("./admin");
+const admin = require("firebase-admin");
+admin.initializeApp();
+db = admin.firestore();
+storage = admin.storage();
 
 const addDocument = (collection, document) => {
   return db.collection(collection).add(document);
@@ -41,4 +44,7 @@ module.exports = {
   queryCollectionSorted,
   deleteDocument,
   uploadFile,
+  admin,
+  db,
+  storage,
 };
