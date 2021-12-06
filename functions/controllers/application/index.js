@@ -1,9 +1,10 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
-const formidable = require("formidable-serverless");
 
-const { jwtCheck, hasReadAnalytics } = require("../../utils/middleware");
+const { jwtCheck } = require("../../utils/middleware");
+const { queryDocument, setDocument, uploadFile } = require("../../utils/database");
+
 const {
   createAppObject,
   validateAppData,
@@ -11,7 +12,7 @@ const {
   isValidFileData,
   getNewFileName,
 } = require("../../utils/application");
-const { queryDocument, setDocument, uploadFile } = require("../../utils/database");
+const formidable = require("formidable-serverless");
 
 const application = express();
 application.disable("x-powered-by");
@@ -30,9 +31,6 @@ const bucket = app ? app.bucket : "";
 
 application.use(cors(corsOptions));
 
-/* TODO: 
-  Unit Test Functions
-*/
 application.post("/submit", jwtCheck, async (req, res) => {
   const form = new formidable.IncomingForm();
   return await form.parse(req, async (err, fields, files) => {
@@ -56,8 +54,8 @@ application.post("/submit", jwtCheck, async (req, res) => {
       functions.logger.log(req.user.sub + " Validation Errors " + isValidResume);
       return res.status(400).send({ code: 400, message: "Resume Validation Failed", errors: isValidResume });
     }
-
     if (files && files.file) {
+      functions.logger.log(req.user.sub + "is submitting with a resume");
       return (
         uploadFile(bucket, getNewFileName(appData, files.file.name, req.user.sub), files.file)
           .then((filedata) => {
@@ -81,6 +79,7 @@ application.post("/submit", jwtCheck, async (req, res) => {
           })
       );
     } else {
+      functions.logger.log(req.user.sub + "is submitting without a resume");
       return (
         setDocument("applicants", req.user.sub, appData)
           // eslint-disable-next-line no-unused-vars
@@ -110,29 +109,6 @@ application.get("/checkApp", jwtCheck, async (req, res) => {
     } else {
       res.status(500).send({ code: 500, status: "No Document", exists: false, message: "Internal Server Error" });
     }
-  }
-});
-
-application.get("/analytics", jwtCheck, hasReadAnalytics, async (req, res) => {
-  try {
-    const analyticsSnapshot = await queryDocument("analytics", "applicant-analytics");
-    if (!analyticsSnapshot.exists) {
-      throw new Error("No Document");
-    }
-
-    res.status(201).send({
-      status: 201,
-      message: {
-        applicantCount: analyticsSnapshot.get("applicantCount"),
-        firstTime: analyticsSnapshot.get("firstTimeCount"),
-        ucscApplicants: analyticsSnapshot.get("ucscStudentCount"),
-      },
-    });
-  } catch (error) {
-    if (error.message === "No Document") {
-      res.status(200).send({ status: 200, message: "No Document" });
-    }
-    res.status(500).send({ status: 500, message: "Insufficient Permissions" });
   }
 });
 

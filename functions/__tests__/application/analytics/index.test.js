@@ -4,7 +4,7 @@ const request = require("supertest");
 const { queryDocument } = require("../../../utils/database");
 const { jwtCheck, hasReadAnalytics } = require("../../../utils/middleware");
 const { makeDocumentSnapshot } = require("firebase-functions-test/lib/providers/firestore");
-const { application } = require("../../../controllers/application/index");
+const { application } = require("../../../controllers/analytics/index");
 
 testConfig.mockConfig({
   auth: {
@@ -12,9 +12,6 @@ testConfig.mockConfig({
     audience: "audience",
     issuer: "issuer",
     jwk_uri: "some uri",
-  },
-  app: {
-    bucket: "resume",
   },
 });
 
@@ -41,7 +38,7 @@ describe("Analytics test", () => {
     });
     queryDocument.mockImplementationOnce(() => Promise.resolve(fakeDoc));
 
-    const res = await request(application).get("/analytics");
+    const res = await request(application).get("/");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasReadAnalytics).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(201);

@@ -3,7 +3,6 @@ const express = require("express");
 const cors = require("cors");
 const { jwtCheck, validKey, hasDeleteAnnouncement, hasUpdateAnnouncement } = require("../../utils/middleware");
 const { addDocument, queryCollectionSorted, deleteDocument } = require("../../utils/database");
-const { alphanumericRegex, alphanumericPunctuationRegexWithNewLine } = require("../../utils/regex");
 
 const auth0Config = functions.config().auth;
 const corsConfig = auth0Config ? auth0Config.cors : "";
@@ -63,6 +62,7 @@ announcements.delete("/:id", jwtCheck, hasDeleteAnnouncement, async (req, res) =
 });
 
 announcements.post("/", jwtCheck, hasUpdateAnnouncement, async (req, res) => {
+  const { alphanumericRegex, alphanumericPunctuationRegexWithNewLine } = require("../../utils/regex");
   const { title, message } = req.body;
   if (!title || title.length > 25 || alphanumericRegex(title)) {
     return res.status(400).send({ error: true, status: 400, message: "Invalid title" });
