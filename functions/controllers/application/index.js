@@ -105,7 +105,9 @@ application.get("/checkApp", jwtCheck, async (req, res) => {
     res.status(200).send({ code: 200, status: appStatus, exists: true, message: `Document Found for ${req.user.sub}` });
   } catch (error) {
     if (error.message === "No Document") {
-      res.status(200).send({ code: 200, status: "No Document", exists: false, message: `No Document for ${req.user.sub}` });
+      res
+        .status(200)
+        .send({ code: 200, status: "No Document", exists: false, message: `No Document for ${req.user.sub}` });
     } else {
       res.status(500).send({ code: 500, status: "No Document", exists: false, message: "Internal Server Error" });
     }
