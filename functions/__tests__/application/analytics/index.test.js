@@ -41,7 +41,7 @@ describe("Analytics test", () => {
     const res = await request(application).get("/");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasReadAnalytics).toHaveBeenCalledTimes(1);
-    expect(res.status).toBe(201);
+    expect(res.status).toBe(200);
     done();
   });
 });
