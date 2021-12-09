@@ -26,8 +26,8 @@ application.get("/", jwtCheck, hasReadAnalytics, async (req, res) => {
       throw new Error("No Document");
     }
 
-    return res.status(201).send({
-      status: 201,
+    return res.status(200).send({
+      status: 200,
       message: {
         applicantCount: analyticsSnapshot.get("applicantCount"),
         firstTime: analyticsSnapshot.get("firstTimeCount"),
