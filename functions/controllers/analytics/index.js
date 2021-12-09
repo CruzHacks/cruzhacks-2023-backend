@@ -26,8 +26,8 @@ application.get("/", jwtCheck, hasReadAnalytics, async (req, res) => {
       throw new Error("No Document");
     }
 
-    res.status(201).send({
-      status: 201,
+    return res.status(200).send({
+      status: 200,
       message: {
         applicantCount: analyticsSnapshot.get("applicantCount"),
         firstTime: analyticsSnapshot.get("firstTimeCount"),
@@ -36,9 +36,9 @@ application.get("/", jwtCheck, hasReadAnalytics, async (req, res) => {
     });
   } catch (error) {
     if (error.message === "No Document") {
-      res.status(200).send({ status: 200, message: "No Document" });
+      return res.status(200).send({ status: 200, message: "No Document" });
     }
-    res.status(500).send({ status: 500, message: "Insufficient Permissions" });
+    return res.status(500).send({ status: 500, message: "Insufficient Permissions" });
   }
 });
 
