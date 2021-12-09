@@ -68,7 +68,7 @@ application.post("/submit", jwtCheck, async (req, res) => {
           })
           // eslint-disable-next-line no-unused-vars
           .then((data) => {
-            return res.status(201).send({ code: 201, message: "Successfully Updated Application" });
+            return res.status(201).send({ code: 201, message: `Successfully Updated Application for ${req.user.sub}` });
           })
           .catch((error) => {
             functions.logger.log("Resume Upload: " + error.message);
@@ -84,7 +84,7 @@ application.post("/submit", jwtCheck, async (req, res) => {
         setDocument("applicants", req.user.sub, appData)
           // eslint-disable-next-line no-unused-vars
           .then((data) => {
-            return res.status(201).send({ code: 201, message: "Successfully Updated Application" });
+            return res.status(201).send({ code: 201, message: `Successfully Updated Application for ${req.user.sub}` });
           })
           .catch((error) => {
             functions.logger.log(error);
@@ -102,12 +102,18 @@ application.get("/checkApp", jwtCheck, async (req, res) => {
     if (appStatus === undefined) {
       throw new Error("No Document");
     }
-    res.status(200).send({ code: 200, status: appStatus, exists: true, message: "Document Found" });
+    return res
+      .status(200)
+      .send({ code: 200, status: appStatus, exists: true, message: `Document Found for ${req.user.sub}` });
   } catch (error) {
     if (error.message === "No Document") {
-      res.status(200).send({ code: 200, status: "No Document", exists: false, message: "No Document" });
+      return res
+        .status(200)
+        .send({ code: 200, status: "No Document", exists: false, message: `No Document for ${req.user.sub}` });
     } else {
-      res.status(500).send({ code: 500, status: "No Document", exists: false, message: "Internal Server Error" });
+      return res
+        .status(500)
+        .send({ code: 500, status: "No Document", exists: false, message: "Internal Server Error" });
     }
   }
 });
