@@ -1145,7 +1145,7 @@ describe("Given submit invalid form data", () => {
     expect(jwtCheck).toHaveBeenCalledTimes(1);
 
     expect(res.status).toBe(201);
-    expect(res.body.message).toBe("Successfully Updated Application");
+    expect(res.body.message).toBe("Successfully Updated Application for Auth0|12345");
     expect(res.body.errors).toStrictEqual(undefined);
   });
 
@@ -1177,7 +1177,7 @@ describe("Given submit invalid form data", () => {
     expect(jwtCheck).toHaveBeenCalledTimes(1);
 
     expect(res.status).toBe(201);
-    expect(res.body.message).toBe("Successfully Updated Application");
+    expect(res.body.message).toBe("Successfully Updated Application for Auth0|12345");
     expect(res.body.errors).toStrictEqual(undefined);
   });
 
@@ -1280,7 +1280,7 @@ describe("Given submit invalid form data", () => {
     expect(jwtCheck).toHaveBeenCalledTimes(1);
 
     expect(res.status).toBe(201);
-    expect(res.body.message).toBe("Successfully Updated Application");
+    expect(res.body.message).toBe("Successfully Updated Application for Auth0|12345");
     expect(res.body.errors).toStrictEqual(undefined);
   });
 });

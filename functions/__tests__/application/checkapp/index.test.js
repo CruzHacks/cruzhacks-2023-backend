@@ -51,7 +51,7 @@ describe("Application Test", () => {
       code: 200,
       status: "accepted",
       exists: true,
-      message: "Document Found",
+      message: "Document Found for test user",
     });
   });
 
@@ -76,7 +76,7 @@ describe("Application Test", () => {
       code: 200,
       status: "rejected",
       exists: true,
-      message: "Document Found",
+      message: "Document Found for test user",
     });
   });
 
@@ -100,7 +100,7 @@ describe("Application Test", () => {
       code: 200,
       status: "No Document",
       exists: false,
-      message: "No Document",
+      message: "No Document for test user",
     });
   });
 
