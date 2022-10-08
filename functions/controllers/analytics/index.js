@@ -2,7 +2,7 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 
-const { jwtCheck, hasReadAnalytics } = require("../../utils/middleware");
+const { jwtCheck, hasReadAdmin } = require("../../utils/middleware");
 const { queryDocument } = require("../../utils/database");
 
 const application = express();
@@ -19,7 +19,7 @@ const corsOptions = {
 
 application.use(cors(corsOptions));
 
-application.get("/", jwtCheck, hasReadAnalytics, async (req, res) => {
+application.get("/", jwtCheck, hasReadAdmin, async (req, res) => {
   try {
     const analyticsSnapshot = await queryDocument("analytics", "applicant-analytics");
     if (!analyticsSnapshot.exists) {
