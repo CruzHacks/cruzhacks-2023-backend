@@ -2,7 +2,7 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 
-const { jwtCheck } = require("../../utils/middleware");
+const { jwtCheck, hasUpdateAppStatus } = require("../../utils/middleware");
 const { queryDocument, setDocument, uploadFile } = require("../../utils/database");
 
 const {
@@ -93,6 +93,56 @@ application.post("/submit", jwtCheck, async (req, res) => {
       );
     }
   });
+});
+
+/*
+<++> TODO:
+Create a new endpoint PUT /updatestatus that allows authenticated user
+(jwt check) with update:applicationstatus permission  to accept or reject
+an applicant
+
+body: {
+  applicant-id: DocumentID for applicant
+  status: ACCEPT | REJECT| PENDING
+}
+
+If a hacker has been accepted add a checked-in field to their document
+*/
+application.post("/updatestatus", jwtCheck, async (req, res) => {
+
+  // jwtCheck with hasUpdateAppStatus ?
+
+  // Grab appid and status ?
+  const applicant_id = req.params.applicant_id;
+  const status = req.params.status;
+
+  const appData = {
+    status: status
+  }
+
+
+  // Check application exists ?
+  // const doc = await queryDocument("applicants", req.user.sub);
+  // const appStatus = doc.get("status");
+  // if (appStatus === undefined) {
+  //   throw new Error("No Document");
+  // }
+
+  // Update status
+      functions.logger.log(req.user.sub + "status is updated:" + status);
+      return (
+        setDocument("applicants", req.user.sub, appData)
+          // eslint-disable-next-line no-unused-vars
+          .then((data) => {
+            return res.status(201).send({ code: 201, message: `Successfully Updated Application status for ${req.user.sub}` });
+          })
+          .catch((error) => {
+            functions.logger.log(error);
+            return res.status(500).send({ code: 500, message: "Server Error" });
+          })
+      );
+
+  // return res.status(400).send({ code: 400, message: "Application status updated", errors: isValidData });
 });
 
 application.get("/checkApp", jwtCheck, async (req, res) => {
