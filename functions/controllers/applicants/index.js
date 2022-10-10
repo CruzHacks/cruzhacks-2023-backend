@@ -20,7 +20,7 @@ applicant.use(cors(corsOptions));
 
 applicant.get("/applicant/:id/", jwtCheck, hasPermission, async (req, res) => {
   try {
-    const snapshot = await queryDocument("applicants", req.params.id);
+    const snapshot = await queryDocument("applicants");
     if (!snapshot.exists) {
       throw new Error("Applicant doesn't exist for the given ID");
     }
@@ -31,7 +31,7 @@ applicant.get("/applicant/:id/", jwtCheck, hasPermission, async (req, res) => {
     });
   } catch (error) {
     if (error.message === "Applicant doesn't exist for the given ID") {
-      return res.status(200).send({ status: 200, message: "Applicant doesn't exist for the given ID" });
+      return res.status(404).send({ status: 404, message: "Applicant doesn't exist for the given ID" });
     }
     return res.status(500).send({ status: 500, message: "Insufficient Permissions" });
   }

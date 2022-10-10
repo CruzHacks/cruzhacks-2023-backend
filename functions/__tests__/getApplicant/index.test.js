@@ -41,10 +41,10 @@ describe("Get Applicant by ID Test", () => {
     });
     queryDocument.mockImplementationOnce(() => Promise.resolve(fakeApplicant));
 
-    const res = await request(applicant).get("/applicants/1");
-    //expect(jwtCheck).toHaveBeenCalledTimes(1);
-    //expect(hasPermission).toHaveBeenCalledTimes(1);
-    console.info(res.data);
+    const res = await request(applicant).get("/applicant/1");
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(hasPermission).toHaveBeenCalledTimes(1);
+    console.info(res.body.message);
     expect(res.status).toBe(200);
     done();
   });
