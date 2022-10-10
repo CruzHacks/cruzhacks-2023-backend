@@ -95,54 +95,42 @@ application.post("/submit", jwtCheck, async (req, res) => {
   });
 });
 
-/*
-<++> TODO:
-Create a new endpoint PUT /updatestatus that allows authenticated user
-(jwt check) with update:applicationstatus permission  to accept or reject
-an applicant
+application.put("/updatestatus", jwtCheck, hasUpdateAppStatus, async (req, res) => {
+  const status = req.body.status;
 
-body: {
-  applicant-id: DocumentID for applicant
-  status: ACCEPT | REJECT| PENDING
-}
-
-If a hacker has been accepted add a checked-in field to their document
-*/
-application.post("/updatestatus", jwtCheck, async (req, res) => {
-
-  // jwtCheck with hasUpdateAppStatus ?
-
-  // Grab appid and status ?
-  const applicant_id = req.params.applicant_id;
-  const status = req.params.status;
-
-  const appData = {
-    status: status
+  if (!status) {
+    functions.logger.log("Status Update: Missing status in request Body");
+    return res.status(400).send({ code: 400, message: "Missing 'status' in request body" });
   }
 
+  if (status !== "ACCEPT" && status !== "REJECT" && status !== "PENDING") {
+    functions.logger.log("Status Update: invalid status");
+    return res.status(400).send({ code: 400, message: "Status must be ACCEPT, REJECT, or PENDING" });
+  }
 
-  // Check application exists ?
-  // const doc = await queryDocument("applicants", req.user.sub);
-  // const appStatus = doc.get("status");
-  // if (appStatus === undefined) {
-  //   throw new Error("No Document");
-  // }
+  const appData = {
+    status: status,
+  };
 
   // Update status
-      functions.logger.log(req.user.sub + "status is updated:" + status);
-      return (
-        setDocument("applicants", req.user.sub, appData)
-          // eslint-disable-next-line no-unused-vars
-          .then((data) => {
-            return res.status(201).send({ code: 201, message: `Successfully Updated Application status for ${req.user.sub}` });
-          })
-          .catch((error) => {
-            functions.logger.log(error);
-            return res.status(500).send({ code: 500, message: "Server Error" });
-          })
-      );
-
-  // return res.status(400).send({ code: 400, message: "Application status updated", errors: isValidData });
+  functions.logger.log(req.user.sub + " status is updated: " + status);
+  return (
+    setDocument("applicants", req.user.sub, appData)
+      // eslint-disable-next-line no-unused-vars
+      .then((data) => {
+        if (!data) {
+          functions.logger.log("application not found");
+          return res.status(404).send({ code: 404, message: "Application Not Found" });
+        }
+        return res
+          .status(200)
+          .send({ code: 200, message: `Successfully Updated Application status for ${req.user.sub}` });
+      })
+      .catch((error) => {
+        functions.logger.log(error);
+        return res.status(500).send({ code: 500, message: "Server Error" });
+      })
+  );
 });
 
 application.get("/checkApp", jwtCheck, async (req, res) => {
