@@ -2,7 +2,7 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 
-const { jwtCheck, hasUpdateAppStatus } = require("../../utils/middleware");
+const { jwtCheck, hasUpdateStatus } = require("../../utils/middleware");
 const { queryDocument, setDocument, uploadFile } = require("../../utils/database");
 
 const {
@@ -95,8 +95,14 @@ application.post("/submit", jwtCheck, async (req, res) => {
   });
 });
 
-application.put("/updatestatus", jwtCheck, hasUpdateAppStatus, async (req, res) => {
+application.put("/updatestatus", jwtCheck, hasUpdateStatus, async (req, res) => {
+  const applicant_id = req.body.applicant_id;
   const status = req.body.status;
+
+  if (!applicant_id) {
+    functions.logger.log("Status Update: Missing applicant_id in request Body");
+    return res.status(400).send({ code: 400, message: "Missing 'applicant_id' in request body" });
+  }
 
   if (!status) {
     functions.logger.log("Status Update: Missing status in request Body");
@@ -115,7 +121,7 @@ application.put("/updatestatus", jwtCheck, hasUpdateAppStatus, async (req, res) 
   // Update status
   functions.logger.log(req.user.sub + " status is updated: " + status);
   return (
-    setDocument("applicants", req.user.sub, appData)
+    setDocument("applicants", applicant_id, appData)
       // eslint-disable-next-line no-unused-vars
       .then((data) => {
         if (!data) {

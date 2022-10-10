@@ -55,7 +55,6 @@ const hasPermission = (permission) => {
 };
 
 const hasUpdateApp = hasPermission("update:app");
-const hasUpdateAppStatus = hasPermission("update:applicationstatus");
 const hasReadApp = hasPermission("read:app");
 const hasUpdateAnnouncement = hasPermission("update:announcements");
 const hasDeleteAnnouncement = hasPermission("delete:announcements");
@@ -67,7 +66,6 @@ module.exports = {
   validKey,
   hasPermission,
   hasUpdateApp,
-  hasUpdateAppStatus,
   hasReadApp,
   hasUpdateAnnouncement,
   hasDeleteAnnouncement,
