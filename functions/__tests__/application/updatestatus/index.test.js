@@ -42,13 +42,13 @@ describe("Application Test", () => {
 
     const body = {};
 
-    const res = await request(application).put("/updatestatus").send(body);
+    const res = await request(application).put("/updatestatus/1234").send(body);
     expect(jwtCheck).toHaveBeenCalledTimes(1);
 
     expect(res.status).toBe(400);
     expect(res.body).toStrictEqual({
       code: 400,
-      message: "Missing 'applicant_id' in request body",
+      message: "Missing 'status' in request body",
     });
   });
 
@@ -64,7 +64,7 @@ describe("Application Test", () => {
 
     const body = { applicant_id: "test", status: "invalid option" };
 
-    const res = await request(application).put("/updatestatus").send(body);
+    const res = await request(application).put("/updatestatus/1234").send(body);
     expect(jwtCheck).toHaveBeenCalledTimes(1);
 
     expect(res.status).toBe(400);
@@ -89,7 +89,7 @@ describe("Application Test", () => {
     fakeDoc = makeDocumentSnapshot({ status: "ACCEPT" });
     setDocument.mockImplementation(() => Promise.resolve(fakeDoc));
 
-    const res = await request(application).put("/updatestatus").send(body);
+    const res = await request(application).put("/updatestatus/1234").send(body);
     expect(jwtCheck).toHaveBeenCalledTimes(1);
 
     expect(res.status).toBe(200);

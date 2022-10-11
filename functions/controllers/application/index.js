@@ -95,14 +95,9 @@ application.post("/submit", jwtCheck, async (req, res) => {
   });
 });
 
-application.put("/updatestatus", jwtCheck, hasUpdateStatus, async (req, res) => {
-  const applicant_id = req.body.applicant_id;
+application.put("/updatestatus/:id", jwtCheck, hasUpdateStatus, async (req, res) => {
+  const applicant_id = req.params.id;
   const status = req.body.status;
-
-  if (!applicant_id) {
-    functions.logger.log("Status Update: Missing applicant_id in request Body");
-    return res.status(400).send({ code: 400, message: "Missing 'applicant_id' in request body" });
-  }
 
   if (!status) {
     functions.logger.log("Status Update: Missing status in request Body");
