@@ -2,7 +2,7 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 
-const { jwtCheck } = require("../../utils/middleware");
+const { jwtCheck, hasUpdateStatus } = require("../../utils/middleware");
 const { queryDocument, setDocument, uploadFile } = require("../../utils/database");
 
 const {
@@ -93,6 +93,45 @@ application.post("/submit", jwtCheck, async (req, res) => {
       );
     }
   });
+});
+
+application.put("/updatestatus/:id", jwtCheck, hasUpdateStatus, async (req, res) => {
+  const applicant_id = req.params.id;
+  const status = req.body.status;
+
+  if (!status) {
+    functions.logger.log("Status Update: Missing status in request Body");
+    return res.status(400).send({ code: 400, message: "Missing 'status' in request body" });
+  }
+
+  if (status !== "ACCEPT" && status !== "REJECT" && status !== "PENDING") {
+    functions.logger.log("Status Update: invalid status");
+    return res.status(400).send({ code: 400, message: "Status must be ACCEPT, REJECT, or PENDING" });
+  }
+
+  const appData = {
+    status: status,
+  };
+
+  // Update status
+  functions.logger.log(req.user.sub + " status is updated: " + status);
+  return (
+    setDocument("applicants", applicant_id, appData)
+      // eslint-disable-next-line no-unused-vars
+      .then((data) => {
+        if (!data) {
+          functions.logger.log("application not found");
+          return res.status(404).send({ code: 404, message: "Application Not Found" });
+        }
+        return res
+          .status(200)
+          .send({ code: 200, message: `Successfully Updated Application status for ${req.user.sub}` });
+      })
+      .catch((error) => {
+        functions.logger.log(error);
+        return res.status(500).send({ code: 500, message: "Server Error" });
+      })
+  );
 });
 
 application.get("/checkApp", jwtCheck, async (req, res) => {
