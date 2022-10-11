@@ -1,7 +1,7 @@
 const testConfig = require("firebase-functions-test")();
 const request = require("supertest");
 const { applicant } = require("../../controllers/applicants/index");
-const { jwtCheck, hasPermission } = require("../../utils/middleware");
+const { jwtCheck, hasReadAdmin } = require("../../utils/middleware");
 const { makeDocumentSnapshot } = require("firebase-functions-test/lib/providers/firestore");
 const { queryDocument } = require("../../utils/database");
 
@@ -27,7 +27,7 @@ describe("Get Applicant by ID Test", () => {
       next();
     });
 
-    hasPermission.mockImplementation((req, res, next) => {
+    hasReadAdmin.mockImplementation((req, res, next) => {
       next();
     });
   });
@@ -43,7 +43,7 @@ describe("Get Applicant by ID Test", () => {
 
     const res = await request(applicant).get("/applicant/1");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasPermission).toHaveBeenCalledTimes(1);
+    expect(hasReadAdmin).toHaveBeenCalledTimes(1);
     console.info(res.body.message);
     expect(res.status).toBe(200);
     done();

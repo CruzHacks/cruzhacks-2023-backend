@@ -1,7 +1,7 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
-const { jwtCheck, hasPermission } = require("../../utils/middleware");
+const { jwtCheck, hasReadAdmin } = require("../../utils/middleware");
 const { queryDocument } = require("../../utils/database");
 
 const applicant = express();
@@ -18,9 +18,9 @@ const corsOptions = {
 
 applicant.use(cors(corsOptions));
 
-applicant.get("/applicant/:id/", jwtCheck, hasPermission, async (req, res) => {
+applicant.get("/applicant/:id/", jwtCheck, hasReadAdmin, async (req, res) => {
   try {
-    const snapshot = await queryDocument("applicants");
+    const snapshot = await queryDocument("applicants", req.params.id);
     if (!snapshot.exists) {
       throw new Error("Applicant doesn't exist for the given ID");
     }
