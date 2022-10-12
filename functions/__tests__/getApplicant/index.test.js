@@ -44,7 +44,10 @@ describe("Get Applicant by ID Test", () => {
     const res = await request(applicant).get("/applicant/1");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
     expect(hasReadAdmin).toHaveBeenCalledTimes(1);
-    console.info(res.body.message);
+    console.info(res.body.applicant);
+    expect(res.body.applicant).toBe(
+      '{"id":1,"name":"Dummy","age":"20","major":"Computer Engineering","status":"Accepted"}',
+    );
     expect(res.status).toBe(200);
     done();
   });
