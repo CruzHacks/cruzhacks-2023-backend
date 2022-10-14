@@ -165,7 +165,6 @@ application.get("/applications", jwtCheck, hasReadAdmin, async (req, res) => {
   */
 
   try {
-
     let applicants = undefined;
     if (!req.query.appStatus) {
       applicants = await queryCollection("applicants");
