@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 
 const { jwtCheck, hasUpdateStatus, hasReadAdmin, hasUpdateApp } = require("../../utils/middleware");
-const { queryDocument, setDocument, uploadFile } = require("../../utils/database");
+const { queryDocument, queryCollection, db, setDocument, uploadFile } = require("../../utils/database");
 
 const {
   createAppObject,
