@@ -2,7 +2,7 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 
-const { jwtCheck, hasUpdateStatus } = require("../../utils/middleware");
+const { jwtCheck, hasUpdateStatus, hasReadAdmin, hasUpdateApp } = require("../../utils/middleware");
 const { queryDocument, setDocument, uploadFile } = require("../../utils/database");
 
 const {
@@ -13,7 +13,6 @@ const {
   getNewFileName,
 } = require("../../utils/application");
 const formidable = require("formidable-serverless");
-
 const application = express();
 application.disable("x-powered-by");
 application.use(express.json());
@@ -154,6 +153,58 @@ application.get("/checkApp", jwtCheck, async (req, res) => {
         .status(500)
         .send({ code: 500, status: "No Document", exists: false, message: "Internal Server Error" });
     }
+  }
+});
+
+application.get("/applications", jwtCheck, hasReadAdmin, async (req, res) => {
+  /*
+      req.query.status === "pending" | "accepted" | "rejected" | "confirmed"
+    */
+  try {
+    const validAppStatuses = /pending|accepted|rejected|confirmed/;
+    let applicants = undefined;
+    if (!req.query.appStatus) {
+      applicants = await queryCollection("applicants");
+    } else if (req.query.appStatus.match(validAppStatuses)) {
+      applicants = await db.collection("applicants").where("status", "==", req.query.appStatus).get();
+    } else {
+      throw new Error("Invalid App Status Request");
+    }
+    const appDocuments = [];
+
+    applicants.forEach((doc) => {
+      data = doc.data();
+      appDocuments.push({
+        applicant_id: doc.id,
+        name: data.name,
+        age: data.age,
+        major: data.major,
+        status: data.status,
+      });
+    });
+
+    return res.status(200).send({ code: 200, applications: appDocuments });
+  } catch (err) {
+    functions.logger.log(`Query Error:  ${err}`);
+    return res.status(500).send({ code: 500, message: "Invalid Input" });
+  }
+});
+
+application.put("/confirmposition", jwtCheck, hasUpdateApp, async (req, res) => {
+  try {
+    const currDoc = await queryDocument("applicants", req.user.sub);
+    if (currDoc.data().status === "accepted") {
+      await currDoc.ref.update({ status: "comfirmed" });
+      return res.status(200).send({ code: 200, message: "Application Confirmed" });
+    } else {
+      throw new Error("Current Status Is Not Equal To Accepted");
+    }
+  } catch (err) {
+    functions.logger.log(`Unable to update status to confirmed\n ${err}`);
+    if (err.message === "Current Status Is Not Equal To Accepted") {
+      return res.status(500).send({ code: 500, message: err.message });
+    }
+    return res.status(500).send({ code: 500, message: "Unkown Error" });
   }
 });
 
