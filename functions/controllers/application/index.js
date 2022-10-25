@@ -30,6 +30,8 @@ const bucket = app ? app.bucket : "";
 
 application.use(cors(corsOptions));
 
+const validAppStatuses = /pending|accepted|rejected|confirmed|waitlisted/;
+
 application.post("/submit", jwtCheck, async (req, res) => {
   const form = new formidable.IncomingForm();
   return await form.parse(req, async (err, fields, files) => {
@@ -95,6 +97,10 @@ application.post("/submit", jwtCheck, async (req, res) => {
 });
 
 application.put("/updatestatus/:id", jwtCheck, hasUpdateStatus, async (req, res) => {
+  /*
+    req.body.status === "pending" | "accepted" | "rejected" | "confirmed" | "waitlisted"
+  */
+
   const applicant_id = req.params.id;
   const status = req.body.status;
 
@@ -103,7 +109,7 @@ application.put("/updatestatus/:id", jwtCheck, hasUpdateStatus, async (req, res)
     return res.status(400).send({ code: 400, message: "Missing 'status' in request body" });
   }
 
-  if (status !== "ACCEPT" && status !== "REJECT" && status !== "PENDING") {
+  if (!status.match(validAppStatuses)) {
     functions.logger.log("Status Update: invalid status");
     return res.status(400).send({ code: 400, message: "Status must be ACCEPT, REJECT, or PENDING" });
   }
@@ -114,23 +120,20 @@ application.put("/updatestatus/:id", jwtCheck, hasUpdateStatus, async (req, res)
 
   // Update status
   functions.logger.log(req.user.sub + " status is updated: " + status);
-  return (
-    setDocument("applicants", applicant_id, appData)
-      // eslint-disable-next-line no-unused-vars
-      .then((data) => {
-        if (!data) {
-          functions.logger.log("application not found");
-          return res.status(404).send({ code: 404, message: "Application Not Found" });
-        }
-        return res
-          .status(200)
-          .send({ code: 200, message: `Successfully Updated Application status for ${req.user.sub}` });
-      })
-      .catch((error) => {
-        functions.logger.log(error);
-        return res.status(500).send({ code: 500, message: "Server Error" });
-      })
-  );
+  return setDocument("applicants", applicant_id, appData)
+    .then((data) => {
+      if (!data) {
+        functions.logger.log("Status Update: application not found");
+        return res.status(404).send({ code: 404, message: "Application Not Found" });
+      }
+      return res
+        .status(200)
+        .send({ code: 200, message: `Successfully Updated Application status for ${req.user.sub}` });
+    })
+    .catch((error) => {
+      functions.logger.log("Status Update: ", error);
+      return res.status(500).send({ code: 500, message: "Server Error" });
+    });
 });
 
 application.get("/checkApp", jwtCheck, async (req, res) => {
@@ -158,10 +161,10 @@ application.get("/checkApp", jwtCheck, async (req, res) => {
 
 application.get("/applications", jwtCheck, hasReadAdmin, async (req, res) => {
   /*
-    req.query.status === "pending" | "accepted" | "rejected" | "confirmed"
+    req.query.status === "pending" | "accepted" | "rejected" | "confirmed" | "waitlisted"
   */
+
   try {
-    const validAppStatuses = /pending|accepted|rejected|confirmed/;
     let applicants = undefined;
     if (!req.query.appStatus) {
       applicants = await queryCollection("applicants");

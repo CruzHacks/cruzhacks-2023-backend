@@ -84,7 +84,7 @@ describe("Application Test", () => {
       next();
     });
 
-    const body = { applicant_id: "test", status: "ACCEPT" };
+    const body = { applicant_id: "test", status: "waitlisted" };
 
     fakeDoc = makeDocumentSnapshot({ status: "ACCEPT" });
     setDocument.mockImplementation(() => Promise.resolve(fakeDoc));
