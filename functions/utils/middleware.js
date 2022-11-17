@@ -55,18 +55,22 @@ const hasPermission = (permission) => {
 };
 
 const hasUpdateApp = hasPermission("update:app");
+const hasUpdateAppStatus = hasPermission("update:applicationstatus");
 const hasReadApp = hasPermission("read:app");
 const hasUpdateAnnouncement = hasPermission("update:announcements");
 const hasDeleteAnnouncement = hasPermission("delete:announcements");
-const hasReadAnalytics = hasPermission("read:stats");
+const hasReadAdmin = hasPermission("read:admin");
+const hasUpdateStatus = hasPermission("update:applicationstatus");
 
 module.exports = {
   jwtCheck,
   validKey,
   hasPermission,
   hasUpdateApp,
+  hasUpdateAppStatus,
   hasReadApp,
   hasUpdateAnnouncement,
   hasDeleteAnnouncement,
-  hasReadAnalytics,
+  hasReadAdmin,
+  hasUpdateStatus,
 };

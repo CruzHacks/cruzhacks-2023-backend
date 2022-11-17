@@ -2,7 +2,7 @@ const testConfig = require("firebase-functions-test")();
 
 const request = require("supertest");
 const { queryDocument } = require("../../../utils/database");
-const { jwtCheck, hasReadAnalytics } = require("../../../utils/middleware");
+const { jwtCheck, hasReadAdmin } = require("../../../utils/middleware");
 const { makeDocumentSnapshot } = require("firebase-functions-test/lib/providers/firestore");
 const { application } = require("../../../controllers/analytics/index");
 
@@ -25,7 +25,7 @@ describe("Analytics test", () => {
       next();
     });
 
-    hasReadAnalytics.mockImplementation((req, res, next) => {
+    hasReadAdmin.mockImplementation((req, res, next) => {
       next();
     });
   });
@@ -40,7 +40,7 @@ describe("Analytics test", () => {
 
     const res = await request(application).get("/");
     expect(jwtCheck).toHaveBeenCalledTimes(1);
-    expect(hasReadAnalytics).toHaveBeenCalledTimes(1);
+    expect(hasReadAdmin).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(200);
     done();
   });

@@ -1,4 +1,4 @@
-# CruzHacks 2022 Backend
+# CruzHacks 2022-2023 Backend
 
 This repository contains all the endpoints used to support CruzHacks 2022. Developed with firebase, javascript, jest.
 
