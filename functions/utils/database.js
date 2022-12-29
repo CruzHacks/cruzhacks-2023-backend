@@ -15,6 +15,10 @@ const setDocument = (collection, id, fields) => {
   return db.collection(collection).doc(id).set(fields);
 };
 
+const updateDocument = (collection, id, fields) => {
+  return db.collection(collection).doc(id).update(fields);
+};
+
 const queryCollection = (collection) => {
   return db.collection(collection).get();
 };
@@ -40,6 +44,7 @@ module.exports = {
   addDocument,
   queryDocument,
   setDocument,
+  updateDocument,
   queryCollection,
   queryCollectionSorted,
   deleteDocument,

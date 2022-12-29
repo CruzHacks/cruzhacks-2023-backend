@@ -20,3 +20,7 @@ if (!function_name || function_name === "analytics") {
 if (!function_name || function_name === "writeToAnalytics") {
   exports.writeToAnalytics = require("./utils/analytics").service;
 }
+
+if (!function_name || function_name === "hacker") {
+  exports.hacker = require("./controllers/hacker/index").service;
+}
