@@ -1,7 +1,7 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
-const { jwtCheck, hasCreateHacker, hasUpdateHacker, hasCreateAdmin, hasReadHacker } = require("../../utils/middleware");
+const { jwtCheck, hasUpdateHacker, hasCreateAdmin, hasReadHacker } = require("../../utils/middleware");
 const { setDocument, updateDocument, queryDocument } = require("../../utils/database");
 
 const hacker = express();
@@ -49,8 +49,12 @@ hacker.put("/isAttending", jwtCheck, hasUpdateHacker, async (req, res) => {
 
 hacker.get("/hackerProfile", jwtCheck, hasReadHacker, async (req, res) => {
   try {
+    console.log(req.user.sub);
     const doc = await queryDocument("Hackers", req.user.sub);
-    console.log(doc.exists);
+    if (!doc.exists) {
+      functions.logger.log(`Could not fetch profile for ${req.user.sub},\nError: Document does not exist`);
+      res.status(500).send({ status: 500, error: "No Hacker Profile" });
+    }
     res.status(200).send({ status: 200, hackerProfile: doc.data() });
   } catch (err) {
     functions.logger.log(`Could not fetch profile for ${req.user.sub},\nError: ${err}`);
