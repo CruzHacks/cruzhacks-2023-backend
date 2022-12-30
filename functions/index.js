@@ -24,3 +24,7 @@ if (!function_name || function_name === "writeToAnalytics") {
 if (!function_name || function_name === "hacker") {
   exports.hacker = require("./controllers/hacker/index").service;
 }
+
+if (!function_name || function_name === "cruzpoints") {
+  exports.cruzpoints = require("./controllers/cruzpoints/index").service;
+}
