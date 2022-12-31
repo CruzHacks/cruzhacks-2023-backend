@@ -46,7 +46,6 @@ cruzpoints.post("/submitCode", jwtCheck, hasUpdateHacker, async (req, res) => {
   try {
     const code = req.body.code;
     const activity = await queryDocument("CruzPoints", code);
-    console.log(activity.data());
     const hackerRef = db.collection("Hackers").doc(req.user.sub);
 
     if (activity.exists) {

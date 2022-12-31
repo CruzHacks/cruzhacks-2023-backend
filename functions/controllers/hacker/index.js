@@ -2,7 +2,7 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const { jwtCheck, hasUpdateHacker, hasCreateAdmin, hasReadHacker } = require("../../utils/middleware");
-const { setDocument, updateDocument, queryDocument } = require("../../utils/database");
+const { db, setDocument, updateDocument, queryDocument } = require("../../utils/database");
 
 const hacker = express();
 hacker.disable("x-powered-by");
@@ -18,6 +18,28 @@ const corsOptions = {
 
 hacker.use(cors(corsOptions));
 
+const makeIDSearchable = async (db, auth0ID, email) => {
+  try {
+    const auth0IDSearchRef = db.collection("Searches").doc("auth0IDSearch");
+    const auth0SearchDoc = await auth0IDSearchRef.get();
+    if (!auth0SearchDoc.exists) {
+      const searchDoc = {
+        emailSearch: {},
+      };
+      await setDocument("Searches", "auth0IDSearch", searchDoc);
+    }
+    await db.runTransaction(async (t) => {
+      const doc = await t.get(auth0IDSearchRef);
+      const newEmailSearch = { ...doc.data().emailSearch, [email]: auth0ID };
+      console.log(newEmailSearch);
+      t.update(auth0IDSearchRef, { emailSearch: newEmailSearch });
+    });
+  } catch (err) {
+    functions.logger.log(`Could Not Make Reverse Search Document`);
+  }
+  return;
+};
+
 hacker.post("/createHacker", jwtCheck, hasCreateAdmin, async (req, res) => {
   try {
     const hackerProfile = {
@@ -31,6 +53,9 @@ hacker.post("/createHacker", jwtCheck, hasCreateAdmin, async (req, res) => {
 
     await setDocument("Hackers", req.body.auth0ID, hackerProfile);
     functions.logger.log(`Hacker Profile Created For ${req.body.firstName}`);
+
+    makeIDSearchable(db, req.body.auth0ID, req.body.email);
+
     res.status(201).send({ status: 201 });
   } catch (err) {
     functions.logger.log(`Could Not Create Hacker Profile For ${req.body.firstName},\nError: ${err}`);
