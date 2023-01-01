@@ -28,3 +28,7 @@ if (!function_name || function_name === "hacker") {
 if (!function_name || function_name === "cruzpoints") {
   exports.cruzpoints = require("./controllers/cruzpoints/index").service;
 }
+
+if (!function_name || function_name === "teams") {
+  exports.teams = require("./controllers/teams/index").service;
+}

@@ -48,7 +48,10 @@ hacker.post("/createHacker", jwtCheck, hasCreateAdmin, async (req, res) => {
       lastName: req.body.lastName,
       isAttending: false,
       cruzPoints: 0,
+      invitationMode: "JOIN",
       usedCodes: {},
+      team: {},
+      invitations: {},
     };
 
     await setDocument("Hackers", req.body.auth0ID, hackerProfile);
