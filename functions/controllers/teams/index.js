@@ -1,7 +1,7 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
-const { jwtCheck, hasUpdateHacker } = require("../../utils/middleware");
+const { jwtCheck, hasUpdateHacker, hasReadHacker } = require("../../utils/middleware");
 const { db, setDocument, queryDocument, updateDocument } = require("../../utils/database");
 
 const teams = express();
@@ -46,6 +46,7 @@ teams.post("/createTeam", jwtCheck, hasUpdateHacker, async (req, res) => {
       teamLeader: teamLeader,
       members: [
         {
+          memberEmail: userDoc.email,
           memberName: teamLeaderName,
           memberID: req.user.sub,
         },
@@ -61,9 +62,12 @@ teams.post("/createTeam", jwtCheck, hasUpdateHacker, async (req, res) => {
 
     await updateDocument("Hackers", req.user.sub, { team: team });
 
+    let membersRes = [{ position: 0, name: teamDoc.members[0].memberName, id: teamDoc.members[0].memberID }];
+
     res.status(201).send({
       status: 201,
-      team: team,
+      ...team,
+      members: membersRes,
       message: "Team Created",
     });
   } catch (err) {
@@ -95,13 +99,18 @@ teams.post("/inviteTeamMember", jwtCheck, hasUpdateHacker, async (req, res) => {
     const teamName = userDoc.team.teamName;
 
     if (!teamName) {
-      res.status(500).send({ status: 500, Error: "User Does Not Have A Team" });
+      res.status(500).send({ status: 500, error: "Hacker Does Not Have A Team" });
       return;
     }
 
     const teamDoc = (await queryDocument("Teams", teamName)).data();
     if (teamDoc.teamLeader !== req.user.sub) {
-      res.status(500).send({ status: 500, Error: "User Is Not The Team Leader" });
+      res.status(500).send({ status: 500, error: "Hacker Is Not The Team Leader" });
+      return;
+    }
+
+    if (teamDoc.members.length >= 5) {
+      res.status(500).send({ status: 500, error: "You Have Invited The Max Number of Hackers" });
       return;
     }
 
@@ -111,14 +120,72 @@ teams.post("/inviteTeamMember", jwtCheck, hasUpdateHacker, async (req, res) => {
     await db.runTransaction(async (t) => {
       const invitedMemberDocRef = db.collection("Hackers").doc(invitedMemberAuth0ID);
       const doc = (await t.get(invitedMemberDocRef)).data();
-      const newInvitations = { ...doc.invitations, [teamName]: "PENDING" };
-      t.update(invitedMemberDocRef, { invitations: newInvitations });
+      let invitations = doc.invitations;
+      invitations.push({ teamName: teamName, status: "PENDING" });
+      t.update(invitedMemberDocRef, { invitations: invitations });
     });
 
     res.status(200).send({ status: 200, memberEmail: invitedMemberAuth0ID });
   } catch (err) {
+    functions.logger.log(`Could Not Invite ${req.body.invitedMember}\nError: ${err}`);
+    res.status(500).send({ status: 500, error: "Unable to Invite" });
+  }
+});
+
+teams.get("/teamProfile", jwtCheck, hasReadHacker, async (req, res) => {
+  try {
+    const userDoc = (await queryDocument("Hackers", req.user.sub)).data();
+    const teamName = userDoc.team.teamName;
+    const teamLeader = userDoc.team.teamLeader;
+    let members = [];
+    if (teamName) {
+      const teamDoc = (await queryDocument("Teams", teamName)).data();
+      for (let i = 0; i < teamDoc.members.length; i++) {
+        members.push({ position: i, name: teamDoc.members[i].memberName });
+      }
+    }
+
+    const teamProfile = {
+      teamName: teamName,
+      teamLeader: teamLeader,
+      members: members,
+      invitationMode: userDoc.invitationMode,
+      invitations: userDoc.invitations,
+    };
+    res.status(200).send({ status: 200, ...teamProfile });
+  } catch (err) {
     console.log(err);
-    res.status(500).send({ status: 500, Error: "Unable to Invite" });
+    res.status(500).send({ status: 500, error: "Could Not Fetch Team" });
+  }
+});
+
+teams.delete("/removeMember", jwtCheck, hasUpdateHacker, async (req, res) => {
+  try {
+    const teamMemberToRemove = req.body.teamMemberToRemove;
+    const userDoc = (await queryDocument("Hackers", req.user.sub)).data();
+
+    if (userDoc.team.teamLeader === teamMemberToRemove) {
+      res.status(500).send({ status: 500, error: "Cannot remove yourself from your own team" });
+      return;
+    }
+
+    if (userDoc.team.teamLeader !== req.user.sub) {
+      res.status(500).send({ status: 500, error: "Only the team leader can remove members" });
+      return;
+    }
+    const teamName = userDoc.team.teamName;
+
+    await db.runTransaction(async (t) => {
+      const teamDocRef = db.collection("Teams").doc(teamName);
+      const newMembers = teamDoc.members.filter((element) => element.memberID !== teamMemberToRemove);
+      t.update(teamDocRef, { members: newMembers });
+    });
+
+    await updateDocument("Hackers", teamMemberToRemove, { team: {} });
+
+    res.status(200).send({ status: 200, message: "Removed Hacker from team" });
+  } catch (err) {
+    res.status(500).send({ status: 500, error: "Cannot remove Hacker" });
   }
 });
 

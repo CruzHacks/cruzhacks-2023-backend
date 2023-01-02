@@ -31,7 +31,6 @@ const makeIDSearchable = async (db, auth0ID, email) => {
     await db.runTransaction(async (t) => {
       const doc = await t.get(auth0IDSearchRef);
       const newEmailSearch = { ...doc.data().emailSearch, [email]: auth0ID };
-      console.log(newEmailSearch);
       t.update(auth0IDSearchRef, { emailSearch: newEmailSearch });
     });
   } catch (err) {
@@ -51,7 +50,7 @@ hacker.post("/createHacker", jwtCheck, hasCreateAdmin, async (req, res) => {
       invitationMode: "JOIN",
       usedCodes: {},
       team: {},
-      invitations: {},
+      invitations: Array(),
     };
 
     await setDocument("Hackers", req.body.auth0ID, hackerProfile);
