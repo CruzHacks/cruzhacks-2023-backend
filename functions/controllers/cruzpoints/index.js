@@ -38,7 +38,7 @@ cruzpoints.post("/createActivity", jwtCheck, hasCreateAdmin, async (req, res) =>
     res.status(201).send({ status: 201, message: "Activity Created", cruzPointsCode: code });
   } catch (err) {
     functions.logger.log(`Could Not Create Activity,\nError: ${err}`);
-    res.status(500).send({ status: 500, message: "Activity Could Not Be Created" });
+    res.status(500).send({ status: 500, error: "Activity Could Not Be Created" });
   }
 });
 
@@ -67,7 +67,7 @@ cruzpoints.post("/submitCode", jwtCheck, hasUpdateHacker, async (req, res) => {
       res.status(200).send({ status: 200, updatedPoints: newPoints });
       functions.logger.log(`CruzPoints Updated for ${req.user.sub}`);
     } else {
-      res.status(500).send({ status: 500, Error: "Activity Does Not Exist" });
+      res.status(500).send({ status: 500, error: "Activity Does Not Exist" });
       functions.logger.log(`Activity ${code} does not exist`);
     }
   } catch (err) {
