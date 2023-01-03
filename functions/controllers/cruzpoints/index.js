@@ -2,7 +2,7 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const { jwtCheck, hasCreateAdmin, hasUpdateHacker } = require("../../utils/middleware");
-const { setDocument, queryDocument, transaction } = require("../../utils/database");
+const { setDocument, queryDocument, docTransaction: docTransaction } = require("../../utils/database");
 const { customAlphabet } = require("nanoid");
 
 const nanoid = customAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789");
@@ -57,7 +57,7 @@ cruzpoints.post("/submitCode", jwtCheck, hasUpdateHacker, async (req, res) => {
 
       let newPoints = 0;
 
-      await transaction("Hackers", req.user.sub, async (t, docRef) => {
+      await docTransaction("Hackers", req.user.sub, async (t, docRef) => {
         const hackerDoc = (await docRef.get()).data();
         newPoints = hackerDoc.cruzPoints + activity.data().points;
         const newUsedCodes = { ...hackerDoc.usedCodes, [code]: true };

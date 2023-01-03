@@ -2,7 +2,15 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const { jwtCheck, hasUpdateHacker, hasReadHacker } = require("../../utils/middleware");
-const { setDocument, queryDocument, updateDocument, transaction } = require("../../utils/database");
+const {
+  setDocument,
+  queryDocument,
+  updateDocument,
+  docTransaction,
+  db,
+  dbTransaction,
+  documentRef,
+} = require("../../utils/database");
 
 const teams = express();
 teams.disable("x-powered-by");
@@ -51,6 +59,7 @@ teams.post("/createTeam", jwtCheck, hasUpdateHacker, async (req, res) => {
           memberID: req.user.sub,
         },
       ],
+      invitedMembers: [],
     };
 
     await setDocument("Teams", teamName, teamDoc);
@@ -109,24 +118,95 @@ teams.post("/inviteTeamMember", jwtCheck, hasUpdateHacker, async (req, res) => {
       return;
     }
 
-    if (teamDoc.members.length >= 5) {
+    if (teamDoc.members.length + teamDoc.invitedMembers.length >= 5) {
       res.status(500).send({ status: 500, error: "You Have Invited The Max Number of Hackers" });
       return;
     }
 
     const reverseSearchDoc = (await queryDocument("Searches", "auth0IDSearch")).data();
     const invitedMemberAuth0ID = reverseSearchDoc.emailSearch[invitedMemberEmail];
-    await transaction("Hackers", invitedMemberAuth0ID, async (t, docRef) => {
-      const doc = (await t.get(docRef)).data();
-      let invitations = doc.invitations;
-      invitations.push({ teamName: teamName, status: "PENDING" });
-      t.update(docRef, { invitations: invitations });
+
+    await dbTransaction(async (t) => {
+      const invitedMemberDocRef = documentRef("Hackers", invitedMemberAuth0ID);
+      const invitedMemberDoc = (await t.get(invitedMemberDocRef)).data();
+      const teamDocRef = documentRef("Teams", teamName);
+      const teamDoc = (await t.get(teamDocRef)).data();
+      let invitations = invitedMemberDoc.invitations;
+      invitations.push({ teamName: teamName });
+
+      let invitedMembers = teamDoc.invitedMembers;
+      invitedMembers.push({
+        memberEmail: invitedMemberEmail,
+        memberID: invitedMemberAuth0ID,
+        memberName: `${invitedMemberDoc.firstName} ${invitedMemberDoc.lastName}`,
+      });
+
+      t.update(invitedMemberDocRef, { invitations: invitations });
+      t.update(teamDocRef, { invitedMembers: invitedMembers });
     });
 
     res.status(200).send({ status: 200 });
   } catch (err) {
     functions.logger.log(`Could Not Invite ${req.body.invitedMember}\nError: ${err}`);
     res.status(500).send({ status: 500, error: "Unable to Invite" });
+  }
+});
+
+teams.post("/acceptInvite", jwtCheck, hasUpdateHacker, async (req, res) => {
+  // Remove hacker from invitedMembers in teamDoc
+  // Add hacker to team member
+  // Remove team invitation from hackers doc
+  // Add team to hackers team
+
+  try {
+    const hackerDoc = (await queryDocument("Hackers", req.user.sub)).data();
+    if (hackerDoc.team.teamName) {
+      res.status(400).send({ status: 400, error: "Leave current team before joining another one" });
+      return;
+    }
+    const acceptedTeamName = req.body.acceptedTeamName;
+
+    dbTransaction(async (t) => {
+      const teamDocRef = documentRef("Teams", acceptedTeamName);
+      const teamDoc = (await t.get(teamDocRef)).data();
+      const teamLeader = teamDoc.teamLeader;
+      let invitedMembers = teamDoc.invitedMembers;
+
+      // if (!invitedMembers.includes({ memberID: req.user.sub })) {
+      //   throw new Error("Hacker is not invited to this team");
+      // }
+      let invitedMemberElement = {};
+
+      const newInvitedMembers = invitedMembers.filter((element) => {
+        if (element.memberID === req.user.sub) {
+          invitedMemberElement = element;
+          return false;
+        }
+        return true;
+      });
+
+      let members = teamDoc.members;
+      members.push(invitedMemberElement);
+
+      const hackerDocRef = documentRef("Hackers", req.user.sub);
+      const hackerDoc = (await t.get(hackerDocRef)).data();
+      let invitations = hackerDoc.invitations;
+
+      const newInvitations = invitations.filter((element) => element.teamName !== acceptedTeamName);
+
+      const team = {
+        teamName: acceptedTeamName,
+        teamLeader: teamLeader,
+      };
+
+      t.update(hackerDocRef, { invitations: newInvitations, team: team });
+      t.update(teamDocRef, { invitedMembers: newInvitedMembers, members: members });
+    });
+
+    res.status(200).send({ status: 200, message: "Invitation Accepted" });
+  } catch (err) {
+    res.status(500).send({ status: 500, message: "Could Not Accept Invitation" });
+    console.log(err);
   }
 });
 
@@ -172,7 +252,7 @@ teams.delete("/removeMember", jwtCheck, hasUpdateHacker, async (req, res) => {
       return;
     }
     const teamName = userDoc.team.teamName;
-    await transaction("Teams", teamName, async (t, docRef) => {
+    await docTransaction("Teams", teamName, async (t, docRef) => {
       const teamDoc = (await t.get(docRef)).data();
       const newMembers = teamDoc.members.filter((element) => element.memberID !== teamMemberToRemove);
       t.update(docRef, { members: newMembers });

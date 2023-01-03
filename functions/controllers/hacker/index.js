@@ -2,7 +2,7 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const { jwtCheck, hasUpdateHacker, hasCreateAdmin, hasReadHacker } = require("../../utils/middleware");
-const { setDocument, updateDocument, queryDocument, transaction } = require("../../utils/database");
+const { setDocument, updateDocument, queryDocument, docTransaction: docTransaction } = require("../../utils/database");
 
 const hacker = express();
 hacker.disable("x-powered-by");
@@ -29,7 +29,7 @@ const makeIDSearchable = async (auth0ID, email) => {
       await setDocument("Searches", "auth0IDSearch", searchDoc);
     }
 
-    await transaction("Searches", "auth0IDSearch", async (t, docRef) => {
+    await docTransaction("Searches", "auth0IDSearch", async (t, docRef) => {
       const doc = (await t.get(docRef)).data();
       const newEmailSearch = { ...doc.emailSearch, [email]: auth0ID };
       t.update(docRef, { emailSearch: newEmailSearch });
