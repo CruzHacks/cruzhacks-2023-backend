@@ -15,6 +15,10 @@ const setDocument = (collection, id, fields) => {
   return db.collection(collection).doc(id).set(fields);
 };
 
+const updateDocument = (collection, id, fields) => {
+  return db.collection(collection).doc(id).update(fields);
+};
+
 const queryCollection = (collection) => {
   return db.collection(collection).get();
 };
@@ -36,14 +40,23 @@ const uploadFile = (bucketName, filename, file) => {
   });
 };
 
+const transaction = async (collection, id, updateFunction) => {
+  await db.runTransaction(async (t) => {
+    const docRef = db.collection(collection).doc(id);
+    await updateFunction(t, docRef);
+  });
+};
+
 module.exports = {
   addDocument,
   queryDocument,
   setDocument,
+  updateDocument,
   queryCollection,
   queryCollectionSorted,
   deleteDocument,
   uploadFile,
+  transaction,
   admin,
   db,
   storage,
