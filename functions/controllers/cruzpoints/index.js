@@ -2,7 +2,7 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const { jwtCheck, hasCreateAdmin, hasUpdateHacker } = require("../../utils/middleware");
-const { setDocument, queryDocument, db } = require("../../utils/database");
+const { setDocument, queryDocument, transaction } = require("../../utils/database");
 const { customAlphabet } = require("nanoid");
 
 const nanoid = customAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789");
@@ -35,7 +35,7 @@ cruzpoints.post("/createActivity", jwtCheck, hasCreateAdmin, async (req, res) =>
     };
 
     await setDocument("CruzPoints", code, activityDocument);
-    res.status(201).send({ status: 201, message: "Activity Created" });
+    res.status(201).send({ status: 201, message: "Activity Created", cruzPointsCode: code });
   } catch (err) {
     functions.logger.log(`Could Not Create Activity,\nError: ${err}`);
     res.status(500).send({ status: 500, message: "Activity Coould Not Be Created" });
@@ -46,22 +46,22 @@ cruzpoints.post("/submitCode", jwtCheck, hasUpdateHacker, async (req, res) => {
   try {
     const code = req.body.code;
     const activity = await queryDocument("CruzPoints", code);
-    const hackerRef = db.collection("Hackers").doc(req.user.sub);
 
     if (activity.exists) {
-      const doc = await hackerRef.get();
-      if (doc.data().usedCodes[code] === true) {
+      const doc = (await queryDocument("Hackers", req.user.sub)).data();
+      if (doc.usedCodes[code] === true) {
         res.status(500).send({ status: 500, error: "Code Used" });
         functions.logger.log(`Code Used for ${req.user.sub}`);
         return;
       }
 
       let newPoints = 0;
-      await db.runTransaction(async (t) => {
-        const doc = await t.get(hackerRef);
-        newPoints = doc.data().cruzPoints + activity.data().points;
-        const newUsedCodes = { ...doc.data().usedCodes, [code]: true };
-        t.update(hackerRef, { cruzPoints: newPoints, usedCodes: newUsedCodes });
+
+      await transaction("Hackers", req.user.sub, async (t, docRef) => {
+        const hackerDoc = (await docRef.get()).data();
+        newPoints = hackerDoc.cruzPoints + activity.data().points;
+        const newUsedCodes = { ...hackerDoc.usedCodes, [code]: true };
+        t.update(docRef, { cruzPoints: newPoints, usedCodes: newUsedCodes });
       });
 
       res.status(200).send({ status: 200, updatedPoints: newPoints });

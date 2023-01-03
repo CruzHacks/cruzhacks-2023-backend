@@ -2,7 +2,7 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const { jwtCheck, hasUpdateHacker, hasReadHacker } = require("../../utils/middleware");
-const { db, setDocument, queryDocument, updateDocument } = require("../../utils/database");
+const { setDocument, queryDocument, updateDocument, transaction } = require("../../utils/database");
 
 const teams = express();
 teams.disable("x-powered-by");
@@ -116,16 +116,14 @@ teams.post("/inviteTeamMember", jwtCheck, hasUpdateHacker, async (req, res) => {
 
     const reverseSearchDoc = (await queryDocument("Searches", "auth0IDSearch")).data();
     const invitedMemberAuth0ID = reverseSearchDoc.emailSearch[invitedMemberEmail];
-
-    await db.runTransaction(async (t) => {
-      const invitedMemberDocRef = db.collection("Hackers").doc(invitedMemberAuth0ID);
-      const doc = (await t.get(invitedMemberDocRef)).data();
+    await transaction("Hackers", invitedMemberAuth0ID, async (t, docRef) => {
+      const doc = (await t.get(docRef)).data();
       let invitations = doc.invitations;
       invitations.push({ teamName: teamName, status: "PENDING" });
-      t.update(invitedMemberDocRef, { invitations: invitations });
+      t.update(docRef, { invitations: invitations });
     });
 
-    res.status(200).send({ status: 200, memberEmail: invitedMemberAuth0ID });
+    res.status(200).send({ status: 200 });
   } catch (err) {
     functions.logger.log(`Could Not Invite ${req.body.invitedMember}\nError: ${err}`);
     res.status(500).send({ status: 500, error: "Unable to Invite" });
@@ -174,11 +172,10 @@ teams.delete("/removeMember", jwtCheck, hasUpdateHacker, async (req, res) => {
       return;
     }
     const teamName = userDoc.team.teamName;
-
-    await db.runTransaction(async (t) => {
-      const teamDocRef = db.collection("Teams").doc(teamName);
+    await transaction("Teams", teamName, async (t, docRef) => {
+      const teamDoc = (await t.get(docRef)).data();
       const newMembers = teamDoc.members.filter((element) => element.memberID !== teamMemberToRemove);
-      t.update(teamDocRef, { members: newMembers });
+      t.update(docRef, { members: newMembers });
     });
 
     await updateDocument("Hackers", teamMemberToRemove, { team: {} });

@@ -40,6 +40,13 @@ const uploadFile = (bucketName, filename, file) => {
   });
 };
 
+const transaction = async (collection, id, updateFunction) => {
+  await db.runTransaction(async (t) => {
+    const docRef = db.collection(collection).doc(id);
+    await updateFunction(t, docRef);
+  });
+};
+
 module.exports = {
   addDocument,
   queryDocument,
@@ -49,6 +56,7 @@ module.exports = {
   queryCollectionSorted,
   deleteDocument,
   uploadFile,
+  transaction,
   admin,
   db,
   storage,
