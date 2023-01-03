@@ -24,8 +24,8 @@ cruzpoints.use(cors(corsOptions));
 cruzpoints.post("/createActivity", jwtCheck, hasCreateAdmin, async (req, res) => {
   try {
     const code = nanoid(7);
-    if (typeof req.body.points !== "number") {
-      res.status(500).send("Invalid Body Type");
+    if (!req.body.points || !req.body.activity || typeof req.body.points !== "number") {
+      res.status(400).send({ status: 400, error: "Invalid Body Type" });
       return;
     }
 
@@ -38,7 +38,7 @@ cruzpoints.post("/createActivity", jwtCheck, hasCreateAdmin, async (req, res) =>
     res.status(201).send({ status: 201, message: "Activity Created", cruzPointsCode: code });
   } catch (err) {
     functions.logger.log(`Could Not Create Activity,\nError: ${err}`);
-    res.status(500).send({ status: 500, message: "Activity Coould Not Be Created" });
+    res.status(500).send({ status: 500, message: "Activity Could Not Be Created" });
   }
 });
 
