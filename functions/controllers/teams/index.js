@@ -11,7 +11,6 @@ const {
   documentRef,
 } = require("../../utils/database");
 
-
 const teams = express();
 teams.disable("x-powered-by");
 teams.use(express.json());
@@ -142,7 +141,6 @@ teams.post("/inviteTeamMember", jwtCheck, hasUpdateHacker, async (req, res) => {
 
       t.update(invitedMemberDocRef, { invitations: invitations });
       t.update(teamDocRef, { invitedMembers: invitedMembers });
-
     });
 
     res.status(200).send({ status: 200 });
@@ -151,7 +149,6 @@ teams.post("/inviteTeamMember", jwtCheck, hasUpdateHacker, async (req, res) => {
     res.status(500).send({ status: 500, error: "Unable to Invite" });
   }
 });
-
 
 teams.post("/acceptInvite", jwtCheck, hasUpdateHacker, async (req, res) => {
   // Remove hacker from invitedMembers in teamDoc
@@ -210,7 +207,6 @@ teams.post("/acceptInvite", jwtCheck, hasUpdateHacker, async (req, res) => {
     console.log(err);
   }
 });
-
 
 teams.get("/teamProfile", jwtCheck, hasReadHacker, async (req, res) => {
   try {

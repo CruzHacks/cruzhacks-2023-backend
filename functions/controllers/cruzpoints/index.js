@@ -58,7 +58,6 @@ cruzpoints.post("/submitCode", jwtCheck, hasUpdateHacker, async (req, res) => {
       let newPoints = 0;
 
       await docTransaction("Hackers", req.user.sub, async (t, docRef) => {
-
         const hackerDoc = (await docRef.get()).data();
         newPoints = hackerDoc.cruzPoints + activity.data().points;
         const newUsedCodes = { ...hackerDoc.usedCodes, [code]: true };
