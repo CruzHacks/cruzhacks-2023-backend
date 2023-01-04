@@ -40,11 +40,19 @@ const uploadFile = (bucketName, filename, file) => {
   });
 };
 
-const transaction = async (collection, id, updateFunction) => {
+const docTransaction = async (collection, id, updateFunction) => {
   await db.runTransaction(async (t) => {
     const docRef = db.collection(collection).doc(id);
     await updateFunction(t, docRef);
   });
+};
+
+const dbTransaction = async (updateFunction) => {
+  await db.runTransaction(updateFunction);
+};
+
+const documentRef = (collection, id) => {
+  return db.collection(collection).doc(id);
 };
 
 module.exports = {
@@ -56,7 +64,9 @@ module.exports = {
   queryCollectionSorted,
   deleteDocument,
   uploadFile,
-  transaction,
+  docTransaction,
+  dbTransaction,
+  documentRef,
   admin,
   db,
   storage,
