@@ -7,7 +7,6 @@ const {
   queryDocument,
   updateDocument,
   docTransaction,
-  db,
   dbTransaction,
   documentRef,
 } = require("../../utils/database");
