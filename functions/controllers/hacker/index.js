@@ -2,7 +2,7 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const { jwtCheck, hasUpdateHacker, hasCreateAdmin, hasReadHacker } = require("../../utils/middleware");
-const { setDocument, updateDocument, queryDocument, docTransaction: docTransaction } = require("../../utils/database");
+const { setDocument, queryDocument, docTransaction: docTransaction } = require("../../utils/database");
 
 const hacker = express();
 hacker.disable("x-powered-by");
