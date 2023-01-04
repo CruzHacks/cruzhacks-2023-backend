@@ -2,7 +2,7 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const { jwtCheck, hasCreateAdmin, hasUpdateHacker } = require("../../utils/middleware");
-const { setDocument, queryDocument, docTransaction: docTransaction } = require("../../utils/database");
+const { setDocument, queryDocument, docTransaction } = require("../../utils/database");
 const { customAlphabet } = require("nanoid");
 
 const nanoid = customAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789");
