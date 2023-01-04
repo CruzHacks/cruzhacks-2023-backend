@@ -11,6 +11,7 @@ const {
   documentRef,
 } = require("../../utils/database");
 
+
 const teams = express();
 teams.disable("x-powered-by");
 teams.use(express.json());
@@ -124,7 +125,6 @@ teams.post("/inviteTeamMember", jwtCheck, hasUpdateHacker, async (req, res) => {
 
     const reverseSearchDoc = (await queryDocument("Searches", "auth0IDSearch")).data();
     const invitedMemberAuth0ID = reverseSearchDoc.emailSearch[invitedMemberEmail];
-
     await dbTransaction(async (t) => {
       const invitedMemberDocRef = documentRef("Hackers", invitedMemberAuth0ID);
       const invitedMemberDoc = (await t.get(invitedMemberDocRef)).data();
@@ -142,6 +142,7 @@ teams.post("/inviteTeamMember", jwtCheck, hasUpdateHacker, async (req, res) => {
 
       t.update(invitedMemberDocRef, { invitations: invitations });
       t.update(teamDocRef, { invitedMembers: invitedMembers });
+
     });
 
     res.status(200).send({ status: 200 });
@@ -150,6 +151,7 @@ teams.post("/inviteTeamMember", jwtCheck, hasUpdateHacker, async (req, res) => {
     res.status(500).send({ status: 500, error: "Unable to Invite" });
   }
 });
+
 
 teams.post("/acceptInvite", jwtCheck, hasUpdateHacker, async (req, res) => {
   // Remove hacker from invitedMembers in teamDoc
@@ -209,6 +211,7 @@ teams.post("/acceptInvite", jwtCheck, hasUpdateHacker, async (req, res) => {
   }
 });
 
+
 teams.get("/teamProfile", jwtCheck, hasReadHacker, async (req, res) => {
   try {
     const userDoc = (await queryDocument("Hackers", req.user.sub)).data();
@@ -251,6 +254,7 @@ teams.delete("/removeMember", jwtCheck, hasUpdateHacker, async (req, res) => {
       return;
     }
     const teamName = userDoc.team.teamName;
+
     await docTransaction("Teams", teamName, async (t, docRef) => {
       const teamDoc = (await t.get(docRef)).data();
       const newMembers = teamDoc.members.filter((element) => element.memberID !== teamMemberToRemove);
