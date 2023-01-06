@@ -66,6 +66,7 @@ const hasCreateHacker = hasPermission("create:hacker");
 const hasUpdateHacker = hasPermission("update:hacker");
 const hasReadHacker = hasPermission("read:hacker");
 
+
 module.exports = {
   jwtCheck,
   validKey,
@@ -81,4 +82,5 @@ module.exports = {
   hasUpdateHacker,
   hasCreateAdmin,
   hasReadHacker,
+
 };
