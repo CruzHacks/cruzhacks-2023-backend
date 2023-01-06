@@ -66,6 +66,33 @@ hacker.post("/createHacker", jwtCheck, hasCreateAdmin, async (req, res) => {
   }
 });
 
+hacker.post("/bulkCreateHackers", jwtCheck, hasCreateAdmin, async (req, res) => {
+  try {
+    const users = req.body.users;
+    users.forEach(async (user) => {
+      const hackerProfile = {
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        attendanceStatus: "NOT CONFIRMED",
+        cruzPoints: 0,
+        invitationMode: "JOIN",
+        usedCodes: {},
+        team: {},
+        invitations: Array(),
+      };
+
+      await setDocument("Hackers", user.auth0ID, hackerProfile);
+      await makeIDSearchable(user.auth0ID, user.email);
+      functions.logger.log(`Hacker Profile Created For ${user.firstName}`);
+    });
+    res.status(201).send({ status: 201 });
+  } catch (err) {
+    functions.logger.log(`Could Not Create Hacker Profiles,\nError: ${err}`);
+    res.status(500).send({ status: 500, error: "Could Not Create Hacker Documents" });
+  }
+});
+
 hacker.put("/setAttendanceStatus", jwtCheck, hasUpdateHacker, async (req, res) => {
   try {
     const confirmedStatus = req.body.confirmedStatus;
@@ -82,7 +109,7 @@ hacker.put("/setAttendanceStatus", jwtCheck, hasUpdateHacker, async (req, res) =
       }
       t.update(docRef, { attendanceStatus: confirmedStatus });
     });
-    res.status(200).send({ status: 200, attendanceStatus: confirmedStatus });
+    res.status(200).send({ status: 200, message: "Attendance Status Confirmed", attendanceStatus: confirmedStatus });
   } catch (err) {
     functions.logger.log(`Could not update attendance for ${req.user.sub},\nError: ${err}`);
     res.status(500).send({ status: 500, error: "Could Not Update Attendance" });
