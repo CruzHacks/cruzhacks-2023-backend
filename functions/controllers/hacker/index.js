@@ -2,7 +2,7 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const { jwtCheck, hasUpdateHacker, hasCreateAdmin, hasReadHacker } = require("../../utils/middleware");
-const { setDocument, updateDocument, queryDocument, transaction } = require("../../utils/database");
+const { setDocument, queryDocument, docTransaction } = require("../../utils/database");
 
 const hacker = express();
 hacker.disable("x-powered-by");
@@ -29,7 +29,7 @@ const makeIDSearchable = async (auth0ID, email) => {
       await setDocument("Searches", "auth0IDSearch", searchDoc);
     }
 
-    await transaction("Searches", "auth0IDSearch", async (t, docRef) => {
+    await docTransaction("Searches", "auth0IDSearch", async (t, docRef) => {
       const doc = (await t.get(docRef)).data();
       const newEmailSearch = { ...doc.emailSearch, [email]: auth0ID };
       t.update(docRef, { emailSearch: newEmailSearch });
@@ -46,7 +46,7 @@ hacker.post("/createHacker", jwtCheck, hasCreateAdmin, async (req, res) => {
       email: req.body.email,
       firstName: req.body.firstName,
       lastName: req.body.lastName,
-      isAttending: false,
+      attendanceStatus: "NOT CONFIRMED",
       cruzPoints: 0,
       invitationMode: "JOIN",
       usedCodes: {},
@@ -66,10 +66,50 @@ hacker.post("/createHacker", jwtCheck, hasCreateAdmin, async (req, res) => {
   }
 });
 
-hacker.put("/isAttending", jwtCheck, hasUpdateHacker, async (req, res) => {
+hacker.post("/bulkCreateHackers", jwtCheck, hasCreateAdmin, async (req, res) => {
   try {
-    await updateDocument("Hackers", req.user.sub, { isAttending: true });
-    res.status(200).send({ status: 200 });
+    const users = req.body.users;
+    users.forEach(async (user) => {
+      const hackerProfile = {
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        attendanceStatus: "NOT CONFIRMED",
+        cruzPoints: 0,
+        invitationMode: "JOIN",
+        usedCodes: {},
+        team: {},
+        invitations: Array(),
+      };
+
+      await setDocument("Hackers", user.auth0ID, hackerProfile);
+      await makeIDSearchable(user.auth0ID, user.email);
+      functions.logger.log(`Hacker Profile Created For ${user.firstName}`);
+    });
+    res.status(201).send({ status: 201 });
+  } catch (err) {
+    functions.logger.log(`Could Not Create Hacker Profiles,\nError: ${err}`);
+    res.status(500).send({ status: 500, error: "Could Not Create Hacker Documents" });
+  }
+});
+
+hacker.put("/setAttendanceStatus", jwtCheck, hasUpdateHacker, async (req, res) => {
+  try {
+    const confirmedStatus = req.body.confirmedStatus;
+    if (confirmedStatus !== "CONFIRMED" && confirmedStatus !== "NOT ATTENDING") {
+      console.log(confirmedStatus);
+      res.status(400).send({ status: 400, error: "Invalid Attendance Status" });
+      return;
+    }
+    await docTransaction("Hackers", req.user.sub, async (t, docRef) => {
+      const doc = (await t.get(docRef)).data();
+      const attendanceStatus = doc.attendanceStatus;
+      if (attendanceStatus === "NOT ATTENDING") {
+        throw new Error("Can't change status of non attending hacker");
+      }
+      t.update(docRef, { attendanceStatus: confirmedStatus });
+    });
+    res.status(200).send({ status: 200, message: "Attendance Status Confirmed", attendanceStatus: confirmedStatus });
   } catch (err) {
     functions.logger.log(`Could not update attendance for ${req.user.sub},\nError: ${err}`);
     res.status(500).send({ status: 500, error: "Could Not Update Attendance" });
@@ -78,13 +118,20 @@ hacker.put("/isAttending", jwtCheck, hasUpdateHacker, async (req, res) => {
 
 hacker.get("/hackerProfile", jwtCheck, hasReadHacker, async (req, res) => {
   try {
-    console.log(req.user.sub);
-    const doc = await queryDocument("Hackers", req.user.sub);
-    if (!doc.exists) {
+    const docGet = await queryDocument("Hackers", req.user.sub);
+    if (!docGet.exists) {
       functions.logger.log(`Could not fetch profile for ${req.user.sub},\nError: Document does not exist`);
       res.status(500).send({ status: 500, error: "No Hacker Profile" });
+      return;
     }
-    res.status(200).send({ status: 200, hackerProfile: doc.data() });
+
+    const doc = docGet.data();
+    const profileFields = {
+      cruzPoints: doc.cruzPoints,
+      attendanceStatus: doc.attendanceStatus,
+    };
+
+    res.status(200).send({ status: 200, hackerProfile: profileFields });
   } catch (err) {
     functions.logger.log(`Could not fetch profile for ${req.user.sub},\nError: ${err}`);
     res.status(500).send({ status: 500, error: "Could not fetch hacker profile" });
