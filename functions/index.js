@@ -20,3 +20,15 @@ if (!function_name || function_name === "analytics") {
 if (!function_name || function_name === "writeToAnalytics") {
   exports.writeToAnalytics = require("./utils/analytics").service;
 }
+
+if (!function_name || function_name === "hacker") {
+  exports.hacker = require("./controllers/hacker/index").service;
+}
+
+if (!function_name || function_name === "cruzpoints") {
+  exports.cruzpoints = require("./controllers/cruzpoints/index").service;
+}
+
+if (!function_name || function_name === "teams") {
+  exports.teams = require("./controllers/teams/index").service;
+}
