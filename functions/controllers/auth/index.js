@@ -83,6 +83,74 @@ app.post("/resend", jwtCheck, async (req, res) => {
   }
 });
 
+app.patch("/metadata", jwtCheck, async (req, res) => {
+  const validThemes = /light|dark/;
+  const theme = req.body.theme;
+  functions.logger.info(`PATCH request to metadata made with theme: ${theme}`);
+  if (!theme || !theme.match(validThemes)) {
+    res.status(400).send({ code: 400, message: "invalid request body" });
+  } else {
+    const auth0Config = functions.config().auth;
+    const client_vars = functions.config().client_vars;
+    const issuer = auth0Config ? auth0Config.issuer : "";
+    const client_id = client_vars ? client_vars.client_id : "";
+    const client_secret = client_vars ? client_vars.client_secret : "";
+
+    const token = await getM2MToken(client_id, client_secret, issuer);
+    const options = {
+      method: "PATCH",
+      url: api_url + "users/" + req.user.sub,
+      headers: {
+        authorization: "Bearer " + token,
+        "content-type": "application/json",
+      },
+      data: {
+        user_metadata: {
+          theme: theme,
+        },
+      },
+    };
+    const patchMetadataRes = await axios(options);
+    if (patchMetadataRes.status === 200) {
+      res.status(200).send({ code: 200, message: "metadata update success" });
+    } else {
+      const retStatus = patchMetadataRes.status;
+      res.status(retStatus).send({ code: retStatus, message: "unable to update metadata" });
+    }
+  }
+});
+
+app.get("/metadata", jwtCheck, async (req, res) => {
+  functions.logger.info(`Get user metadata request received`);
+  const auth0Config = functions.config().auth;
+  const client_vars = functions.config().client_vars;
+  const issuer = auth0Config ? auth0Config.issuer : "";
+  const client_id = client_vars ? client_vars.client_id : "";
+  const client_secret = client_vars ? client_vars.client_secret : "";
+  const token = await getM2MToken(client_id, client_secret, issuer);
+
+  const options = {
+    // options for the API call
+    method: "GET",
+    url: api_url + "users/" + req.user.sub,
+    headers: { authorization: "Bearer " + token },
+  };
+  const user = await axios(options); // send request
+  if (user.data && user.data.user_metadata && user.data.user_metadata.theme) {
+    res.status(200).send({
+      code: 200,
+      message: "user metadata found",
+      theme: user.data.user_metadata.theme,
+    });
+  } else {
+    functions.logger.error(`Request to get metadata failed with response: ${user.status}`);
+    res.status(404).send({
+      code: 404,
+      message: "unable to retrieve requested resource",
+    });
+  }
+});
+
 const service = functions.https.onRequest(app);
 
 module.exports = { app, service };

@@ -83,3 +83,85 @@ describe("Supertest", () => {
     done();
   });
 });
+
+describe("user metadata", () => {
+  beforeEach(() => {
+    getM2MToken((client_id, client_secret, issuer) => Promise.resolve("token"));
+  });
+  afterEach(() => {
+    jwtCheck.mockClear();
+    axios.mockClear();
+  });
+
+  it("PATCH Should fail on no theme", async (done) => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+
+    const res = await request(app).patch("/metadata");
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(axios).toHaveBeenCalledTimes(0);
+    expect(res.status).toBe(400);
+    done();
+  });
+
+  it("PATCH Should fail on invalid theme", async (done) => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+
+    const res = await request(app).patch("/metadata").send({ theme: "pink" });
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(axios).toHaveBeenCalledTimes(0);
+    expect(res.status).toBe(400);
+    done();
+  });
+
+  it("PATCH Should succeed on valid theme", async (done) => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+    axios.mockImplementationOnce(() => Promise.resolve({ status: 200 }));
+
+    const res = await request(app).patch("/metadata").send({ theme: "light" });
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(axios).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(200);
+    done();
+  });
+
+  it("GET Should fail on no metadata return", async (done) => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+    axios.mockImplementationOnce(() => Promise.resolve({ status: 200 }));
+
+    const res = await request(app).get("/metadata");
+
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(axios).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(404);
+    done();
+  });
+
+  it("GET Should succeed on metadata return", async (done) => {
+    jwtCheck.mockImplementation((req, res, next) => {
+      req.user = { sub: "test user" };
+      next();
+    });
+    axios
+      .mockImplementationOnce(() => Promise.resolve({ data: { user_metadata: { theme: "dark" } } }))
+      .mockImplementationOnce(() => Promise.resolve({ status: 200 }));
+
+    const res = await request(app).get("/metadata");
+
+    expect(jwtCheck).toHaveBeenCalledTimes(1);
+    expect(axios).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(200);
+    done();
+  });
+});
