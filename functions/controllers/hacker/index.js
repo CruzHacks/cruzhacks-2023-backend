@@ -1,7 +1,7 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
-const { jwtCheck, hasUpdateHacker, hasCreateAdmin, hasReadHacker } = require("../../utils/middleware");
+const { jwtCheck, hasUpdateHacker, hasCreateAdmin, hasReadHacker, hasReadAdmin } = require("../../utils/middleware");
 const { setDocument, queryDocument, docTransaction } = require("../../utils/database");
 
 const hacker = express();
@@ -63,6 +63,21 @@ hacker.post("/createHacker", jwtCheck, hasCreateAdmin, async (req, res) => {
   } catch (err) {
     functions.logger.log(`Could Not Create Hacker Profile For ${req.body.firstName},\nError: ${err}`);
     res.status(500).send({ status: 500, error: "Could Not Create Hacker Document" });
+  }
+});
+
+hacker.get("/searchHacker", jwtCheck, hasReadAdmin, async (req, res) => {
+  try {
+    const hackerEmail = req.body.hackerEmail;
+    const searchesDoc = (await queryDocument("Searches", "auth0IDSearch")).data();
+    const hackerAuth0ID = searchesDoc.emailSearch[hackerEmail];
+
+    const hackerDoc = (await queryDocument("Hackers", hackerAuth0ID)).data();
+    res.status(200).send({ status: 200, hackerDoc: hackerDoc });
+    functions.logger.log(`Retrieved Hacker Document for ${hackerEmail}`);
+  } catch (err) {
+    res.status(500).send({ status: 500, error: "Unable to retrieve hacker document" });
+    functions.logger.log(`Unable to retrieve hacker document for ${req.body.hackerEmail},\nError: ${err}`);
   }
 });
 
