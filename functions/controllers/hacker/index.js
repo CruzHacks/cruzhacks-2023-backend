@@ -84,7 +84,8 @@ hacker.get("/searchHacker", jwtCheck, hasReadAdmin, async (req, res) => {
 hacker.post("/bulkCreateHackers", jwtCheck, hasCreateAdmin, async (req, res) => {
   try {
     const users = req.body.users;
-    users.forEach(async (user) => {
+    for (let i = 0; i < users.length; i++) {
+      const user = users[i];
       const hackerProfile = {
         email: user.email,
         firstName: user.firstName,
@@ -100,7 +101,7 @@ hacker.post("/bulkCreateHackers", jwtCheck, hasCreateAdmin, async (req, res) => 
       await setDocument("Hackers", user.auth0ID, hackerProfile);
       await makeIDSearchable(user.auth0ID, user.email);
       functions.logger.log(`Hacker Profile Created For ${user.firstName}`);
-    });
+    }
     res.status(201).send({ status: 201 });
   } catch (err) {
     functions.logger.log(`Could Not Create Hacker Profiles,\nError: ${err}`);
@@ -124,6 +125,7 @@ hacker.put("/setAttendanceStatus", jwtCheck, hasUpdateHacker, async (req, res) =
       }
       t.update(docRef, { attendanceStatus: confirmedStatus });
     });
+
     res.status(200).send({ status: 200, message: "Attendance Status Confirmed", attendanceStatus: confirmedStatus });
   } catch (err) {
     functions.logger.log(`Could not update attendance for ${req.user.sub},\nError: ${err}`);
