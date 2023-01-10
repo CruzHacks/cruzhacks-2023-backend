@@ -111,6 +111,14 @@ hacker.post("/bulkCreateHackers", jwtCheck, hasCreateAdmin, async (req, res) => 
 
 hacker.put("/setAttendanceStatus", jwtCheck, hasUpdateHacker, async (req, res) => {
   try {
+    const lockoutDate = new Date(2023, 0, 10, 7, 59, 59); // UTC time
+    const currentDate = new Date();
+
+    if (currentDate.getTime() > lockoutDate.getTime()) {
+      res.status(500).send({ status: 500, error: "RSVP is locked out" });
+      functions.logger.error("Locked Out");
+      return;
+    }
     const confirmedStatus = req.body.confirmedStatus;
     if (confirmedStatus !== "CONFIRMED" && confirmedStatus !== "NOT ATTENDING") {
       console.log(confirmedStatus);
