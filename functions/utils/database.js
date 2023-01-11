@@ -1,7 +1,9 @@
 const admin = require("firebase-admin");
+
 admin.initializeApp();
 db = admin.firestore();
 storage = admin.storage();
+rtdb = admin.database();
 
 const addDocument = (collection, document) => {
   return db.collection(collection).add(document);
@@ -55,6 +57,20 @@ const documentRef = (collection, id) => {
   return db.collection(collection).doc(id);
 };
 
+/*----------------------------------------*/
+/*         Real-Time Database ops         */
+/*----------------------------------------*/
+
+const setRefRTDB = (collection, id, fields) => {
+  return rtdb.ref(`${collection}/${id}`).set(fields, (error) => {
+    if (error) {
+      functions.logger.error("error occured", error);
+    } else {
+      functions.logger.log("success? ", error);
+    }
+  });
+};
+
 module.exports = {
   addDocument,
   queryDocument,
@@ -67,7 +83,9 @@ module.exports = {
   docTransaction,
   dbTransaction,
   documentRef,
+  setRefRTDB,
   admin,
   db,
+  rtdb,
   storage,
 };
