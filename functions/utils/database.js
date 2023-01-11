@@ -1,4 +1,5 @@
 const admin = require("firebase-admin");
+const functions = require("firebase-functions");
 
 admin.initializeApp();
 db = admin.firestore();
@@ -66,7 +67,7 @@ const setRefRTDB = (collection, id, fields) => {
     if (error) {
       functions.logger.error("error occured", error);
     } else {
-      functions.logger.log("success? ", error);
+      functions.logger.log("successfully wrote announcement");
     }
   });
 };
