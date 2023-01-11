@@ -66,15 +66,15 @@ notify.post("/send", jwtCheck, hasUpdateAnnouncement, async (req, res) => {
     }
 
     await sendMessage(payload)
-    .then((response) => {
-      functions.logger.log("Successfully sent message:", response);
-      res.status(201).send({ message: "Success", status: 201 });
-    })
-    .then(async() => await setRefRTDB("Announcements", nanoid(), { ...payload.notification, date: Date.now() }))
-    .catch((error) => {
-      functions.logger.error("Error sending message:", error);
-      res.status(500).send({ message: "Error in processing request", status: 500 });
-    });
+      .then((response) => {
+        functions.logger.log("Successfully sent message:", response);
+        res.status(201).send({ message: "Success", status: 201 });
+      })
+      .then(async () => await setRefRTDB("Announcements", nanoid(), { ...payload.notification, date: Date.now() }))
+      .catch((error) => {
+        functions.logger.error("Error sending message:", error);
+        res.status(500).send({ message: "Error in processing request", status: 500 });
+      });
   } catch (error) {
     functions.logger.error("Error occured:", error);
     res.status(500).send({ message: "Error in processing request", status: 500 });
