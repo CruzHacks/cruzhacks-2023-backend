@@ -1,7 +1,7 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
-const { jwtCheck, hasUpdateHacker, hasCreateAdmin, hasReadHacker } = require("../../utils/middleware");
+const { jwtCheck, hasUpdateHacker, hasCreateAdmin, hasReadHacker, hasReadAdmin } = require("../../utils/middleware");
 const { setDocument, queryDocument, docTransaction } = require("../../utils/database");
 
 const hacker = express();
@@ -66,10 +66,26 @@ hacker.post("/createHacker", jwtCheck, hasCreateAdmin, async (req, res) => {
   }
 });
 
+hacker.get("/searchHacker", jwtCheck, hasReadAdmin, async (req, res) => {
+  try {
+    const hackerEmail = req.body.hackerEmail;
+    const searchesDoc = (await queryDocument("Searches", "auth0IDSearch")).data();
+    const hackerAuth0ID = searchesDoc.emailSearch[hackerEmail];
+
+    const hackerDoc = (await queryDocument("Hackers", hackerAuth0ID)).data();
+    res.status(200).send({ status: 200, hackerDoc: hackerDoc });
+    functions.logger.log(`Retrieved Hacker Document for ${hackerEmail}`);
+  } catch (err) {
+    res.status(500).send({ status: 500, error: "Unable to retrieve hacker document" });
+    functions.logger.log(`Unable to retrieve hacker document for ${req.body.hackerEmail},\nError: ${err}`);
+  }
+});
+
 hacker.post("/bulkCreateHackers", jwtCheck, hasCreateAdmin, async (req, res) => {
   try {
     const users = req.body.users;
-    users.forEach(async (user) => {
+    for (let i = 0; i < users.length; i++) {
+      const user = users[i];
       const hackerProfile = {
         email: user.email,
         firstName: user.firstName,
@@ -85,7 +101,7 @@ hacker.post("/bulkCreateHackers", jwtCheck, hasCreateAdmin, async (req, res) => 
       await setDocument("Hackers", user.auth0ID, hackerProfile);
       await makeIDSearchable(user.auth0ID, user.email);
       functions.logger.log(`Hacker Profile Created For ${user.firstName}`);
-    });
+    }
     res.status(201).send({ status: 201 });
   } catch (err) {
     functions.logger.log(`Could Not Create Hacker Profiles,\nError: ${err}`);
@@ -95,7 +111,16 @@ hacker.post("/bulkCreateHackers", jwtCheck, hasCreateAdmin, async (req, res) => 
 
 hacker.put("/setAttendanceStatus", jwtCheck, hasUpdateHacker, async (req, res) => {
   try {
+    const lockoutDate = new Date(2023, 0, 27, 7, 59, 59); // UTC time
+    const currentDate = new Date();
     const confirmedStatus = req.body.confirmedStatus;
+
+    if (currentDate.getTime() > lockoutDate.getTime() && confirmedStatus === "CONFIRMED") {
+      res.status(500).send({ status: 500, error: "RSVP is locked out" });
+      functions.logger.error("Locked Out");
+      return;
+    }
+
     if (confirmedStatus !== "CONFIRMED" && confirmedStatus !== "NOT ATTENDING") {
       console.log(confirmedStatus);
       res.status(400).send({ status: 400, error: "Invalid Attendance Status" });
@@ -109,6 +134,7 @@ hacker.put("/setAttendanceStatus", jwtCheck, hasUpdateHacker, async (req, res) =
       }
       t.update(docRef, { attendanceStatus: confirmedStatus });
     });
+
     res.status(200).send({ status: 200, message: "Attendance Status Confirmed", attendanceStatus: confirmedStatus });
   } catch (err) {
     functions.logger.log(`Could not update attendance for ${req.user.sub},\nError: ${err}`);
