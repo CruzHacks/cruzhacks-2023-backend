@@ -29,7 +29,7 @@
     "formidable-serverless": "^1.1.1",
     "helmet": "^4.6.0",
     "jest-fetch-mock": "^3.0.3",
-    "jwks-rsa": "^2.0.4",
+    "jwks-rsa": "^2.1.5",
     "nanoid": "^3.0.0",
     "supertest": "^6.1.3"
   },
