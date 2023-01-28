@@ -146,7 +146,7 @@ hacker.get("/hackerProfile", jwtCheck, hasReadHacker, async (req, res) => {
   try {
     const docGet = await queryDocument("Hackers", req.user.sub);
     if (!docGet.exists) {
-      functions.logger.log(`Could not fetch profile for ${req.user.sub},\nError: Document does not exist`);
+      functions.logger.error(`Could not fetch profile for ${req.user.sub},\nError: Document does not exist`);
       res.status(500).send({ status: 500, error: "No Hacker Profile" });
       return;
     }
@@ -160,7 +160,7 @@ hacker.get("/hackerProfile", jwtCheck, hasReadHacker, async (req, res) => {
     res.status(200).send({ status: 200, hackerProfile: profileFields });
   } catch (err) {
     functions.logger.log(`Could not fetch profile for ${req.user.sub},\nError: ${err}`);
-    res.status(500).send({ status: 500, error: "Could not fetch hacker profile" });
+    res.status(500).send({ status: 500, error: "Could not fetch hacker profile", err: err });
   }
 });
 
