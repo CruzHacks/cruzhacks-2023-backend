@@ -32,3 +32,7 @@ if (!function_name || function_name === "cruzpoints") {
 if (!function_name || function_name === "teams") {
   exports.teams = require("./controllers/teams/index").service;
 }
+
+if (!function_name || function_name === "admin") {
+  exports.admin = require("./controllers/admin/index").service;
+}
