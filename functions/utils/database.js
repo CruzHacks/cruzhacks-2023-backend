@@ -1,4 +1,5 @@
 const admin = require("firebase-admin");
+const { firebaseConfig } = require("firebase-functions");
 const functions = require("firebase-functions");
 
 admin.initializeApp();
@@ -62,14 +63,8 @@ const documentRef = (collection, id) => {
 /*         Real-Time Database ops         */
 /*----------------------------------------*/
 
-const setRefRTDB = (collection, id, fields) => {
-  return rtdb.ref(`${collection}/${id}`).set(fields, (error) => {
-    if (error) {
-      functions.logger.error("error occured", error);
-    } else {
-      functions.logger.log("successfully wrote announcement");
-    }
-  });
+const writeAnnouncement = (collection, fields) => {
+  return rtdb.ref(collection).push().set(fields);
 };
 
 module.exports = {
@@ -84,7 +79,7 @@ module.exports = {
   docTransaction,
   dbTransaction,
   documentRef,
-  setRefRTDB,
+  writeAnnouncement,
   admin,
   db,
   rtdb,
