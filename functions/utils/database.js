@@ -56,10 +56,6 @@ const documentRef = (collection, id) => {
   return db.collection(collection).doc(id);
 };
 
-/*----------------------------------------*/
-/*         Real-Time Database ops         */
-/*----------------------------------------*/
-
 const writeAnnouncement = (collection, fields) => {
   return rtdb.ref(collection).push().set(fields);
 };
