@@ -2,13 +2,19 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const { jwtCheck, hasUpdateHacker, hasCreateAdmin, hasReadHacker, hasReadAdmin } = require("../../utils/middleware");
-const { setDocument, queryDocument, docTransaction } = require("../../utils/database");
+const { setDocument, queryDocument, docTransaction, collectionRef, storage } = require("../../utils/database");
+const fs = require("fs");
+const os = require("os");
+const { nanoid } = require("nanoid");
 
 const hacker = express();
 hacker.disable("x-powered-by");
 hacker.use(express.json());
 
 const auth0Config = functions.config().auth;
+const app = functions.config().app;
+const bucket = app ? app.bucket : "";
+
 const corsConfig = auth0Config ? auth0Config.cors : "";
 
 const corsOptions = {
@@ -161,6 +167,30 @@ hacker.get("/hackerProfile", jwtCheck, hasReadHacker, async (req, res) => {
   } catch (err) {
     functions.logger.log(`Could not fetch profile for ${req.user.sub},\nError: ${err}`);
     res.status(500).send({ status: 500, error: "Could not fetch hacker profile" });
+  }
+});
+
+hacker.get("/exportHackers", jwtCheck, hasReadAdmin, async (req, res) => {
+  try {
+    const hackersRef = collectionRef("Hackers");
+    const RSVPHackers = await hackersRef.where("attendanceStatus", "==", "CONFIRMED").get();
+    if (RSVPHackers.empty) {
+      res.status(500).send({ status: 500, error: "No Hackers Are RSVP'd" });
+      return;
+    }
+    let RSVPHackersCSV = "Email,First Name,Last Name\n";
+    RSVPHackers.forEach((docRef) => {
+      const doc = docRef.data();
+      RSVPHackersCSV += `${doc.email},${doc.firstName},${doc.lastName}\n`;
+    });
+    const uploadedFileName = "/exportedhackers-" + nanoid(5) + ".csv";
+    fs.writeFileSync(os.tmpdir() + uploadedFileName, RSVPHackersCSV, "utf-8");
+
+    await storage.bucket(bucket).upload(os.tmpdir() + uploadedFileName);
+    res.status(200).send({ status: 200, message: `Exported To ${uploadedFileName}` });
+  } catch (err) {
+    functions.logger.error(err);
+    res.status(500).send({ status: 500, error: "Error fetching RSVP'd Hackers" });
   }
 });
 

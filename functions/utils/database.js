@@ -55,6 +55,10 @@ const documentRef = (collection, id) => {
   return db.collection(collection).doc(id);
 };
 
+const collectionRef = (collection) => {
+  return db.collection(collection);
+};
+
 module.exports = {
   addDocument,
   queryDocument,
@@ -67,6 +71,7 @@ module.exports = {
   docTransaction,
   dbTransaction,
   documentRef,
+  collectionRef,
   admin,
   db,
   storage,
