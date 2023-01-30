@@ -1,8 +1,8 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
-const { jwtCheck, hasReadAdmin } = require("../../utils/middleware");
-const { queryCollection } = require("../../utils/database");
+const { jwtCheck, hasReadAdmin, hasCreateAdmin } = require("../../utils/middleware");
+const { queryCollection, setDocument } = require("../../utils/database");
 
 const admin = express();
 admin.disable("x-powered-by");
@@ -37,6 +37,18 @@ admin.get("/getHackers", jwtCheck, hasReadAdmin, async (req, res) => {
   } catch (err) {
     res.status(500).send({ status: 500, error: "Unable to retrieve hackers" });
     functions.logger.log(`Unable to retrieve hacker document for EVERYONE,\nError: ${err}`);
+  }
+});
+
+/**
+ * Does not take a request body
+ */
+admin.put("/checkIn/:id", jwtCheck, hasCreateAdmin, async (req, res) => {
+  try {
+    await setDocument("Hackers", req.params.id, {checkedIn: true});
+    res.status(201).send({ status: 201, message: "successful update" });
+  } catch (err) {
+    res.status(500).send({ status: 500, error: `Error occurred in checkIn ${err}`});
   }
 });
 
