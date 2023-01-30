@@ -2,6 +2,7 @@
 const config = require("firebase-functions").config();
 var jwt = require("express-jwt");
 var { expressJwtSecret } = require("jwks-rsa");
+const { queryDocument } = require("./database");
 
 const app = config.app;
 const auth0Config = config.auth;
@@ -39,6 +40,23 @@ const validKey = (req, res, next) => {
   next();
 };
 
+const checkTeamLockIn = async (req, res, next) => {
+  try {
+    const userDoc = (await queryDocument("Hackers", req.user.sub)).data();
+    if (Object.keys(userDoc.team).length === 0) {
+      return;
+    }
+    const teamDoc = (await queryDocument("Teams", userDoc.team.teamName)).data();
+    if (teamDoc.lockedIn === true) {
+      return res.status(500).send({ status: 500, error: "Team Is Locked In" });
+    }
+    next();
+    return;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
 /*
 Middleware that checks if custom API specified Auth0 permissions exist on a jwt
 Note: 
@@ -69,6 +87,7 @@ const hasReadHacker = hasPermission("read:hacker");
 module.exports = {
   jwtCheck,
   validKey,
+  checkTeamLockIn,
   hasPermission,
   hasUpdateApp,
   hasUpdateAppStatus,

@@ -1,7 +1,7 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
-const { jwtCheck, hasUpdateHacker, hasReadHacker } = require("../../utils/middleware");
+const { jwtCheck, hasUpdateHacker, hasReadHacker, checkTeamLockIn } = require("../../utils/middleware");
 const { setDocument, queryDocument, updateDocument, dbTransaction, documentRef } = require("../../utils/database");
 
 const teams = express();
@@ -52,6 +52,7 @@ teams.post("/createTeam", jwtCheck, hasUpdateHacker, async (req, res) => {
         },
       ],
       invitedMembers: [],
+      lockedIn: false,
     };
 
     await setDocument("Teams", teamName, teamDoc);
@@ -97,7 +98,7 @@ teams.put("/changeInvitationMode", jwtCheck, hasUpdateHacker, async (req, res) =
   }
 });
 
-teams.post("/inviteTeamMember", jwtCheck, hasUpdateHacker, async (req, res) => {
+teams.post("/inviteTeamMember", jwtCheck, hasUpdateHacker, checkTeamLockIn, async (req, res) => {
   try {
     const invitedMemberEmail = req.body.invitedMember;
     const userDoc = (await queryDocument("Hackers", req.user.sub)).data();
@@ -159,7 +160,7 @@ teams.post("/inviteTeamMember", jwtCheck, hasUpdateHacker, async (req, res) => {
   }
 });
 
-teams.post("/rsvpInvite", jwtCheck, hasUpdateHacker, async (req, res) => {
+teams.post("/rsvpInvite", jwtCheck, hasUpdateHacker, checkTeamLockIn, async (req, res) => {
   // Remove hacker from invitedMembers in teamDoc
   // Add hacker to team member
   // Remove team invitation from hackers doc
@@ -270,7 +271,7 @@ teams.get("/teamProfile", jwtCheck, hasReadHacker, async (req, res) => {
   }
 });
 
-teams.delete("/removeMember", jwtCheck, hasUpdateHacker, async (req, res) => {
+teams.delete("/removeMember", jwtCheck, hasUpdateHacker, checkTeamLockIn, async (req, res) => {
   try {
     const teamMemberToRemove = req.body.teamMemberToRemove;
     const userDoc = (await queryDocument("Hackers", req.user.sub)).data();
@@ -315,7 +316,7 @@ teams.delete("/removeMember", jwtCheck, hasUpdateHacker, async (req, res) => {
   }
 });
 
-teams.delete("/deleteTeam", jwtCheck, hasUpdateHacker, async (req, res) => {
+teams.delete("/deleteTeam", jwtCheck, hasUpdateHacker, checkTeamLockIn, async (req, res) => {
   try {
     await dbTransaction(async (t) => {
       try {
