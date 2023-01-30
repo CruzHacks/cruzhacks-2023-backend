@@ -1,7 +1,4 @@
 const admin = require("firebase-admin");
-const { firebaseConfig } = require("firebase-functions");
-const functions = require("firebase-functions");
-
 admin.initializeApp();
 db = admin.firestore();
 storage = admin.storage();

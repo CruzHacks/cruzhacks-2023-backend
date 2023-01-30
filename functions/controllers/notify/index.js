@@ -3,7 +3,6 @@ const express = require("express");
 const cors = require("cors");
 const { jwtCheck, hasUpdateAnnouncement } = require("../../utils/middleware");
 const { writeAnnouncement } = require("../../utils/database");
-const { nanoid } = require("nanoid");
 
 const notify = express();
 notify.disable("x-powered-by");
