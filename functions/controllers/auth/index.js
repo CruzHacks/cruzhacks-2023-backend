@@ -136,7 +136,7 @@ app.get("/metadata", jwtCheck, async (req, res) => {
     headers: { authorization: "Bearer " + token },
   };
   const user = await axios(options); // send request
-  if (user.status === 200 && user.data && user.data.user_metadata && user.data.user_metadata.theme) {
+  if (user.data && user.data.user_metadata && user.data.user_metadata.theme) {
     res.status(200).send({
       code: 200,
       message: "user metadata found",
