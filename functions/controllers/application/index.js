@@ -161,8 +161,7 @@ application.get("/checkApp", jwtCheck, async (req, res) => {
 });
 
 application.get("/applications", jwtCheck, hasReadAdmin, async (req, res) => {
-  
-    req.query.status === "pending" | "accepted" | "rejected" | "confirmed" | "waitlisted"
+  (req.query.status === "pending") | "accepted" | "rejected" | "confirmed" | "waitlisted";
 
   try {
     let applicants = undefined;
