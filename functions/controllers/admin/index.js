@@ -44,7 +44,7 @@ admin.get("/getHackers", jwtCheck, hasReadAdmin, async (req, res) => {
 /**
  * Does not take a request body
  */
-admin.put("/checkIn/:id", async (req, res) => {
+admin.put("/checkIn/:id", jwtCheck, hasUpdateHacker, async (req, res) => {
   try {
     await updateDocument("Hackers", req.params.id, { checkedIn: true });
     res.status(201).send({ status: 201, message: "successful update" });
