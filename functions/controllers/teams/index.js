@@ -1,7 +1,7 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
-const { jwtCheck, hasUpdateHacker, hasReadHacker, checkTeamLockIn } = require("../../utils/middleware");
+const { jwtCheck, hasUpdateHacker, hasReadHacker, checkTeamLockIn, isAttending } = require("../../utils/middleware");
 const { setDocument, queryDocument, updateDocument, dbTransaction, documentRef } = require("../../utils/database");
 
 const teams = express();
@@ -18,7 +18,7 @@ const corsOptions = {
 
 teams.use(cors(corsOptions));
 
-teams.post("/createTeam", jwtCheck, hasUpdateHacker, async (req, res) => {
+teams.post("/createTeam", jwtCheck, hasUpdateHacker, isAttending, async (req, res) => {
   try {
     const teamName = req.body.teamName;
     const teamLeader = req.user.sub;
@@ -143,6 +143,15 @@ teams.post("/inviteTeamMember", jwtCheck, hasUpdateHacker, checkTeamLockIn, asyn
     const reverseSearchDoc = (await queryDocument("Searches", "auth0IDSearch")).data();
     const invitedMemberAuth0ID = reverseSearchDoc.emailSearch[invitedMemberEmail];
     let newInvitedMembers = [];
+
+    const invitedMemberDoc = (await queryDocument("Hackers", invitedMemberAuth0ID)).data();
+    if (
+      invitedMemberDoc.attendanceStatus === "NOT ATTENDING" ||
+      invitedMemberDoc.attendanceStatus === "NOT CONFIRMED"
+    ) {
+      res.status(500).send({ status: 500, error: "Hacker Is Not RSVP'd" });
+      return;
+    }
 
     await dbTransaction(async (t) => {
       const invitedMemberDocRef = documentRef("Hackers", invitedMemberAuth0ID);

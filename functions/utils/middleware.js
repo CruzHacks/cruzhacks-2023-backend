@@ -57,6 +57,19 @@ const checkTeamLockIn = async (req, res, next) => {
   }
 };
 
+const isAttending = async (req, res, next) => {
+  try {
+    const userDoc = (await queryDocument("Hackers", req.user.sub)).data();
+    if (userDoc.attendanceStatus === "NOT CONFIRMED" || userDoc.attendanceStatus === "NOT ATTENDING") {
+      return res.status(500).send({ status: 500, error: "You Are Not RSVP'd" });
+    }
+    next();
+    return;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
 /*
 Middleware that checks if custom API specified Auth0 permissions exist on a jwt
 Note: 
@@ -88,6 +101,7 @@ module.exports = {
   jwtCheck,
   validKey,
   checkTeamLockIn,
+  isAttending,
   hasPermission,
   hasUpdateApp,
   hasUpdateAppStatus,
