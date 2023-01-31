@@ -1,7 +1,7 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
-const { jwtCheck, hasReadAdmin, hasUpdateHacker } = require("../../utils/middleware");
+const { jwtCheck, hasReadAdmin } = require("../../utils/middleware");
 const { queryCollection, updateDocument } = require("../../utils/database");
 
 const admin = express();
