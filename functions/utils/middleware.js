@@ -44,6 +44,7 @@ const checkTeamLockIn = async (req, res, next) => {
   try {
     const userDoc = (await queryDocument("Hackers", req.user.sub)).data();
     if (Object.keys(userDoc.team).length === 0) {
+      next();
       return;
     }
     const teamDoc = (await queryDocument("Teams", userDoc.team.teamName)).data();
