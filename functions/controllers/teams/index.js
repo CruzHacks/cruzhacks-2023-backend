@@ -184,6 +184,8 @@ teams.post("/rsvpInvite", jwtCheck, hasUpdateHacker, checkTeamLockIn, async (req
   // Add team to hackers team
 
   try {
+    console.log("here");
+
     const hackerDoc = (await queryDocument("Hackers", req.user.sub)).data();
 
     if (hackerDoc.team.teamName) {
@@ -243,6 +245,7 @@ teams.post("/rsvpInvite", jwtCheck, hasUpdateHacker, checkTeamLockIn, async (req
     if (decision === "ACCEPTED") {
       const teamDoc = (await queryDocument("Teams", teamName)).data();
       const teamData = {
+        teamName: teamName,
         teamLeader: teamDoc.teamLeader,
         members: teamDoc.members,
         invitedTeamMembers: teamDoc.invitedMembers,
@@ -256,7 +259,6 @@ teams.post("/rsvpInvite", jwtCheck, hasUpdateHacker, checkTeamLockIn, async (req
     }
   } catch (err) {
     res.status(500).send({ status: 500, message: "Could Not Accept Invitation" });
-    console.log(err);
   }
 });
 
@@ -365,7 +367,6 @@ teams.delete("/deleteTeam", jwtCheck, hasUpdateHacker, checkTeamLockIn, async (r
     res.status(500).send({ status: 500, error: "Cannot Delete Team" });
   }
 });
-
 
 teams.post("/lockTeam", jwtCheck, hasUpdateHacker, async (req, res) => {
   res.status(500).send({ status: 500, error: "Team Submission Will Be Enabled After The Event Starts" });
