@@ -60,6 +60,10 @@ const writeAnnouncement = (collection, fields) => {
   return rtdb.ref(collection).push().set(fields);
 };
 
+const collectionRef = (collection) => {
+  return db.collection(collection);
+};
+
 module.exports = {
   addDocument,
   queryDocument,
@@ -73,6 +77,7 @@ module.exports = {
   dbTransaction,
   documentRef,
   writeAnnouncement,
+  collectionRef,
   admin,
   db,
   rtdb,

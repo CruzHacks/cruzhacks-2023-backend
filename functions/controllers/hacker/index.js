@@ -194,30 +194,6 @@ hacker.get("/exportHackers", jwtCheck, hasReadAdmin, async (req, res) => {
   }
 });
 
-hacker.get("/exportHackers", jwtCheck, hasReadAdmin, async (req, res) => {
-  try {
-    const hackersRef = collectionRef("Hackers");
-    const RSVPHackers = await hackersRef.where("attendanceStatus", "==", "CONFIRMED").get();
-    if (RSVPHackers.empty) {
-      res.status(500).send({ status: 500, error: "No Hackers Are RSVP'd" });
-      return;
-    }
-    let RSVPHackersCSV = "Email,First Name,Last Name\n";
-    RSVPHackers.forEach((docRef) => {
-      const doc = docRef.data();
-      RSVPHackersCSV += `${doc.email},${doc.firstName},${doc.lastName}\n`;
-    });
-    const uploadedFileName = "/exportedhackers-" + nanoid(5) + ".csv";
-    fs.writeFileSync(os.tmpdir() + uploadedFileName, RSVPHackersCSV, "utf-8");
-
-    await storage.bucket(bucket).upload(os.tmpdir() + uploadedFileName);
-    res.status(200).send({ status: 200, message: `Exported To ${uploadedFileName}` });
-  } catch (err) {
-    functions.logger.error(err);
-    res.status(500).send({ status: 500, error: "Error fetching RSVP'd Hackers" });
-  }
-});
-
 const service = functions.https.onRequest(hacker);
 
 module.exports = { hacker, service };
