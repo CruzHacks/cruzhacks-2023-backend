@@ -2,6 +2,7 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 db = admin.firestore();
 storage = admin.storage();
+rtdb = admin.database();
 
 const addDocument = (collection, document) => {
   return db.collection(collection).add(document);
@@ -55,8 +56,8 @@ const documentRef = (collection, id) => {
   return db.collection(collection).doc(id);
 };
 
-const collectionRef = (collection) => {
-  return db.collection(collection);
+const writeAnnouncement = (collection, fields) => {
+  return rtdb.ref(collection).push().set(fields);
 };
 
 module.exports = {
@@ -71,8 +72,9 @@ module.exports = {
   docTransaction,
   dbTransaction,
   documentRef,
-  collectionRef,
+  writeAnnouncement,
   admin,
   db,
+  rtdb,
   storage,
 };
