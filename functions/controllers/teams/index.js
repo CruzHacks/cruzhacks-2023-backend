@@ -366,6 +366,7 @@ teams.delete("/deleteTeam", jwtCheck, hasUpdateHacker, checkTeamLockIn, async (r
   }
 });
 
+
 teams.post("/lockTeam", jwtCheck, hasUpdateHacker, async (req, res) => {
   res.status(500).send({ status: 500, error: "Team Submission Will Be Enabled After The Event Starts" });
 });
