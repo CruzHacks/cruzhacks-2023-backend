@@ -5,7 +5,6 @@ module.exports = {
   plugins: ["promise", "prettier", "jest"],
   extends: ["eslint:recommended", "plugin:prettier/recommended"],
   rules: {
-    "prettier/prettier": ["error", { endOfLine: "auto" }],
     "no-unused-vars": [
       "error",
       {
