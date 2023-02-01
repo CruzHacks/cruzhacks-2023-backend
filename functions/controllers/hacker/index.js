@@ -160,7 +160,7 @@ hacker.get("/hackerProfile", jwtCheck, hasReadHacker, async (req, res) => {
     res.status(200).send({ status: 200, hackerProfile: profileFields });
   } catch (err) {
     functions.logger.log(`Could not fetch profile for ${req.user.sub},\nError: ${err}`);
-    res.status(500).send({ status: 500, error: "Could not fetch hacker profile", err: err });
+    res.status(500).send({ status: 500, error: "Could not fetch hacker profile" });
   }
 });
 
