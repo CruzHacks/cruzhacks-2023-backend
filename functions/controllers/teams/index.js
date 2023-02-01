@@ -23,13 +23,12 @@ teams.post("/createTeam", jwtCheck, hasUpdateHacker, isAttending, async (req, re
     const teamName = req.body.teamName;
     const teamLeader = req.user.sub;
     const teamLeaderName = req.body.teamLeaderName;
-    const checkNameDoc = await queryDocument("Teams", teamName);
 
-    if (teamName.length > 25) {
+    if (teamName.length > 25 || teamName.length < 2) {
       res.status(500).send({ status: 500, error: "Invalid Input Size" });
       return;
     }
-
+    const checkNameDoc = await queryDocument("Teams", teamName);
     const userDoc = (await queryDocument("Hackers", req.user.sub)).data();
     if (userDoc.invitationMode !== "CREATE") {
       res.status(500).send({ status: 500, error: "Invalid Invitation Mode" });
@@ -78,8 +77,7 @@ teams.post("/createTeam", jwtCheck, hasUpdateHacker, isAttending, async (req, re
       message: "Team Created",
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).send({ status: 500, message: "Could Not Create Team" });
+    res.status(500).send({ status: 500, error: "Could Not Create Team" });
   }
 });
 
@@ -367,6 +365,7 @@ teams.delete("/deleteTeam", jwtCheck, hasUpdateHacker, checkTeamLockIn, async (r
     res.status(500).send({ status: 500, error: "Cannot Delete Team" });
   }
 });
+
 
 teams.post("/lockTeam", jwtCheck, hasUpdateHacker, async (req, res) => {
   res.status(500).send({ status: 500, error: "Team Submission Will Be Enabled After The Event Starts" });
