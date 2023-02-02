@@ -49,7 +49,8 @@ admin.put("/checkIn/:id", jwtCheck, hasReadAdmin, async (req, res) => {
     await updateDocument("Hackers", req.params.id, { checkedIn: true });
     res.status(201).send({ status: 201, message: "successful update" });
   } catch (err) {
-    res.status(500).send({ status: 500, error: `Error occurred in checkIn ${err}` });
+    functions.logger.error(`${err}`);
+    res.status(500).send({ status: 500, error: `Error occurred in check in` });
   }
 });
 
