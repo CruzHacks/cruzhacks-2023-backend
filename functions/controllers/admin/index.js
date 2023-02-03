@@ -1,8 +1,8 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
-const { jwtCheck, hasReadAdmin } = require("../../utils/middleware");
-const { queryCollection, queryDocument, updateDocument } = require("../../utils/database");
+const { jwtCheck, hasReadAdmin, hasCreateAdmin } = require("../../utils/middleware");
+const { queryCollection, queryDocument, documentRef, dbTransaction } = require("../../utils/database");
 
 const admin = express();
 admin.disable("x-powered-by");
@@ -71,12 +71,30 @@ admin.get("/getHacker/:id", jwtCheck, hasReadAdmin, async (req, res) => {
 /**
  * Does not take a request body
  */
-admin.put("/checkIn/:id", jwtCheck, hasReadAdmin, async (req, res) => {
+admin.put("/checkIn/:id", jwtCheck, hasCreateAdmin, async (req, res) => {
   try {
-    await updateDocument("Hackers", req.params.id, { checkedIn: true });
-    res.status(201).send({ status: 201, message: "successful update" });
+    let name = "";
+    await dbTransaction(async (t) => {
+      try {
+        const docRef = documentRef("Hackers", req.params.id);
+        const hackerDoc = (await docRef.get()).data();
+        name = `${hackerDoc.firstName} ${hackerDoc.lastName}`;
+        const attendanceStatus = hackerDoc.attendanceStatus;
+        if (attendanceStatus !== "CONFIRMED") {
+          throw new Error("Hacker Is Not RSVP'd");
+        }
+        t.update(docRef, { checkedIn: true });
+      } catch (err) {
+        throw new Error(err.message);
+      }
+    });
+    res.status(201).send({ status: 201, message: `Checked In ${name}` });
   } catch (err) {
-    functions.logger.error(`${err}`);
+    if (err.message === "Hacker Is Not RSVP'd") {
+      res.status(500).send({ status: 500, error: "Hacker Is Not RSVP'd" });
+      return;
+    }
+    functions.logger.error(err);
     res.status(500).send({ status: 500, error: `Error occurred in check in` });
   }
 });
