@@ -103,10 +103,10 @@ admin.put("/checkIn/:id", jwtCheck, hasCreateAdmin, async (req, res) => {
 admin.put("/RSVPHacker", jwtCheck, hasCreateAdmin, async (req, res) => {
   try {
     updateDocument("Hackers", req.body.hackerID, { attendanceStatus: "CONFIRMED" });
-    res.status(200).send({ status: 201, message: `Updated` });
+    res.status(200).send({ status: 200, message: `RSVP'd ${req.body.hackerID}` });
   } catch (err) {
     functions.logger.error(err);
-    res.status(500).send({ status: 500, error: `Error occurred in check in` });
+    res.status(500).send({ status: 500, error: `Error occurred in RSVP  ` });
   }
 });
 
