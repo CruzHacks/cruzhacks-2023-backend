@@ -24,13 +24,17 @@ admin.get("/getHackers", jwtCheck, hasReadAdmin, async (req, res) => {
     const hackerDocs = [];
     hackers.forEach((doc) => {
       data = doc.data();
+      let checkIn = data.checkedIn;
+      if (checkIn === undefined) {
+        checkIn = false;
+      }
       hackerDocs.push({
         id: doc.id,
         email: data.email,
         firstName: data.firstName,
         lastName: data.lastName,
         attendanceStatus: data.attendanceStatus,
-        checkedIn: data.checkedIn,
+        checkedIn: checkIn,
       });
     });
 
