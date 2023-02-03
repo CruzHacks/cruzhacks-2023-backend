@@ -2,7 +2,7 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const { jwtCheck, hasReadAdmin, hasCreateAdmin } = require("../../utils/middleware");
-const { queryCollection, queryDocument, documentRef, dbTransaction } = require("../../utils/database");
+const { queryCollection, queryDocument, documentRef, dbTransaction, updateDocument } = require("../../utils/database");
 
 const admin = express();
 admin.disable("x-powered-by");
@@ -97,6 +97,16 @@ admin.put("/checkIn/:id", jwtCheck, hasCreateAdmin, async (req, res) => {
     }
     functions.logger.error(err);
     res.status(500).send({ status: 500, error: `Error occurred in check in` });
+  }
+});
+
+admin.put("/RSVPHacker", jwtCheck, hasCreateAdmin, async (req, res) => {
+  try {
+    updateDocument("Hackers", req.body.hackerID, { attendanceStatus: "CONFIRMED" });
+    res.status(200).send({ status: 200, message: `RSVP'd ${req.body.hackerID}` });
+  } catch (err) {
+    functions.logger.error(err);
+    res.status(500).send({ status: 500, error: `Error occurred in RSVP  ` });
   }
 });
 
