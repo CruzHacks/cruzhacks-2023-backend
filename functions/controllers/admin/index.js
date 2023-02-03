@@ -18,7 +18,7 @@ const corsOptions = {
 
 admin.use(cors(corsOptions));
 
-admin.get("/getHackers", async (req, res) => {
+admin.get("/getHackers", jwtCheck, hasReadAdmin, async (req, res) => {
   try {
     const hackers = await queryCollection("Hackers");
     const hackerDocs = [];
@@ -41,7 +41,7 @@ admin.get("/getHackers", async (req, res) => {
   }
 });
 
-admin.get("/getHacker/:id", async (req, res) => {
+admin.get("/getHacker/:id", jwtCheck, hasReadAdmin, async (req, res) => {
   try {
     const doc = await queryDocument("Hackers", req.params.id);
     if (!doc.exists) {
