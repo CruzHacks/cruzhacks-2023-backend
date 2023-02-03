@@ -18,12 +18,16 @@ const corsOptions = {
 
 admin.use(cors(corsOptions));
 
-admin.get("/getHackers", async (req, res) => {
+admin.get("/getHackers", jwtCheck, hasReadAdmin, async (req, res) => {
   try {
     const hackers = await queryCollection("Hackers");
     const hackerDocs = [];
     hackers.forEach((doc) => {
       data = doc.data();
+      let checkIn = data.checkedIn;
+      if (checkIn === undefined) {
+        checkIn = false;
+      }
       hackerDocs.push({
         id: doc.id,
         email: data.email,
@@ -41,7 +45,7 @@ admin.get("/getHackers", async (req, res) => {
   }
 });
 
-admin.get("/getHacker/:id", async (req, res) => {
+admin.get("/getHacker/:id", jwtCheck, hasReadAdmin, async (req, res) => {
   try {
     const doc = await queryDocument("Hackers", req.params.id);
     if (!doc.exists) {
@@ -55,6 +59,7 @@ admin.get("/getHacker/:id", async (req, res) => {
       id: doc.id,
       firstName: data.firstName,
       lastName: data.lastName,
+      email: data.email,
     };
 
     res.status(200).send({ status: 200, hacker: hackerFields });
