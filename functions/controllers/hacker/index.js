@@ -102,6 +102,7 @@ hacker.post("/bulkCreateHackers", jwtCheck, hasCreateAdmin, async (req, res) => 
         usedCodes: {},
         team: {},
         invitations: Array(),
+        completedActivities: {},
       };
 
       await setDocument("Hackers", user.auth0ID, hackerProfile);

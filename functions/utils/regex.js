@@ -18,10 +18,15 @@ const emailRegex = (email) => {
   return !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(email);
 };
 
+const cruzPointsActivityTypeRegex = (activityType) => {
+  return activityType.match(/HackathonWorkshops|Game/);
+};
+
 module.exports = {
   phoneRegex,
   alphanumericPunctuationRegex,
   alphanumericRegex,
   alphanumericPunctuationRegexWithNewLine,
+  cruzPointsActivityTypeRegex,
   emailRegex,
 };
