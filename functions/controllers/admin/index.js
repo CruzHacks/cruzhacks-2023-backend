@@ -59,6 +59,7 @@ admin.get("/getHacker/:id", jwtCheck, hasReadAdmin, async (req, res) => {
       id: doc.id,
       firstName: data.firstName,
       lastName: data.lastName,
+      email: data.email,
     };
 
     res.status(200).send({ status: 200, hacker: hackerFields });
