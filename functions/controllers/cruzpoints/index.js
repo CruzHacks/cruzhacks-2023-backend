@@ -4,6 +4,7 @@ const cors = require("cors");
 const { jwtCheck, hasCreateAdmin, hasUpdateHacker } = require("../../utils/middleware");
 const { setDocument, queryDocument, docTransaction } = require("../../utils/database");
 const { customAlphabet } = require("nanoid");
+const { cruzPointsActivityTypeRegex } = require("../../utils/regex");
 
 const nanoid = customAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789");
 
@@ -24,14 +25,29 @@ cruzpoints.use(cors(corsOptions));
 cruzpoints.post("/createActivity", jwtCheck, hasCreateAdmin, async (req, res) => {
   try {
     const code = nanoid(7);
+    const availabilityTime = new Date(req.body.availabilityTime + "-08:00");
+    const expirationTime = new Date(req.body.expirationTime + "-08:00");
+
     if (!req.body.points || !req.body.activity || typeof req.body.points !== "number") {
       res.status(400).send({ status: 400, error: "Invalid Body Type" });
+      return;
+    }
+
+    if (cruzPointsActivityTypeRegex(req.body.activityType)) {
+      res.status(400).send({ status: 400, error: "Invalid Activity Type" });
+    }
+
+    if (availabilityTime > expirationTime) {
+      res.status(400).send({ status: 400, error: "Availability Time Must Come Before Expiration Time" });
       return;
     }
 
     const activityDocument = {
       activity: req.body.activity,
       points: req.body.points,
+      availabilityTime: availabilityTime,
+      expirationTime: expirationTime,
+      activityType: req.body.activityType,
     };
 
     await setDocument("CruzPoints", code, activityDocument);
@@ -45,31 +61,61 @@ cruzpoints.post("/createActivity", jwtCheck, hasCreateAdmin, async (req, res) =>
 cruzpoints.post("/submitCode", jwtCheck, hasUpdateHacker, async (req, res) => {
   try {
     const code = req.body.code;
-    const activity = await queryDocument("CruzPoints", code);
+    const activityRef = await queryDocument("CruzPoints", code);
 
-    if (activity.exists) {
-      const doc = (await queryDocument("Hackers", req.user.sub)).data();
-      if (doc.usedCodes[code] === true) {
-        res.status(500).send({ status: 500, error: "Code Used" });
-        functions.logger.log(`Code Used for ${req.user.sub}`);
-        return;
-      }
-
-      let newPoints = 0;
-
-      await docTransaction("Hackers", req.user.sub, async (t, docRef) => {
-        const hackerDoc = (await docRef.get()).data();
-        newPoints = hackerDoc.cruzPoints + activity.data().points;
-        const newUsedCodes = { ...hackerDoc.usedCodes, [code]: true };
-        t.update(docRef, { cruzPoints: newPoints, usedCodes: newUsedCodes });
-      });
-
-      res.status(200).send({ status: 200, updatedPoints: newPoints });
-      functions.logger.log(`CruzPoints Updated for ${req.user.sub}`);
-    } else {
+    if (!activityRef.exists) {
       res.status(500).send({ status: 500, error: "Activity Does Not Exist" });
       functions.logger.log(`Activity ${code} does not exist`);
+      return;
     }
+
+    const activity = activityRef.data();
+
+    const currDate = new Date();
+    if (currDate < activity.availabilityTime.toDate() || currDate > activity.expirationTime.toDate()) {
+      res.status(500).send({ status: 500, error: "Invalid Code" });
+      return;
+    }
+
+    const doc = (await queryDocument("Hackers", req.user.sub)).data();
+    if (doc.usedCodes[code] === true) {
+      res.status(500).send({ status: 500, error: "Code Used" });
+      functions.logger.log(`Code Used for ${req.user.sub}`);
+      return;
+    }
+
+    let newPoints = 0;
+
+    await docTransaction("Hackers", req.user.sub, async (t, docRef) => {
+      const hackerDoc = (await docRef.get()).data();
+      const activityType = activity.activityType;
+      let activityTypeCount = 0;
+      let completedActivities = {};
+      if (hackerDoc.completedActivities && hackerDoc.completedActivities[activityType]) {
+        completedActivities = hackerDoc.completedActivities;
+        activityTypeCount = hackerDoc.completedActivities[activityType];
+      }
+
+      switch (activityType) {
+        case "HackathonWorkshops":
+          newPoints = hackerDoc.cruzPoints + activity.points + 50 * activityTypeCount;
+          break;
+        default:
+          newPoints = hackerDoc.cruzPoints + activity.points;
+          break;
+      }
+
+      const newUsedCodes = { ...hackerDoc.usedCodes, [code]: true };
+
+      t.update(docRef, {
+        cruzPoints: newPoints,
+        usedCodes: newUsedCodes,
+        completedActivities: { ...completedActivities, [activityType]: activityTypeCount + 1 },
+      });
+    });
+
+    res.status(200).send({ status: 200, updatedPoints: newPoints });
+    functions.logger.log(`CruzPoints Updated for ${req.user.sub}`);
   } catch (err) {
     functions.logger.log(`Could Not Update CruzPoints for ${req.user.sub},\nError: ${err}`);
     res.status(500).send({ status: 500 });
