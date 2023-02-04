@@ -33,7 +33,7 @@ cruzpoints.post("/createActivity", jwtCheck, hasCreateAdmin, async (req, res) =>
       return;
     }
 
-    if (cruzPointsActivityTypeRegex(req.body.activityType)) {
+    if (!cruzPointsActivityTypeRegex(req.body.activityType)) {
       res.status(400).send({ status: 400, error: "Invalid Activity Type" });
     }
 
