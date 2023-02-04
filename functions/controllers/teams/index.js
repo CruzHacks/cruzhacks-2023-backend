@@ -269,10 +269,12 @@ teams.get("/teamProfile", jwtCheck, hasReadHacker, async (req, res) => {
     const teamLeader = userDoc.team.teamLeader;
     let members = [];
     let invitedMembers = [];
+    let lockedIn = false;
     if (teamName) {
       const teamDoc = (await queryDocument("Teams", teamName)).data();
       members = teamDoc.members;
       invitedMembers = teamDoc.invitedMembers;
+      lockedIn = teamDoc.lockedIn;
     }
 
     const teamProfile = {
@@ -282,6 +284,7 @@ teams.get("/teamProfile", jwtCheck, hasReadHacker, async (req, res) => {
       invitedMembers: invitedMembers,
       invitationMode: userDoc.invitationMode,
       invitations: userDoc.invitations,
+      lockedIn: lockedIn,
     };
     res.status(200).send({ status: 200, ...teamProfile });
   } catch (err) {
@@ -369,7 +372,22 @@ teams.delete("/deleteTeam", jwtCheck, hasUpdateHacker, checkTeamLockIn, async (r
 });
 
 teams.post("/lockTeam", jwtCheck, hasUpdateHacker, async (req, res) => {
-  res.status(500).send({ status: 500, error: "Team Submission Will Be Enabled After The Event Starts" });
+  try {
+    const teamName = req.body.teamName;
+    const teamDoc = (await queryDocument("Teams", teamName)).data();
+    console.log(teamDoc.teamLeader);
+    console.log(req.user.sub);
+    if (req.user.sub !== teamDoc.teamLeader) {
+      res.status(500).send({ status: 500, error: "Only The Team Leader Can Lock In Teams" });
+      return;
+    }
+    await updateDocument("Teams", teamName, { lockedIn: true });
+    res.status(200).send({ status: 200, message: "Team Is Locked In", lockedIn: true });
+  } catch (err) {
+    functions.logger.error(err);
+    res.status(500).send({ status: 500, error: "Could Not Lock In" });
+    return;
+  }
 });
 
 const service = functions.https.onRequest(teams);
