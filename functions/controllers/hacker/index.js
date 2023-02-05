@@ -198,15 +198,15 @@ hacker.get("/exportHackers", jwtCheck, hasReadAdmin, async (req, res) => {
 hacker.get("/exportHackersCheckedIn", jwtCheck, hasReadAdmin, async (req, res) => {
   try {
     const hackersRef = collectionRef("Hackers");
-    const checkedInHackers = await hackersRef.where("checkedIn", "==", true).get();
+    const checkedInHackers = await hackersRef.get();
     if (checkedInHackers.empty) {
-      res.status(500).send({ status: 500, error: "No Hackers Are RSVP'd" });
+      res.status(500).send({ status: 500, error: "No Hackers Are Checked In" });
       return;
     }
     let checkedInCSV = "Email,First Name,Last Name\n";
     checkedInHackers.forEach((docRef) => {
       const doc = docRef.data();
-      checkedInCSV += `${doc.email},${doc.firstName},${doc.lastName}\n`;
+      checkedInCSV += `${doc.email},${doc.firstName},${doc.lastName},${doc.checkedIn}\n`;
     });
     const uploadedFileName = "/exportedhackers-" + nanoid(5) + ".csv";
     fs.writeFileSync(os.tmpdir() + uploadedFileName, checkedInCSV, "utf-8");
