@@ -203,10 +203,10 @@ hacker.get("/exportHackersCheckedIn", jwtCheck, hasReadAdmin, async (req, res) =
       res.status(500).send({ status: 500, error: "No Hackers Are Checked In" });
       return;
     }
-    let checkedInCSV = "Email,First Name,Last Name\n";
+    let checkedInCSV = "Email,First Name,Last Name,Checked In\n";
     checkedInHackers.forEach((docRef) => {
       const doc = docRef.data();
-      checkedInCSV += `${doc.email},${doc.firstName},${doc.lastName}\n`;
+      checkedInCSV += `${doc.email},${doc.firstName},${doc.lastName},${doc.checkedIn}\n`;
     });
     const uploadedFileName = "/exportedhackers-" + nanoid(5) + ".csv";
     fs.writeFileSync(os.tmpdir() + uploadedFileName, checkedInCSV, "utf-8");
