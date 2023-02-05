@@ -206,7 +206,7 @@ hacker.get("/exportHackersCheckedIn", jwtCheck, hasReadAdmin, async (req, res) =
     let checkedInCSV = "Email,First Name,Last Name,Checked In\n";
     checkedInHackers.forEach((docRef) => {
       const doc = docRef.data();
-      checkedInCSV += `${doc.email},${doc.firstName},${doc.lastName}\n`;
+      checkedInCSV += `${doc.email},${doc.firstName},${doc.lastName},${doc.checkedIn}\n`;
     });
     const uploadedFileName = "/exportedhackers-" + nanoid(5) + ".csv";
     fs.writeFileSync(os.tmpdir() + uploadedFileName, checkedInCSV, "utf-8");
