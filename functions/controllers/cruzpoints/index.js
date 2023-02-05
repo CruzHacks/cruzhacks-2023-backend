@@ -1,8 +1,8 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
-const { jwtCheck, hasCreateAdmin, hasUpdateHacker } = require("../../utils/middleware");
-const { setDocument, queryDocument, docTransaction } = require("../../utils/database");
+const { jwtCheck, hasCreateAdmin, hasUpdateHacker, hasReadHacker } = require("../../utils/middleware");
+const { setDocument, queryDocument, docTransaction, queryCollectionSorted } = require("../../utils/database");
 const { customAlphabet } = require("nanoid");
 const { cruzPointsActivityTypeRegex } = require("../../utils/regex");
 
@@ -122,6 +122,47 @@ cruzpoints.post("/submitCode", jwtCheck, hasUpdateHacker, async (req, res) => {
   }
 });
 
-const service = functions.https.onRequest(cruzpoints);
+cruzpoints.post("/updateLeaderBoard", jwtCheck, hasCreateAdmin, async (_req, res) => {
+  try {
+    await updateCruzPointsLeaderBoard();
+    res.status(200).send({ status: 200, message: "Updated Leaderboard" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ status: 500 });
+  }
+});
 
-module.exports = { cruzpoints, service };
+cruzpoints.get("/leaderboard", jwtCheck, hasReadHacker, async (req, res) => {
+  try {
+    const leaderboardDoc = (await queryDocument("CruzPoints", "Leaderboard")).data();
+    res.status(200).send({ status: 200, leaderboard: leaderboardDoc.leaderboard });
+  } catch (err) {
+    res.status(500).send({ status: 500 });
+  }
+});
+const updateCruzPointsLeaderBoard = async () => {
+  try {
+    const topCruzPointsers = await queryCollectionSorted("Hackers", "cruzPoints", 20);
+    let cruzPointsLeaderBoard = [];
+    let position = 1;
+    topCruzPointsers.forEach((e) => {
+      const element = e.data();
+      cruzPointsLeaderBoard.push({
+        id: element.email || "",
+        position: position,
+        name: `${element.firstName} ${element.lastName}`,
+        points: element.cruzPoints,
+      });
+      position++;
+    });
+    await setDocument("CruzPoints", "Leaderboard", { leaderboard: cruzPointsLeaderBoard }, true);
+  } catch (err) {
+    functions.logger.error(err);
+  }
+};
+
+const service = functions.https.onRequest(cruzpoints);
+const cruzPointsCronJob = functions.pubsub
+  .schedule("every 10 minutes")
+  .onRun((_context) => updateCruzPointsLeaderBoard());
+module.exports = { cruzpoints, service, cruzPointsCronJob };

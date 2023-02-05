@@ -38,6 +38,7 @@ if (!function_name || function_name === "admin") {
 
 if (!function_name || function_name === "cruzpoints") {
   exports.cruzpoints = require("./controllers/cruzpoints/index").service;
+  exports.cruzpointsCronJob = require("./controllers/cruzpoints/index").cruzPointsCronJob;
 }
 
 if (!function_name || function_name === "teams") {
