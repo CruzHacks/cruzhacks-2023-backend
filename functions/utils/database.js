@@ -1,8 +1,8 @@
 const admin = require("firebase-admin");
 admin.initializeApp();
-db = admin.firestore();
-storage = admin.storage();
-rtdb = admin.database();
+const db = admin.firestore();
+const storage = admin.storage();
+const rtdb = admin.database();
 
 const addDocument = (collection, document) => {
   return db.collection(collection).add(document);
