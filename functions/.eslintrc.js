@@ -2,8 +2,8 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2018,
   },
-  plugins: ["promise", "prettier", "jest"],
-  extends: ["eslint:recommended", "plugin:prettier/recommended"],
+  plugins: ["promise", "jest"],
+  extends: ["eslint:recommended", "eslint-config-prettier"],
   rules: {
     "no-unused-vars": [
       "error",
