@@ -1,5 +1,11 @@
 const admin = require("firebase-admin");
-admin.initializeApp();
+var serviceAccount = require("../../serviceAccountKey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://cruzhacks-2024-developme-d58c3-default-rtdb.firebaseio.com",
+});
+
 const db = admin.firestore();
 const storage = admin.storage();
 const rtdb = admin.database();
