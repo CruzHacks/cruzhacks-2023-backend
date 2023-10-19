@@ -3,6 +3,7 @@
   "description": "Firebase functions for CruzHacks 2022 main site",
   "scripts": {
     "lint": "eslint . --max-warnings=0",
+    "build": "yarn lint && tsc",
     "serve": "firebase emulators:start",
     "shell": "firebase functions:shell",
     "start": "yarn run shell",
@@ -15,10 +16,16 @@
   "engines": {
     "node": "16"
   },
-  "main": "index.js",
+  "main": "lib/index.js",
   "dependencies": {
     "@firebase/database-compat": "0.3.4",
     "@firebase/testing": "^0.20.11",
+    "@types/axios": "^0.14.0",
+    "@types/cors": "^2.8.15",
+    "@types/express": "^4.17.20",
+    "@types/express-jwt": "^7.4.2",
+    "@typescript-eslint/eslint-plugin": "^6.8.0",
+    "@typescript-eslint/parser": "^6.8.0",
     "axios": "^1.5.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
