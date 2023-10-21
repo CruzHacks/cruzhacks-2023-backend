@@ -1,4 +1,6 @@
-const admin = require("firebase-admin");
+import * as admin from "firebase-admin";
+import { Transaction } from "firebase-admin/firestore";
+
 var serviceAccount = require("../../serviceAccountKey.json");
 
 admin.initializeApp({
@@ -10,67 +12,67 @@ const db = admin.firestore();
 const storage = admin.storage();
 const rtdb = admin.database();
 
-const addDocument = (collection, document) => {
+const addDocument = (collection: string, document: any) => {
   return db.collection(collection).add(document);
 };
 
-const queryDocument = (collection, id) => {
+const queryDocument = (collection: string, id: string) => {
   return db.collection(collection).doc(id).get();
 };
 
-const setDocument = (collection, id, fields, merge = false) => {
+const setDocument = (collection: string, id: string, fields: Object, merge = false) => {
   return db.collection(collection).doc(id).set(fields, { merge: merge });
 };
 
-const updateDocument = (collection, id, fields) => {
+const updateDocument = (collection: string, id: string, fields: object) => {
   return db.collection(collection).doc(id).update(fields);
 };
 
-const queryCollection = (collection) => {
+const queryCollection = (collection: string) => {
   return db.collection(collection).get();
 };
 
-const queryCollectionSorted = (collection, opt, limit) => {
+const queryCollectionSorted = (collection: string, opt: string, limit: number) => {
   // returns sorted in ascending order
   // opt must be a string and it must be a doc field
   return db.collection(collection).orderBy(opt, "desc").limit(limit).get();
 };
 
-const deleteDocument = (collection, id) => {
+const deleteDocument = (collection: string, id: string) => {
   return db.collection(collection).doc(id).delete();
 };
 
-const uploadFile = (bucketName, filename, file) => {
+const uploadFile = (bucketName: string, filename: string, file: any) => {
   const bucket = storage.bucket(bucketName);
   return bucket.upload(file.path, {
     destination: filename,
   });
 };
 
-const docTransaction = async (collection, id, updateFunction) => {
+const docTransaction = async (collection: string, id: string, updateFunction: Function) => {
   await db.runTransaction(async (t) => {
     const docRef = db.collection(collection).doc(id);
     await updateFunction(t, docRef);
   });
 };
 
-const dbTransaction = async (updateFunction) => {
+const dbTransaction = async (updateFunction: (transaction: Transaction) => Promise<unknown>) => {
   await db.runTransaction(updateFunction);
 };
 
-const documentRef = (collection, id) => {
+const documentRef = (collection: string, id: string) => {
   return db.collection(collection).doc(id);
 };
 
-const writeAnnouncement = (collection, fields) => {
+const writeAnnouncement = (collection: string, fields: object) => {
   return rtdb.ref(collection).push().set(fields);
 };
 
-const collectionRef = (collection) => {
+const collectionRef = (collection: string) => {
   return db.collection(collection);
 };
 
-module.exports = {
+export {
   addDocument,
   queryDocument,
   setDocument,
