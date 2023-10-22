@@ -149,7 +149,8 @@ hacker.put("/setAttendanceStatus", jwtCheck, hasUpdateHacker, async (req, res) =
   }
 });
 
-hacker.get("/hackerProfile", jwtCheck, hasReadHacker, async (req, res) => {
+// hacker.get("/hackerProfile", jwtCheck, hasReadHacker, async (req, res) => {
+hacker.get("/hackerProfile", hasReadHacker, async (req, res) => {
   try {
     const docGet = await queryDocument("Hackers", req.user.sub);
     if (!docGet.exists) {
