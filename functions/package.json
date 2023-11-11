@@ -19,7 +19,7 @@
     "@firebase/database-compat": "0.3.4",
     "@firebase/testing": "^0.20.11",
     "@mailchimp/mailchimp_marketing": "^3.0.80",
-    "axios": "^1.5.1",
+    "axios": "^1.6.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-jwt": "^6.0.0",
